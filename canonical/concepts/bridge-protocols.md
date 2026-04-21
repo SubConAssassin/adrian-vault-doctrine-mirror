@@ -2,12 +2,12 @@
 title: Cross-Model Bridge Protocols
 type: canonical-doctrine
 status: active
-version: 1.2
+version: 1.3
 last_updated: 2026-04-21
 last_verified: 2026-04-21
 authored_by: claude (via claude.ai, Opus 4.7)
-ratified_by: claude + chatgpt mirror-read verified 2026-04-21
-supersedes: v1.1 (added blob-URL compatibility note in §10, updated §7 status vocabulary note)
+ratified_by: claude + chatgpt live-bridge-test round-trip 2026-04-21 (tests #1 + #2 PASS)
+supersedes: v1.2 (added subfolder-tool-limitation finding in §10; added two-tests-passed ratification evidence)
 related:
   - canonical/concepts/four-room-stack-architecture.md
   - canonical/concepts/mcp-connector-taxonomy.md
@@ -152,6 +152,20 @@ Subfolders (to be created by Antigravity commission):
 
 **Rule:** nothing at root of `ChatGPT-Bridge/` except an index/README. Root drops produce retrieval noise and break audit trail.
 
+### Subfolder targeting: tool-capability constraint (added v1.3)
+
+Not all agents' Drive write tools expose a `parentId` argument. As of 2026-04-21:
+- **Claude's Drive MCP:** supports `parentId` — can write directly to subfolders. **No excuse for Claude to drop at root.**
+- **ChatGPT's Drive write tool:** does **not** expose a parent-folder argument. Writes land at Drive root. This is a tool limitation, not a discipline failure — do not flag it as such.
+
+**Implication:** root-drops from ChatGPT are expected until one of the following is true:
+1. ChatGPT gets an upgraded Drive MCP with `parentId` support, OR
+2. A downstream mover (Claude session, Antigravity, or dedicated daemon) periodically sweeps `ChatGPT-Bridge/` root and relocates root-level files into `chatgpt-to-claude/`.
+
+Until then, `chatgpt-to-claude/` will be populated by post-hoc mover action rather than direct ChatGPT writes. Audit trail integrity is preserved either way — the files just take a brief detour through root before landing in their canonical location.
+
+**Move-capability gap (known):** Neither Claude's Drive MCP nor ChatGPT's has a file-move operation. Implementing option 2 above requires either Google Drive for Desktop (local filesystem moves sync back to cloud) or direct Drive API access via curl + OAuth token. This is an open infrastructure item.
+
 ## 11. Division of labour
 
 | Role | Function |
@@ -178,3 +192,4 @@ Until either fires, courier is sufficient.
 | 2026-04-21 | Initial doctrine ratified via Claude ↔ ChatGPT round-trip | canaries "indigo pelican" (CtoGP) + "silver kingfisher/amber octopus" (infra test) |
 | 2026-04-21 | v1.1: mirror repo flipped from private to public; §3 updated with repo URL and rationale | Adrian (chat directive) |
 | 2026-04-21 | v1.2: ChatGPT end-to-end mirror read verified; §3 updated with blob-URL-vs-raw-URL finding (raw URLs rejected by ChatGPT's GitHub tool; blob URLs work universally) | ChatGPT (CHATGPT-MIRROR-CONFIRM-2026-04-21-01) |
+| 2026-04-21 | v1.3: live-bridge-test #1 (bridge-protocols.md) and #2 (frictionless-operator-doctrine.md) both PASS end-to-end; §10 updated with subfolder-tool-limitation finding — ChatGPT's Drive write tool cannot target subfolders, is not a discipline failure | ChatGPT (CHATGPT-LIVE-BRIDGE-TEST-2026-04-21-02) |
