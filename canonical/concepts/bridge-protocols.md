@@ -2,12 +2,12 @@
 title: Cross-Model Bridge Protocols
 type: canonical-doctrine
 status: active
-version: 1.0
+version: 1.1
 last_updated: 2026-04-21
 last_verified: 2026-04-21
 authored_by: claude (via claude.ai, Opus 4.7)
 ratified_by: claude + chatgpt round-trip 2026-04-21 (canary "indigo pelican")
-supersedes: none
+supersedes: v1.0 (added public-repo clause in §3)
 related:
   - canonical/concepts/four-room-stack-architecture.md
   - canonical/concepts/mcp-connector-taxonomy.md
@@ -41,8 +41,9 @@ This document governs **courier channels** between LLM instances that do not sha
 
 ## 3. Canonical access model
 
-**Option A, ratified.** The vault remains the single canonical source of truth. A one-way mirror publishes selected doctrine to GitHub so external LLMs can read it directly without waiting for Drive snapshots.
+**Option A, ratified and live.** The vault remains the single canonical source of truth. A one-way mirror publishes selected doctrine to GitHub so external LLMs can read it directly without waiting for Drive snapshots.
 
+- **Repository:** https://github.com/SubConAssassin/adrian-vault-doctrine-mirror — **public** as of 2026-04-21. Content is canonical doctrine only; firewall verified by clone-and-check. Public removes per-agent access management overhead and makes the canonical layer readable by any future agent (Gemini, future Opus, third-party tools) without individual permission grants.
 - **Flow:** Vault → GitHub. Never the reverse.
 - **Scope:** `canonical/concepts/*` only. Doctrine, protocols, architecture.
 - **Hard excluded from mirror:** `canonical/people/*`, `canonical/projects/*` (OSB, SS, AGA, Ashta, legal), `canonical/ecosystem/priority-matrix.md`, anything containing PII, client names, legal matter, financial figures, or active disputes.
@@ -174,3 +175,4 @@ Until either fires, courier is sufficient.
 | Date | Change | Authority |
 |------|--------|-----------|
 | 2026-04-21 | Initial doctrine ratified via Claude ↔ ChatGPT round-trip | canaries "indigo pelican" (CtoGP) + "silver kingfisher/amber octopus" (infra test) |
+| 2026-04-21 | v1.1: mirror repo flipped from private to public; §3 updated with repo URL and rationale | Adrian (chat directive) |
