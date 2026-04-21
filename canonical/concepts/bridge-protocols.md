@@ -2,12 +2,12 @@
 title: Cross-Model Bridge Protocols
 type: canonical-doctrine
 status: active
-version: 1.3
+version: 1.4
 last_updated: 2026-04-21
 last_verified: 2026-04-21
 authored_by: claude (via claude.ai, Opus 4.7)
-ratified_by: claude + chatgpt live-bridge-test round-trip 2026-04-21 (tests #1 + #2 PASS)
-supersedes: v1.2 (added subfolder-tool-limitation finding in §10; added two-tests-passed ratification evidence)
+ratified_by: claude + chatgpt subfolder-remediation round-trip 2026-04-21
+supersedes: v1.3 (added hybrid remediation path and temporary root-drop exception in §10)
 related:
   - canonical/concepts/four-room-stack-architecture.md
   - canonical/concepts/mcp-connector-taxonomy.md
@@ -166,6 +166,25 @@ Until then, `chatgpt-to-claude/` will be populated by post-hoc mover action rath
 
 **Move-capability gap (known):** Neither Claude's Drive MCP nor ChatGPT's has a file-move operation. Implementing option 2 above requires either Google Drive for Desktop (local filesystem moves sync back to cloud) or direct Drive API access via curl + OAuth token. This is an open infrastructure item.
 
+### Remediation path (added v1.4, hybrid ratified by Claude + ChatGPT)
+
+**Short-term (live now): temporary root-drop exception for capability-blocked agents.** Root drops from ChatGPT are doctrine-permitted until move capability exists, provided all three conditions hold:
+1. Strict sortable naming format used (`YYYY-MM-DD-HHMM-UTC-sender-recipient-purpose`)
+2. The file is self-evidently ChatGPT-originated via its message header (so downstream cleanup can classify it by origin without parsing content)
+3. Downstream cleanup process exists or is committed to (see medium-term)
+
+This exception does NOT apply to Claude — Claude's Drive MCP supports `parentId`, so Claude drops at root only through error or negligence.
+
+**Medium-term (committed): Antigravity auto-relocation commission.** Antigravity periodically sweeps `ChatGPT-Bridge/` root, identifies ChatGPT-originated files by header + naming, and relocates them into `chatgpt-to-claude/`. Prerequisites:
+- Google Drive for Desktop installed on Adrian's Mac (simplest path; syncs Drive to local filesystem, `Filesystem:move_file` on synced folder sync-propagates back to cloud) OR
+- Direct Drive API via curl + OAuth token with Drive scope (more complex; requires credential management)
+
+Until one of these is in place, the short-term exception stands.
+
+**Long-term (deferred): alternate Drive tool/proxy.** If ChatGPT's environment ever gains a Drive MCP with `parentId` support, Antigravity relocation becomes optional. Deferred until need arises; no active work.
+
+**Operational observation captured from ChatGPT side (adopted):** "When a blocker appears, bridge replies should include diagnosis plus remediation options, not just a statement of failure." This is now implicit in §8 (Diagnostic companion rule) but worth noting that ChatGPT surfaced the pattern and it applies equally to Claude.
+
 ## 11. Division of labour
 
 | Role | Function |
@@ -193,3 +212,4 @@ Until either fires, courier is sufficient.
 | 2026-04-21 | v1.1: mirror repo flipped from private to public; §3 updated with repo URL and rationale | Adrian (chat directive) |
 | 2026-04-21 | v1.2: ChatGPT end-to-end mirror read verified; §3 updated with blob-URL-vs-raw-URL finding (raw URLs rejected by ChatGPT's GitHub tool; blob URLs work universally) | ChatGPT (CHATGPT-MIRROR-CONFIRM-2026-04-21-01) |
 | 2026-04-21 | v1.3: live-bridge-test #1 (bridge-protocols.md) and #2 (frictionless-operator-doctrine.md) both PASS end-to-end; §10 updated with subfolder-tool-limitation finding — ChatGPT's Drive write tool cannot target subfolders, is not a discipline failure | ChatGPT (CHATGPT-LIVE-BRIDGE-TEST-2026-04-21-02) |
+| 2026-04-21 | v1.4: hybrid remediation path ratified (short-term: temporary root-drop exception with conditions; medium-term: Antigravity auto-relocation commission pending move-capability; long-term: alternate tool deferred) | ChatGPT (CHATGPT-SUBFOLDER-REMEDIATION-2026-04-21-01) + Claude acceptance |
