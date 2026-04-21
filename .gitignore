@@ -1,17 +1,59 @@
-# Obsidian
+# Adrian-Vault scoped mirror gitignore
+# Whitelist pattern: deny everything by default, explicitly allow safe paths.
+# Scope governed by canonical/concepts/bridge-protocols.md §3.
+#
+# HARD RULE: only canonical/concepts/ plus pre-existing infrastructure files
+# may be synced to the public-facing GitHub mirror. Everything else stays local.
+
+# Deny everything at root
+/*
+
+# Allow root-level infrastructure files (pre-existing, verified non-sensitive)
+!/.gitignore
+!/AGENTS.md
+!/CLAUDE.md
+
+# Allow specific root-level directories
+!/raw/
+!/wiki/
+!/canonical/
+
+# Within raw/: allow only .gitkeep placeholder
+/raw/*
+!/raw/.gitkeep
+
+# Within wiki/: allow only specific pre-existing files
+/wiki/*
+!/wiki/hot.md
+!/wiki/index.md
+!/wiki/log.md
+
+# Within canonical/: deny everything, then allow only concepts/
+/canonical/*
+!/canonical/concepts/
+!/canonical/concepts/**
+
+# Defence in depth: explicit denials for sensitive paths even if whitelist has a bug
+/canonical/people/
+/canonical/projects/
+/canonical/ecosystem/
+/canonical/frameworks/
+/working/
+/episodic/
+/procedural/
+/graphify/
+/07-Templates/
+/08-Archive/
+
+# Obsidian internal state
 .obsidian/workspace*
 .obsidian/cache
 .trash/
 
-# OS
+# OS + editor cruft
 .DS_Store
 Thumbs.db
-
-# Editor
-.vscode/
 *.swp
 *.swo
-
-# Temp
 *.tmp
 *~
