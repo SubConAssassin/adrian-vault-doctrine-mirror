@@ -41,7 +41,17 @@ Claude **does not fire** on ambiguous signals (e.g. short "ok" or "thanks" mid-w
 
 Tab close, browser crash, network loss, device shutdown. These leave leases dangling. Covered by Dispatcher Protocol's stale lease cleanup (2× TTL rule).
 
-## The five-step shutdown
+## The six-step shutdown
+
+### Step 0 — Write session archive (NEW — mandatory)
+
+Before touching leases or handoffs, write a full session archive to `raw/sessions/YYYY-MM-DD-HHMM-<slug>.md`.
+
+This is NOT the handoff note. It is the full knowledge capture — reasoning chains, failed attempts, fixes, challenges, breakthroughs, decisions with their full context. See full schema: `canonical/concepts/session-archive-protocol.md`.
+
+Skip only if the session was pure status-check (Adrian ran `u`, Claude reported, nothing else happened).
+
+The archive is written FIRST so that even if subsequent steps fail or the session dies, the knowledge is captured.
 
 ### Step 1 — Sweep own leases
 
@@ -118,7 +128,7 @@ This makes shutdown activity visible to the launchd watcher and to future `u` sw
 
 ## After shutdown
 
-Final message to Adrian is one line: `🟢 session closed. N leases released, handoff at <path> (or: no handoff needed).`
+Final message to Adrian is one line: `🟢 session closed. N leases released, archive at <path>, handoff at <path> (or: no handoff needed).`
 
 After the final message, Claude does not initiate further action in that session unless Adrian explicitly re-engages.
 
@@ -172,3 +182,6 @@ inbox.ndjson += {"ts":"...","category":"session","session_id":"a1b2","status":"s
 ## Change log
 
 - 2026-04-21 — Initial canonical version. Paired with Dispatcher Protocol v1. Installed in response to Adrian's "shutdown protocol" command.
+
+## Session references
+- [2026-04-22 hive-mind-archive-protocol](../../raw/sessions/2026-04-22-1800-hive-mind-archive-protocol.md) — Implementation of session archive protocol, ChatGPT export vs Grok export insights, and API stack corrections.

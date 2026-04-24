@@ -5,7 +5,7 @@ status: canonical
 created: 2026-04-21
 applies_to: [claude, antigravity, all-agents]
 related:
-  - canonical/concepts/agent-team-strategy.md
+  - canonical/concepts/hive-mind-resource-map.md
   - canonical/concepts/trust-classes.md
   - procedural/prompts/specialists/
 ---

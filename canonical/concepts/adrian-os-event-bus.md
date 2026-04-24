@@ -115,6 +115,5 @@ Governance dial (set 2026-04-20): **balanced**.
 
 ## Related
 - `canonical/concepts/chatgpt-dispatch-protocol.md`
-- `canonical/concepts/agent-team-strategy.md`
-- `canonical/concepts/agent-team-allocation-ratios.md`
+- `canonical/concepts/hive-mind-resource-map.md`
 - `canonical/ecosystem/shared-infrastructure.md`

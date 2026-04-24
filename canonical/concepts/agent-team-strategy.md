@@ -1,7 +1,9 @@
 ---
 title: Agent Team Strategy — Capability Map and Work Division
 type: canon
-status: canonical
+status: superseded
+superseded_by: canonical/concepts/hive-mind-resource-map.md
+superseded_on: 2026-04-24
 created: 2026-04-18
 last_updated: 2026-04-18
 authored_by: claude (claude.ai session, confirmed against real web research and tool probes)
@@ -225,3 +227,9 @@ Then one extra: what are you best at that my other agents aren't?
 - `procedural/workflows/overnight-autonomous-work.md` — commission pattern for async work
 - `canonical/ecosystem/shared-infrastructure.md` § Vault-as-shared-brain
 - `working/handoffs/2026-04-18-antigravity-testing-engine-scope.md` — first real Antigravity commission
+
+---
+
+## Change Log
+
+- **2026-04-24**: Core capability mapping and economics subsumed by `canonical/concepts/hive-mind-resource-map.md`. This document is now marked superseded, though its operational patterns, capability probe, and 72-hour rule remain valid historical context pending extraction to a dedicated workflow document.

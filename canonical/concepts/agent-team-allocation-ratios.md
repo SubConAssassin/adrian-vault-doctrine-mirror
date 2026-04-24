@@ -1,7 +1,9 @@
 ---
 title: Agent Team — Workload Allocation Ratios and Principles
 type: canon
-status: canonical
+status: superseded
+superseded_by: canonical/concepts/hive-mind-resource-map.md
+superseded_on: 2026-04-24
 created: 2026-04-18
 last_updated: 2026-04-18
 authored_by: claude (claude.ai session, after Adrian corrective framing)

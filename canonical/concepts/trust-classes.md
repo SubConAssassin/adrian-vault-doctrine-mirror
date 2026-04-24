@@ -125,6 +125,6 @@ These may evolve later. Doctrine first, code if needed.
 Pattern lifted from friend's Antigravity platform stack (Layer 4 governance: `read_only` / `local_write` / `external_write` / `destructive`). Adapted to Adrian's smaller, chat-driven workflow. Named gates added for Adrian-specific risk categories.
 
 Related canonical:
-- `concepts/agent-team-strategy.md` — broader agent role allocation
+- `concepts/hive-mind-resource-map.md` — primary routing doctrine
 - `concepts/dispatcher-protocol.md` — how tasks reach agents
 - `concepts/claude-ceo-discipline.md` — Claude's CEO behaviour rules

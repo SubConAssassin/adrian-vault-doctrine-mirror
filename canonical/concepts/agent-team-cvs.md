@@ -1,7 +1,9 @@
 ---
 title: Agent Team CVs — Capabilities, Strengths, Weaknesses, Token Economics
 type: canon
-status: canonical
+status: superseded
+superseded_by: canonical/concepts/hive-mind-resource-map.md
+superseded_on: 2026-04-24
 created: 2026-04-18
 last_updated: 2026-04-18
 authored_by: claude (claude.ai session)
@@ -21,7 +23,7 @@ Total monthly AI spend at current tiers: approximately **$500**. This document h
 
 ### 1. Claude Opus 4.7 — "The Thoughtful Senior Partner"
 **Surface:** claude.ai chat (this session), Claude Code, Cowork
-**Subscription:** Max 20x, $200/month. ~900 messages per 5hr window, ~220k tokens/window. Weekly cap on top.
+**Subscription:** Max 5X, from $100/month baseline (claude.com/pricing, verified 2026-04-24). Advertised as "5x Pro usage"; exact per-window message/token/session-length quotas are not publicly documented at that granularity. Weekly cap on top of rolling-window allowance. **Note:** this doc is superseded — authoritative resource map is `canonical/concepts/hive-mind-resource-map.md`.
 **Released:** 16 April 2026 (two days ago)
 
 **Verified genuine strengths:**
@@ -120,7 +122,7 @@ Total monthly AI spend at current tiers: approximately **$500**. This document h
 
 ### 4. Cowork (Claude Opus 4.6) — "The Live-Session Coder"
 **Surface:** Claude Desktop app, agentic mode
-**Subscription:** Same Max 20x pool as claude.ai — shares your Claude allowance
+**Subscription:** Same Max 5X pool as claude.ai — shares your Claude allowance (corrected 2026-04-24)
 **Tokens:** Burns Adrian's Claude Max usage (choose Sonnet 4.6 to conserve Opus)
 
 **Verified genuine strengths:**
@@ -334,8 +336,13 @@ Ranked by cost-per-task for Adrian:
 
 Paste this as context when orienting a new agent or fresh session:
 
-> I run a multi-agent AI team with Claude (Opus 4.7 on Max 20x) as my orchestrator. My other agents are: Gemini 3.1 Pro via AI Ultra for images/video/Flow/long-context/research; Antigravity for free autonomous coding on Gemini 3 Pro; Cowork for live Claude-quality coding; ChatGPT Plus for independent review and web research; SuperGrok for real-time X data and math.
+> I run a multi-agent AI team with Claude (Opus 4.7 on Max 5X) as my orchestrator. My other agents are: Gemini 3.1 Pro via AI Ultra for images/video/Flow/long-context/research; Antigravity for free autonomous coding on Gemini 3 Pro; Cowork for live Claude-quality coding; ChatGPT Plus for independent review and web research; SuperGrok for real-time X data and math.
 >
 > My shared memory lives in `/Users/adriantaffinder/Documents/Adrian-Vault/`. Claude maintains the canonical layer. All agents route work to the right specialist based on `canonical/concepts/agent-team-cvs.md`.
 >
 > When I ask you to do work, either (a) execute if it's in your sweet spot per that routing doc, (b) flag if another agent is better suited, or (c) ask for clarification if scope is ambiguous. Never pretend to have capabilities you don't have. Never promise overnight autonomous work unless you have a real scheduler.
+
+## Corrections
+
+- 2026-04-24: Tier corrected from Max 20x to Max 5X (Adrian direct correction). Per-window quota numbers pending.
+- 2026-04-24 (late pass): Two additional stale Max 20x references in body — Cowork subscription line (was line 125) and master-prompt paste-block (was line 339) — updated to Max 5X for consistency with superseded-frontmatter signaling.

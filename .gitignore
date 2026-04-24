@@ -57,3 +57,5 @@ Thumbs.db
 *.swo
 *.tmp
 *~
+.env.symlink
+.env

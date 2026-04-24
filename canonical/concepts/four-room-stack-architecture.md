@@ -87,8 +87,7 @@ Every output that crosses a room boundary ends with:
 ## Related
 
 - `canonical/concepts/chatgpt-dispatch-protocol.md` — tactical Room 1/2 dispatch bridge
-- `canonical/concepts/agent-team-strategy.md` — higher-level agent allocation
-- `canonical/concepts/agent-team-allocation-ratios.md` — quota/ratio targets
+- `canonical/concepts/hive-mind-resource-map.md` — routing doctrine and stack inventory
 - `canonical/concepts/claude-ceo-discipline.md` — orchestrator discipline
 - `canonical/ecosystem/shared-infrastructure.md` — vault as Room 4 substrate
 - Superseded: `working/handoffs/2026-04-19-chatgpt-ai-stack-role-allocation.md`

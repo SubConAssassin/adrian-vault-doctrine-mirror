@@ -72,3 +72,6 @@ This doctrine was previously held only in Antigravity's Knowledge Items (hard me
 | Date | Change | Authority |
 |------|--------|-----------|
 | 2026-04-21 | Initial canonical codification of Adrian's directive to Antigravity | Adrian (verbal/chat directive, quoted in Antigravity's status beacon `working/handoffs/2026-04-21-antigravity-to-claude-status-update.md`) |
+
+## Session references
+- [2026-04-22 hive-mind-archive-protocol](../../raw/sessions/2026-04-22-1800-hive-mind-archive-protocol.md) — Implementation of session archive protocol, ChatGPT export vs Grok export insights, and API stack corrections.

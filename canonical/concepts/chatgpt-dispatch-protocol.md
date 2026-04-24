@@ -80,8 +80,7 @@ GUI scripting and fill the `## Response` section of the dispatch file.
 
 ## Related
 
-- `canonical/concepts/agent-team-strategy.md` (§ 4, § 6)
-- `canonical/concepts/agent-team-allocation-ratios.md` (ChatGPT 15% target)
+- `canonical/concepts/hive-mind-resource-map.md` (Routing doctrine)
 - `canonical/concepts/adrian-os-event-bus.md` (vault event conventions)
 - `canonical/ecosystem/shared-infrastructure.md` (§ 4 vault + shared brain)
 - `procedural/workflows/dispatch-chatgpt.md` (tactical how-to for Adrian)
