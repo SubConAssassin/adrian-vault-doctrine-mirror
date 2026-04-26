@@ -48,8 +48,7 @@ In this order, unless Adrian reprioritises:
 4. **Cross-corpus theme extraction (Phase 2)** — Once all Phase 1 summaries complete, run a second pass that extracts themes across all corpora.
 5. **Warm-lead follow-up draft batch** — For the 11 real leads Antigravity deep-read, draft an individualised message per lead. File in `working/drafts-pending/`.
 6. **Customs dispute playbook canonical** — Document the systemic process from the customs_disputes hive-search results + canonical notes.
-7. **Provenance certificate system design** — Per Peter Van Drago's 2022 request + chatgpt-project-intelligence.md recommendation. Design the certificate, the issue process, the ID scheme.
-8. **JC Alice iCloud IMAP pull** — BLOCKED on Apple ID app-specific password. Commission only when Adrian provides.
+7. **JC Alice iCloud IMAP pull** — BLOCKED on Apple ID app-specific password. Commission only when Adrian provides.
 
 ## DELEGATED TO ANTIGRAVITY
 
@@ -70,6 +69,10 @@ Filed at `working/handoffs/2026-04-24-1200-claude-to-antigravity-hive-search-ana
 - JC Alice hotel concession evidence archived (`canonical/people/jack-canfield-train-the-trainer/evidence/2014-01-14-alice-hotel-concession.md`)
 - CEO schedule canonical written (this file)
 - Facebook synthesis + ChatGPT synthesis launched async
+
+## DONE (2026-04-26)
+
+- **Provenance certificate system designed** — `canonical/concepts/osb-provenance-certificate-system.md`. ID scheme (OSB-{YEAR}-{SYMBOL}-{NNNNNN}), full certificate component spec, physical design brief, issue process, open questions for Adrian. Executed via phone-prompt remote session test.
 
 ## BLOCKED (awaiting unblock)
 
