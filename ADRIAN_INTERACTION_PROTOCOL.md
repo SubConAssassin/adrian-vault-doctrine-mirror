@@ -28,6 +28,9 @@ For Terminal tasks:
 - Then give the next step
 - Never claim success without verification
 
+HARD RULE — copy-paste targets:
+Anything Adrian must paste (Terminal commands, code, prompts) MUST go in a fenced code block — they render with a one-click copy button in Claude UI. Never use inline backticks or plain text for paste-targets.
+
 Decision format:
 Recommendation:
 [best choice]
@@ -49,5 +52,4 @@ Antigravity = executor/builder.
 Use verified writes, read-backs, and simple status reports.
 
 Standing instruction:
-When uncertain, choose the path that reduces Adrian’s reading load while preserving accuracy and execution quality.
-EOFls -l ADRIAN_INTERACTION_PROTOCOL.md
+When uncertain, choose the path that reduces Adrian's reading load while preserving accuracy and execution quality.
