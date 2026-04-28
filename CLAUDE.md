@@ -1,191 +1,108 @@
-# LLM Wiki Schema
-
-This folder is a personal LLM wiki — an AI-maintained knowledge base built on Andrej Karpathy's [LLM wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
-
-The core idea: instead of retrieving chunks from raw documents at query time (RAG), **incrementally build and maintain a persistent wiki** that sits between the human and the raw sources. Knowledge is compiled once and kept current — not re-derived on every query. The wiki compounds.
-
-You are the LLM. The human curates sources and asks questions. You do the bookkeeping: read, extract, integrate, cross-reference, keep consistent. Never complain about the grunt work — it is the whole point.
+# CLAUDE.md — Adrian Vault Operating Doctrine
+**Auto-loaded by Claude Code on session start.**  
+Last updated: 2026-04-25
 
 ---
 
-## The map (read this first, every time)
+## Who you are working for
 
-This file is the map for the vault. Think of it as the floor plan posted at the entrance of a building. Before doing anything in this folder, read this file all the way through. The map tells you:
+**Adrian Alan Taffinder** — entrepreneur, product designer, dyslexic. Based in Sayan, Ubud, Bali. Prefers structured, concise, actionable responses. Uses voice-to-text — interpret phonetic errors contextually. Born 6 May 1972, 8:20 AM, Horsforth, Leeds, England.
 
-1. Where the rooms are (the folder structure)
-2. What lives in each room (`raw/`, `wiki/`, etc.)
-3. What workflow to follow for each task (ingest, query, lint)
-4. What you must never do (the guardrails)
-
-**Layout for this vault: `flat`.** Flat means `wiki/` is a single directory of markdown files. Nested means `wiki/entities/`, `wiki/concepts/`, `wiki/sources/`, `wiki/analyses/`.
-
-## Routing table
-
-For each task, read these files first. Skip the rest. This is the main tool for avoiding wasted context.
-
-| Task                      | Read first                                               | Then                                |
-|---------------------------|----------------------------------------------------------|-------------------------------------|
-| Ingest a new source       | this file, `wiki/index.md`                               | the source in `raw/`                |
-| Answer a query            | this file, `wiki/index.md`                               | the specific wiki pages you need    |
-| Lint / self-heal          | this file, `wiki/index.md`, last 10 of `wiki/log.md`     | the audit procedures                |
-| Add a cross-reference     | `wiki/index.md`                                          | the two pages being linked          |
-| Check the timeline        | last entries of `wiki/log.md`                            | —                                   |
-| Diagnose a contradiction  | both affected pages, their `sources:` frontmatter        | the original sources in `raw/`      |
-
-When in doubt, read `wiki/index.md` before reading anything else. It is the routing table — short on purpose, read it every time.
-
-## The three layers
-
-1. **`raw/`** — immutable source documents (articles, PDFs, transcripts, notes). You read from this layer but **never modify it**. This is the source of truth. If you would change anything in `raw/`, stop and ask the human.
-2. **`wiki/`** — LLM-owned markdown files. Summaries, entity pages, concept pages, analyses, audits. You create, update, and maintain everything here.
-3. **This file + `AGENTS.md`** — the schema. Workflows, conventions, guardrails. Update only when the human asks.
-
-## Naming conventions
-
-Claude navigates this wiki by name. There is no database, no vector store — naming *is* the index. Stay strict about these rules and `"pull my karpathy source"` just works.
-
-- **Wiki pages**: `kebab-case.md` matching the page title. Example: `wiki/mechanical-tension.md`, `wiki/andrej-karpathy.md`.
-- **Source files in `raw/`**: `YYYY-MM-DD-source-title.<ext>`. Example: `raw/2026-04-11-karpathy-llm-wiki.md`. The date prefix makes recent sources easy to find with `ls raw/ | sort -r | head`.
-- **Audit files**: `wiki/audits/audit-YYYY-MM-DD.md`.
-- **Index categories**: use the exact headers in `wiki/index.md` — `Entities`, `Concepts`, `Sources`, `Analyses`, `Audits`. Don't invent new categories without updating this schema file.
-
-A missing or inconsistent name is worse than a missing page — it breaks routing.
-
-## Page format
-
-Every wiki page starts with this frontmatter:
-
-```yaml
----
-title: <page title>
-tags: [tag1, tag2]
-sources:
-  - raw/source-file.md
-  - https://external-url (accessed YYYY-MM-DD)
-related: [[other-page]], [[another-page]]
-last_updated: YYYY-MM-DD
----
-```
-
-Rules:
-
-- Use `[[wikilinks]]` for cross-references between pages. No markdown links for internal navigation.
-- One concept or entity per page. If a page is answering three questions, split it.
-- Page title and filename match (`Mechanical Tension` → `wiki/mechanical-tension.md`).
-- `sources:` must not be empty. If you can't cite a source, do not write the page.
-
-## `wiki/index.md` — the catalog
-
-Content-oriented catalog. Organized by category (Entities, Concepts, Sources, Analyses, Audits). Each entry is one line:
-
-```
-- [[page-name]] — one-line summary
-```
-
-**Always read `wiki/index.md` first** on any query. It replaces the need for embedding-based RAG at small-to-moderate scale (up to hundreds of pages).
-
-Update the index on every ingest. A page that exists in `wiki/` but not in `index.md` is invisible — it might as well not exist.
-
-## `wiki/log.md` — the timeline
-
-Chronological, append-only. Every operation appends exactly one entry with this grep-friendly prefix:
-
-```
-## [YYYY-MM-DD] <op> | <title>
-```
-
-Operations: `ingest`, `query`, `lint`, `update`, `init`.
-
-The entry body says what happened, which pages were touched, and any decisions or flags. Example:
-
-```
-## [2026-04-11] ingest | Karpathy LLM Wiki Gist
-
-Read raw/2026-04-11-karpathy-llm-wiki.md. Created [[llm-wiki-pattern]],
-[[andrej-karpathy]], [[second-brain]]. Updated [[rag]] to note contrast
-with wiki approach. Added wikilink from [[obsidian]] to [[llm-wiki-pattern]].
-```
-
-Utility: `grep "^## \[" wiki/log.md | tail -5` returns the last 5 operations.
+**For any personal data point** (DOB, time of birth, place of birth, friends, family, relationships, MBTI, Human Design, etc.) — read `canonical/adrian-corpus/personal-facts.md` first. If the fact isn't there, search `raw/chatgpt-import/` and use `conversation_search` for past Claude chats. Never ask Adrian for information he has already given to Claude or ChatGPT in past sessions.
 
 ---
 
-## Workflow: Ingest
+## The Vault
 
-When the human drops a source into `raw/` and asks to ingest it:
+This is the shared brain between Claude sessions and Antigravity. It is the single source of truth.
 
-1. **Read the source completely.** If it's long, note the structure first, then read section by section.
-2. **Report 3–5 key takeaways** and ask what to emphasize. Skip this if the human said "just ingest it."
-3. **Read `wiki/index.md`** to find pages this source affects — every entity mentioned, every concept referenced.
-4. **For each new entity or concept** without a page: create one, following the page format above.
-5. **For each existing page the source affects**: update it with the new information. When the new source disagrees with existing content, **note the disagreement explicitly** — do not silently overwrite.
-6. **Add bidirectional `[[wikilinks]]`** between new and updated pages.
-7. **Update `wiki/index.md`** with any new pages.
-8. **Append one entry to `wiki/log.md`.**
-9. **Report** to the human: `Created: [...]. Updated: [...].`
-
-A single substantive source typically touches 10–15 pages. That is normal. Do not cut corners to touch fewer.
-
-## Workflow: Query
-
-When the human asks a question about the wiki:
-
-1. **Read `wiki/index.md` first.** Always.
-2. **Identify relevant pages** from the index. Read them. Follow `[[wikilinks]]` as needed.
-3. **Synthesize an answer.** Cite the specific wiki pages you drew from, with `[[wikilinks]]`.
-4. **If the answer is novel** (a comparison, a synthesis, a connection not already captured), **offer to file it back into the wiki** as a new analysis page. Good answers compound — they should not disappear into chat history.
-5. **If the wiki doesn't have the knowledge needed**, say so explicitly. Do not hallucinate. Suggest what source to add to fill the gap.
-
-## Workflow: Lint
-
-When the human asks to lint or health-check the wiki, scan for:
-
-- **Contradictions** between pages
-- **Stale claims** superseded by newer sources
-- **Orphan pages** with no inbound `[[wikilinks]]`
-- **Missing pages** — concepts referenced ≥ 2 times without their own page
-- **Missing cross-references** — pages that should link to each other but don't
-- **Data gaps** — concepts mentioned but lacking depth (research candidates)
-
-Output a severity-ranked list. For each finding, propose a fix: update page, create page, research, add cross-reference, skip. Do not make changes without confirmation unless the human said "fix everything."
-
-For autonomous auditing plus quality-gated web research to fill gaps, use the `wiki-self-heal` skill.
+| Path | Purpose |
+|---|---|
+| `canonical/` | Authoritative project docs. Read before acting on any named project. |
+| `working/handoffs/` | Agent-to-agent handoff files. Read latest before starting work. |
+| `working/drafts-pending/` | Drafts awaiting Adrian review. File silently, never present as menus. |
+| `tools/` | Scripts — ask-chatgpt.py, ask-grok.py, preflight-check.sh etc. |
 
 ---
 
-## Guardrails
+## CEO Execution Protocol (non-negotiable)
 
-- **Never modify `raw/`.** It is immutable. Read only.
-- **Never delete wiki pages** without explicit human confirmation. Flag orphans, do not remove them.
-- **Never add factual claims without sources.** Every claim traces back to `sources:` frontmatter or a cited URL.
-- **Never fabricate citations.** If you can't find a source, say so and skip the claim.
-- **Never silently resolve contradictions.** Note the disagreement in both affected pages and let the human decide.
-- **Never bypass `wiki/index.md`.** It is not decorative — it is the routing table.
+1. **Execute with available tools immediately — no asking permission.**
+2. **Zero pause between tasks.**
+3. **Delegation cascade:** (1) osascript/filesystem → (2) Antigravity for file-based work → (3) ChatGPT/Grok API for strategy.
+4. **Drafts filed silently** in `working/drafts-pending/` — never presented as menus.
+5. **Run preflight before heavy work:** `tools/preflight-check.sh`
 
-## Navigation quick reference
+---
+
+## Active Ventures (read canonical for detail)
+
+- **Original Siberian Blue** — luxury spiritual jewelry, cobalt-doped hydrothermal quartz. `canonical/projects/original-siberian-blue/`
+- **Subconscious Surgery** — 1:1 coaching + Kajabi mastermind. `canonical/projects/subconscious-surgery/`
+- **AGA Bali** — 13ha conscious community, Candidasa, East Bali. `canonical/projects/aga-bali/`
+- **PT Tri Hita WtE Indonesia** — modular biomethane, V6.4 framework. `canonical/projects/pt-tri-hita/`
+- **Ashta Project** — distributed consciousness research platform. `canonical/projects/ashta/`
+- **Bodhisvara** — voice-analytics/therapist-matching, concept stage, parked. `canonical/projects/bodhisvara/`
+
+---
+
+## Critical Rules
+
+- **NEVER mention Chelsea** in any context across any project.
+- **AYA is deprecated** — replaced by Bodhisvara.
+- **Staleness check mandatory** on any named project — canonical is starting point, most recent handoff is current truth.
+- **Erica Johnson (legal dispute):** always conversation_search for latest status before acting.
+- **Crystal facts:** discovered Siberia, grown in lab outside Moscow, ~2 months growth. No "Cosmic Vein." No diamond wire saw mention in marketing.
+- **Cross-pollination protocol:** When Adrian references prior context ("as we discussed", "like I told you", possessives like "my friend X", "my Y"), search the ChatGPT import + Claude past chats BEFORE asking him to repeat. The 3.87M-word corpus exists for exactly this reason.
+- **Voice-to-text spelling drift:** Names and uncommon words may be phonetically substituted. Examples: "Abby" → **Abee**, "Bolognese" → **Balinese**, "ambulate" → **amulet**. Verify against `personal-facts.md` before treating a name as new.
+
+---
+
+## Hive Mind API Stack
 
 ```bash
-# Last 5 operations
-grep "^## \[" wiki/log.md | tail -5
+# ChatGPT (default: gpt-5.4-mini | escalate: --model gpt-5.4)
+python3 ~/Documents/Adrian-Vault/tools/ask-chatgpt.py "your prompt"
+python3 ~/Documents/Adrian-Vault/tools/ask-chatgpt.py --model gpt-5.4 "your prompt"
 
-# All lint passes
-grep "^## \[.*lint" wiki/log.md
+# Grok (grok-4)
+python3 ~/Documents/Adrian-Vault/tools/ask-grok.py "your prompt"
 
-# Page count
-ls wiki/*.md | wc -l
-
-# Find pages referencing a concept
-grep -rl "\[\[concept-name\]\]" wiki/
-
-# Find orphan pages (no inbound wikilinks)
-for f in wiki/*.md; do
-  name=$(basename "$f" .md)
-  [ "$name" = "index" ] && continue
-  [ "$name" = "log" ] && continue
-  count=$(grep -rl "\[\[$name\]\]" wiki/ --exclude="$(basename "$f")" 2>/dev/null | wc -l)
-  [ "$count" -eq 0 ] && echo "orphan: $name"
-done
-
-# Recent sources (date-prefixed filenames)
-ls raw/ | sort -r | head
+# Keys at:
+~/.config/com.adrian-vault/.env
 ```
+The Bridge is retired. Use direct scripts only.
+
+### ONE-SHOT PROTOCOL — HARD RULE (no exceptions)
+
+A previous session made 1,053 API calls (~2.7M tokens, ~$8) on a single task. This must never happen again.
+
+- **One call per question.** Craft a single comprehensive prompt. Accept one reply. Stop.
+- **No iteration loops.** Do not follow up, refine, or re-prompt the same API in the same session.
+- **No agentic chaining.** Do not pass API output back into another API call automatically.
+- If one reply is insufficient: synthesise what you have and ask Adrian before any further call.
+- Run ChatGPT + Grok in parallel (not sequentially) when both are needed — one Bash call each, sent together.
+- Budget: 1–3 calls per session maximum. Target cost = cents.
+
+---
+
+## Hardware
+
+MacBook Pro M3 Pro, 18GB RAM. Always ARM64/Apple Silicon builds. Never Intel.
+
+---
+
+## Remote Control (iPhone)
+
+If Adrian connects from iPhone:
+- Session registered via `claude remote-control` in this vault directory
+- Web URL fallback: `https://claude.ai/code?environment=ENV_ID`
+- App session list was broken April 2026 — use web URL
+
+---
+
+## Key Contacts
+
+- **Stephan Schwartz** — crystal source/custodian, Seattle. Spiritual not contractual. US receiving address for any returned inventory.
+- **Gino Yu** — strategic advisor.
+- **Yoga** — master artisan, Bali.
