@@ -2,10 +2,10 @@
 title: API Integration Doctrine
 type: canonical-doctrine
 status: active
-version: 1.1
-last_updated: 2026-04-24
-last_verified: 2026-04-24
-authored_by: claude (codifying 2026-04-22 integration work; v1.1 budget-frugality 2026-04-24)
+version: 2.0
+last_updated: 2026-04-30
+last_verified: 2026-04-30
+authored_by: claude (v2.0 cash-flow lockdown 2026-04-30 — Adrian directive after $53 OpenAI+Grok overspend in 24h)
 related:
   - canonical/concepts/bridge-protocols.md
   - canonical/concepts/frictionless-operator-doctrine.md
@@ -15,12 +15,42 @@ related:
 
 # API Integration Doctrine
 
-This document outlines the API integration principles and operational patterns for direct cross-model and external access in the hive mind. It supersedes older courier-primary methods, establishing direct API usage as the primary inter-agent communication channel.
+## ⛔ PRIORITY 0 — SUBSCRIPTION-FIRST ROUTING (HARD RULE)
 
-## Core Principles
+**Adrian already pays flat-rate for: Claude Max, ChatGPT Plus, Gemini, Grok subscription. These are pre-paid. Metered APIs cost extra cash on top. Cash flow is tight.**
 
-1. **Zero-relay principle:** Claude calls ChatGPT/Grok APIs directly. There is no manual forwarding step required from Adrian.
-2. **Frictionless operation:** True frictionless design means zero recurring manual action by Adrian. The direct API is always primary; the Drive courier/bridge mechanism acts purely as an audit trail and fallback.
+**Default routing (free first):**
+
+1. **This Claude session** — already paid for. Use it for thinking, drafting, analysis.
+2. **Claude Code CLI / Antigravity** — flat-rate via Claude Max. Use for batch/headless/automation work. **All multi-file or multi-call jobs route here, not the API.**
+3. **ChatGPT desktop app / Grok web / Gemini web** — flat-rate. Use for second opinions via manual paste-in.
+4. **Metered APIs (OpenAI, xAI/Grok, Anthropic) — LAST RESORT.** Only when:
+   - The task is a single technical query that genuinely cannot be answered without a model call from inside a script
+   - AND there is no path to do it via a subscription-backed tool
+   - AND the projected cost is under $0.10 for the single call
+
+**Hard monthly cap across all metered APIs combined: $30/month** (= equivalent to one Claude Max subscription, Adrian's stated ceiling). Daily soft cap: $1. If projected spend would exceed either, **stop and surface the cost to Adrian in chat before any call**.
+
+**Forbidden patterns:**
+- ❌ Batch processing N>10 files through ask-chatgpt.py / ask-grok.py. Route through Claude Code.
+- ❌ "Let me just ask ChatGPT" reflex when the question can be reasoned in-session or pasted into ChatGPT desktop.
+- ❌ Unattended cron/launchd jobs hitting metered APIs without an explicit cost ceiling.
+- ❌ Multi-round conversations through the API. One concierge prompt → one comprehensive answer. If a follow-up is needed, write a new comprehensive prompt; do not loop.
+
+**Enforcement:**
+- OpenAI dashboard hard cap: $5 (Adrian to set at platform.openai.com/settings/organization/limits)
+- xAI/Grok dashboard hard cap: $5 (Adrian to set at console.x.ai)
+- All API wrapper scripts must log every call to `working/api-usage.jsonl` — no exceptions, no silent paths
+- Any script making OpenAI/Grok calls must be auditable from the cost log, or it gets disabled
+
+**Failure mode this rule prevents:** 2026-04-30 incident — synthesis pipeline processed 871 conversations through OpenAI ($26) and a parallel Grok job ($27), totalling $53 in one day = ~2 months of monthly cap. Both jobs could have run free through Claude Code. This must never recur.
+
+---
+
+## Core Principles (subordinate to Priority 0)
+
+1. **Zero-relay principle:** Claude calls ChatGPT/Grok APIs directly when an API call is justified under Priority 0. No manual forwarding from Adrian.
+2. **Frictionless operation:** True frictionless design means zero recurring manual action by Adrian. When an API call is justified, the direct API is primary; the Drive courier/bridge acts purely as audit trail and fallback.
 
 ## Infrastructure and Security
 
@@ -30,7 +60,7 @@ API keys are stored centrally in a single `.env` file to ensure a single source 
 - **Keys contained:** `OPENAI_API_KEY`, `XAI_API_KEY`
 
 ### Bridge Tool Invocations
-Agents with shell capabilities can invoke the APIs directly using canonical wrapper scripts:
+Agents with shell capabilities can invoke the APIs directly using canonical wrapper scripts — **but only when Priority 0 permits**:
 
 - **ChatGPT:** `python3 ~/Documents/Adrian-Vault/tools/ask-chatgpt.py "prompt"`
   - **Default Model:** `gpt-5.4-mini` (via Responses API endpoint) — frugal, ~6x cheaper than full 5.4
@@ -53,7 +83,7 @@ Every API call automatically writes its interaction to Google Drive to maintain 
 - **ChatGPT calls:** Saved to `Google Drive/ChatGPT-Bridge/chatgpt-to-claude/`
 - **Grok calls:** Saved to `Google Drive/Grok-Bridge/grok-to-claude/`
 
-## Capability Routing
+## Capability Routing (when an API call IS justified under Priority 0)
 
 Different APIs serve specific purposes based on their strengths:
 
@@ -73,29 +103,32 @@ Different APIs serve specific purposes based on their strengths:
 ## Cost Context
 
 ### Budget
-- **Monthly budget:** $40 total across all external APIs (Adrian directive, 2026-04-24).
-- **ChatGPT credits:** $10 loaded on 2026-04-22; $8.62 consumed by 2026-04-24 (bulk spent on Apr 24).
+- **Hard monthly budget:** $30 total across all external metered APIs (OpenAI + Grok + Anthropic API). Adrian directive 2026-04-30. Equivalent to one Claude Max subscription.
+- **Daily soft cap:** $1.
+- **Per-call ceiling without surfacing:** $0.10. Anything projected above this requires explicit Adrian go-ahead in chat.
 
 ### Pricing (per 1M tokens)
 | Model | Input | Cached Input | Output | Notes |
 |---|---|---|---|---|
-| gpt-5.5 (coming) | $2.50 | $0.25 | $15.00 | Flagship — reserve for frontier reasoning |
+| gpt-5.5 | $2.50 | $0.25 | $15.00 | Flagship — reserve for frontier reasoning |
 | gpt-5.4 | $1.25 | $0.125 | $7.50 | Escalation only |
-| **gpt-5.4-mini** | **$0.375** | **$0.0375** | **$2.25** | **Default — hive-mind workhorse** |
+| **gpt-5.4-mini** | **$0.375** | **$0.0375** | **$2.25** | **Default — frugal workhorse** |
 | grok-4 | $3.00 | — | $15.00 | Grok divergent / capability probing |
 
 **Batch API (OpenAI):** -50% on all rates; use for non-urgent bulk work.
 
-### Headroom at $40/month
-- gpt-5.4-mini standard: ~100M tokens/month
-- gpt-5.4-mini batch: ~200M tokens/month
-- gpt-5.4 full standard: ~13M tokens/month (tight)
-
-### Frugality Rules
-1. **Default to mini.** Escalate only with explicit reason (reasoning depth proven insufficient on mini).
+### Frugality Rules (apply when API call is already justified)
+1. **Default to mini.** Escalate only with explicit reason.
 2. **One comprehensive prompt > many round-trips.** Output tokens cost 4-6x input.
 3. **Cap `--max-tokens`** to what's actually needed (default 800).
-4. **Cache prefixes.** Put stable context (doctrine, voice profile, project state) at the TOP of long prompts — OpenAI auto-caches after first call, cutting cached input to 10% of full rate.
-5. **Pipe via `--stdin`** for long context — avoids re-encoding in subsequent calls and keeps prompts single-shot.
-6. **Batch non-urgent work** via OpenAI Batch API (50% off) — currently manual via dashboard, not yet wired into ask-chatgpt.py.
-7. **Local-first override** — if a local tool exists (see `tooling-preference-doctrine.md`), use it before any paid API.
+4. **Cache prefixes.** Stable context at TOP of long prompts.
+5. **Pipe via `--stdin`** for long context.
+6. **Batch non-urgent work** via OpenAI Batch API (50% off).
+7. **Local-first override** — if a local tool exists, use it before any paid API.
+
+## Session-Start Check (mandatory)
+
+Every Claude session start, before any work that could touch a metered API, verify:
+1. Read this doctrine. Confirm Priority 0 is active.
+2. Run `python3 ~/Documents/Adrian-Vault/working/usage_report.py` to see current month-to-date spend.
+3. If spend > $25/month, **all metered API calls suspended** until Adrian explicitly authorises.
