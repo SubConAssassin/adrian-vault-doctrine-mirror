@@ -1,13 +1,17 @@
 ---
 title: Claude's CEO Discipline — Question Protocol and Cross-Model Review
 type: canon
-status: canonical
+status: needs-review-2026-05-01-bridge-superseded
 created: 2026-04-20
-updated: 2026-04-21 (added /tmp salvage false-alarm case; added "Hands-off pattern" and "MCP listing as ground truth" anti-patterns)
+updated: 2026-05-01 (added bridge-superseded status)
 authored_by: claude (after Adrian's direct feedback on the Antigravity billing miss)
 context: Claude accepted Antigravity's "I need an Anthropic API key" self-report uncritically. Missed the Gemini-native-vision workaround for 3 full exchanges until Adrian himself remembered and pushed back. The $10 wasn't the issue. The reflex was.
 tags: [orchestration, discipline, meta, ceo-role, multi-agent]
 ---
+
+> [!WARNING]
+> **BRIDGE SUPERSEDED (2026-05-01)**
+> This document references the Drive-courier Bridge as an active cross-model review path. The Drive-courier Bridge has been retired in favor of the direct-API integration pattern defined in `api-integration-doctrine.md`. Needs Adrian review for in-place amendments.
 
 ## The core mandate
 

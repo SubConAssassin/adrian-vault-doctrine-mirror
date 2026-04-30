@@ -1,7 +1,7 @@
 ---
 title: Trust Classes — Action Authorization Taxonomy
 type: doctrine
-status: draft-pending-adrian-approval
+status: canonical
 last_updated: 2026-04-21
 applies_to: [claude, antigravity, all-agents]
 source: Lifted from friend's Antigravity platform (4-class trust system + approval gates), adapted for Adrian's stack
