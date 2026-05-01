@@ -25,9 +25,16 @@ Voice-to-text introduces phonetic ambiguity (e.g. "u" spoken becomes "you" writt
 
 ### Update Sweep Protocol (what Claude does when triggered)
 
-> **MANDATORY CHANNELS — no `u` response is complete until all four have been swept:**
+> **SESSION TYPE DETECTION — do this first:**
+> - **Claude Desktop on Mac (local session):** local vault filesystem IS accessible via Filesystem MCP. Run full 4-channel sweep below.
+> - **Web/remote session (iPhone, browser, Claude Code web):** local vault is NOT accessible. Skip to **WEB SESSION SWEEP** below.
+
+> **WEB SESSION SWEEP (when local vault not accessible):**
+> ONE JOB: Check Google Drive folder `vault-handoffs` (ID: `1KwbVbmkzytjLCF8_oMV02lDGAcRBrLa3`) for new handoffs from Antigravity. List files by recency. Report what's there. That is the entire sweep for a web session. Do NOT sweep ChatGPT bridge docs, Grok outputs, or anything else unless Adrian explicitly asks. Stop after reporting vault-handoffs contents.
+
+> **MANDATORY CHANNELS (local session only) — no `u` response is complete until all four have been swept:**
 > 1. Local vault (handoffs, events, extraction dirs, canonical)
-> 2. **Google Drive** (ChatGPT + any external bridge doc)
+> 2. **Google Drive** `vault-handoffs/` folder for Antigravity dual-writes
 > 3. Active extraction output directories for the current commission
 > 4. Pending-Adrian items
 >
