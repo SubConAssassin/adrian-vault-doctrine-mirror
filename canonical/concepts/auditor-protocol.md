@@ -2,6 +2,7 @@
 title: Auditor Protocol (The "One Strike" Doctrine)
 type: canon
 created: 2026-05-01
+authorized_by: Adrian (CEO direct instruction 2026-05-01)
 tags: [auditor, compliance, consistency, accountability]
 ---
 
