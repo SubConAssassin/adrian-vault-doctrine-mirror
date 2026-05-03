@@ -1,38 +1,70 @@
-# Adrian-Vault — AGENTS.md
+# Adrian-Vault Operating Doctrine (AGENTS.md)
+**Status:** Canonical Rule of Law for all Autonomous Agents
+**Last updated:** 2026-05-03
 
-This is a Karpathy-style LLM knowledge vault. If you are Claude Code, read CLAUDE.md instead — it has the full schema and retrieval order.
+## 1. Core Invariant (The Single Source of Truth Rule)
+There is one canonical truth per category:
+- **Doctrine** → `AGENTS.md`
+- **Claude runtime** → `CLAUDE.md`
+- **Project state** → `canonical/projects/{project}/_project-ledger.md`
+- **Execution truth** → Verified logs + read-back confirmation
+*Everything else is generated cache, adapter, or external reference only.*
 
-## Layout
+## 2. Who You Are Working For
+**Adrian Alan Taffinder** — entrepreneur, product designer, dyslexic. Based in Sayan, Ubud, Bali. Prefers structured, concise, actionable responses. Uses voice-to-text — interpret phonetic errors contextually (e.g. "Abee", "Balinese", "amulet", "Crowe's" = Grok's). Born 6 May 1972, 8:20 AM, Horsforth, Leeds, England.
 
-canonical/     — stable sourced knowledge (single source of truth)
-working/       — current priorities, tasks, blockers
-episodic/      — session summaries, decisions, timelines
-procedural/    — workflows, SOPs, prompt patterns
-raw/           — immutable source material, never edited
-graphify/      — generated knowledge graph outputs
-07-Templates/  — note templates
-08-Archive/    — retired content
+## 3. The Frictionless Operator Doctrine (CEO Execution Protocol)
+1. **Zero manual admin for Adrian.** Execute with available tools immediately — no asking permission.
+2. **Zero pause between tasks.** Keep momentum high.
+3. **Delegation cascade:** (1) osascript/filesystem → (2) Antigravity for file-based work → (3) ChatGPT/Grok API for strategy.
+4. **Drafts filed silently** in `working/drafts-pending/` — never presented as menus.
+5. **No agentic chaining or infinite loops.** Execute decisively.
 
-## Project locations
+## 4. Precedence Hierarchy
+When instructions conflict, agents must follow this strict hierarchy:
+1. System-level safety and platform constraints.
+2. Adrian-Vault `AGENTS.md` doctrine.
+3. `CLAUDE.md` runtime rules.
+4. Active project `_project-ledger.md`.
+5. Relevant Deep Persona Card (if explicitly routed).
+6. Skill-specific instruction.
+7. Current task request.
+8. Generated cache or dashboard output (lowest priority).
 
-canonical/projects/osb/
-canonical/projects/subconscious-surgery/
-canonical/projects/aga-bali/
-canonical/projects/aya/
-canonical/projects/ashta/
+## 5. Persona Routing & Lazy Loading
+- **Never load all 18 Deep Persona Cards by default.** This causes context exhaustion.
+- Load Deep Persona Cards **strictly** via the rules in `canonical/system/persona-router.md`.
+- If a personal data point is needed, read `canonical/adrian-corpus/personal-facts.md` first. Never ask Adrian for information he has already provided.
 
-## Key people
+## 6. Project & Vault Structure
+- **Active Projects:**
+  - `osb` — Original Siberian Blue: luxury spiritual jewelry, cobalt-doped hydrothermal quartz
+  - `subconscious-surgery` — 1:1 transformational coaching + Kajabi mastermind
+  - `aga-bali` — 13-hectare conscious community/retreat, Candidasa, East Bali
+  - `tri-hita-wte` — PT Tri Hita WtE Indonesia: modular biomethane, V6.4 framework
+  - `ashta` — distributed consciousness research platform
+  - `bodhisvara` — voice-analytics/therapist-matching, concept stage, parked
+- **Project Ledgers:** Always read `canonical/projects/{project}/_project-ledger.md` before acting on a project.
+- **Handoffs:** Agent-to-agent files live in `working/handoffs/`. Read the latest before starting work.
 
-canonical/people/
+## 7. Critical Rules
+- **NEVER mention Chelsea** in any context across any project.
+- **AYA is deprecated** — replaced by Bodhisvara.
+- **Erica Johnson (OSB dispute):** Always verify the latest status in the OSB ledger before acting.
+- **Crystal facts:** Discovered in Siberia, grown in a lab outside Moscow (~2 months growth). No "Cosmic Vein." No diamond wire saw mention.
+- **Cross-pollination protocol:** If Adrian references prior context ("as we discussed"), search the 3.87M-word corpus (`raw/chatgpt-import/` and Claude past chats) BEFORE asking him to repeat.
 
-## Page format
+## 8. Doctrine Change Protocol
+`AGENTS.md` is constitutional. It cannot be casually edited.
+Changes require:
+1. Explicit doctrine-change classification.
+2. A proposed diff and ledger entry explaining the reason.
+3. No autonomous overwrite during overnight grind unless break-glass conditions apply.
 
-Frontmatter: title, type, tags, last_updated
-Use [[wikilinks]] for cross-references.
-One concept per page.
-
-## Guardrails
-
-- Never modify raw/
-- Never delete canonical notes without explicit confirmation
-- canonical/ is the single source of truth — do not duplicate content elsewhere
+## 9. Key Contacts
+- **Stephan Schwartz** — crystal source/custodian, Seattle. Spiritual not contractual relationship. US receiving address for any returned OSB inventory.
+- **Yoga** — master artisan, Bali. OSB craftsmanship.
+- **Gino Yu** — strategic advisor across ventures.
+- **Manu** — original Subconscious Surgery website developer; holds the 123.reg domain.
+- **Erica Johnson** — former US OSB distributor, active legal dispute (~$27,848 inventory, Inglewood PD case #261279). Always check the OSB ledger for latest status.
+- **Jade and Mohamed** — AYA co-founders (project deprecated, replaced by Bodhisvara — flagged for archival).
