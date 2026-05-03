@@ -3,11 +3,47 @@ title: Agent Budget Framework — The Financial Director Layer
 type: doctrine
 status: canonical
 created: 2026-05-02
-last_updated: 2026-05-02
+last_updated: 2026-05-03
 related:
   - canonical/concepts/claude-antigravity-work-partition.md
   - canonical/concepts/24-7-operating-model.md
   - canonical/concepts/api-integration-doctrine.md
+revision_log:
+  - "2026-05-03 — Adrian observed asymmetric leak: Claude weekly 67% used in 3 days (4 days remain) while AG monthly only 2% used in 12 days (9 days remain). Capacity Adrian paid for is evaporating. Three additions made this revision: (a) reset-date awareness as first-class field, (b) burn-asymmetry corrective rule, (c) mandatory token-reporting block in every AG completion handoff."
+---
+
+## Reset-date awareness (added 2026-05-03)
+
+Every resource pool gets two new tracked fields and one rule:
+
+| Field | Description |
+|---|---|
+| `next_reset_date` | The exact UTC datetime when usage zeroes |
+| `cycle_percent_used` | 0–100, refreshed at every reconciliation tick |
+| `days_until_reset` | Derived; surfaced in weekly reconciliation |
+
+**Burn-asymmetry corrective rule:** When `cycle_percent_used < 30%` AND `days_until_reset < 10` AND the resource is use-it-or-lose-it (AG monthly is, Claude weekly is) — Claude MUST queue overnight grind work to absorb the unused capacity. Failing to do so is paying-for-air.
+
+**Inverse rule:** When `cycle_percent_used > 60%` AND `days_until_reset > 3` — Claude MUST shift work to other resource pools. Continued burn at that rate exhausts the cycle early.
+
+The rules apply per-pool, separately. As of 2026-05-03 they trigger:
+- AG: 2% used / 9 days left → BURN-DOWN ACTIVE (commission `2026-05-03-claude-to-ag-burndown-grind-9day.md` filed)
+- Claude: 67% used / 4 days left → CONSERVE (Claude orchestrates only, AG executes)
+
+## Token-reporting frontmatter (added 2026-05-03 — mandatory)
+
+Every `ag-to-claude-*-complete.md` handoff MUST include this block:
+
+```yaml
+tokens_consumed_this_task: <integer>
+tokens_remaining_this_cycle: <integer>
+cycle_reset_date: <YYYY-MM-DD>
+cycle_percent_used: <integer>
+time_spent_minutes: <integer>
+```
+
+A completion handoff without this block is malformed. Claude rejects it back to AG for resubmission. This is the data layer the daily reconciliation script depends on.
+
 ---
 
 # Agent Budget Framework
