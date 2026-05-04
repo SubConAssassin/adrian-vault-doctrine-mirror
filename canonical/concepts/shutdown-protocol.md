@@ -1,13 +1,14 @@
 ---
-title: Shutdown Protocol — Graceful Session Close for Claude Chat Sessions
+title: Shutdown Protocol — Graceful Session Close for Claude Chat AND Antigravity Sessions
 type: canon
 status: canonical
-version: 2.1
+version: 2.2
+applies_to: [claude, antigravity]
 created: 2026-04-21
 updated: 2026-05-04
 supersedes:
   - canonical/concepts/session-shutdown-protocol.md
-tags: [adrian-os, concurrency, session-management, hivemind, infrastructure]
+tags: [adrian-os, concurrency, session-management, hivemind, infrastructure, antigravity]
 related:
   - canonical/concepts/dispatcher-protocol.md
   - canonical/concepts/adrian-os-event-bus.md
@@ -17,6 +18,8 @@ related:
 ---
 
 ## Thesis
+
+This protocol applies to BOTH Claude chat sessions AND Antigravity windows/execution sessions. One canonical doctrine, two surface implementations — same pattern as the U-protocol. The body of this document defines the universal 11-step sequence; AG-specific deltas are in the **Antigravity adaptations** section near the end.
 
 The Dispatcher Protocol coordinates work across parallel live sessions. But sessions also end — and a session that ends badly is worse than one that never started.
 
@@ -293,6 +296,55 @@ Stale lease cleanup (Dispatcher Protocol Rule 4) will handle the dangling leases
 
 ---
 
+## Antigravity adaptations
+
+This protocol applies to Antigravity (AG) windows and execution sessions, with the deltas defined here. Per the U-protocol pattern, one canonical doctrine, two surface implementations.
+
+### AG-specific triggers
+
+When Adrian's message in AG is `shutdown`, `shutdown protocol`, `close window`, `wrap up`, `end session`, `shut it down`, AG runs the protocol on its own session.
+
+AG also fires the protocol implicitly when:
+- A handoff completes AND no new handoff exists AND standing grind queue is empty
+- Adrian closes the AG window (best-effort — graceful close via OS signal handling if available)
+- A long-running task hits a fatal error AG cannot recover from (emergency hard-close path)
+
+### Step-by-step deltas for AG
+
+| Step | AG behaviour |
+|---|---|
+| 1. Process audit | Same — AG already has shell. Add: kill any AG-spawned subprocess that's stalled. |
+| 2. Session archive | Archive the EXECUTION session — what handoffs ran, what files written, what subprocess output. Path: `raw/sessions/YYYY-MM-DD-HHMM-ag-<slug>.md`. Mandatory `## Lessons & Mitigations` section. |
+| 3. Secretary | Append actions emerging from execution (e.g. "file X needs reprocessing", "tool Y returned unexpected schema"). Owner usually `claude-next-session` or `adrian`. Skip actions that are just normal output Adrian already saw. |
+| 4-5. Leases | CRITICAL for AG — AG holds leases longer than Claude chat. Sweep, close completed, hand off partial. Never leave `active`. |
+| 6. Handoff | AG writes `working/handoffs/YYYY-MM-DD-HHMM-ag-to-claude-session-<slug>.md`. Schema same. Direction reversed. |
+| 7. Promote chat decisions | Narrowed for AG — AG executes, doesn't make strategic decisions. BUT: if AG noticed canonical drift mid-execution (a fact in canonical was wrong and AG worked around it), promote that correction. Strategic decisions stay Claude's domain per work-partition v2. |
+| 8. Lessons & mitigations | CRITICAL for AG — AG hits more tool gotchas than Claude chat (longer runtime, more subprocess calls, more file ops). All four tags apply heavily. Promote materially per the same rule. |
+| 9. Log shutdown event | Same — `category` becomes `ag-session` in the JSON. |
+| 10. Apple Note | OPTIONAL for AG. Skip unless the session was particularly notable (major work shipped, emergency, or Adrian-flagged). Adrian sees AG output natively in the window — phone-findability less critical. |
+| 11. save-vault | Same — fire after all writes. |
+
+### AG final-line format
+
+> 🤖 AG session closed. N handoffs executed, M leases released, K files written. Archive: `<path>`. Handoff to claude: `<path>`. Secretary: K captured, J open, L overdue. Lessons: N extracted, M promoted. Standing grind queue: <next target or "empty">.
+
+The `Standing grind queue: ...` line is AG-specific — it tells Adrian what AG would have done next if it hadn't been shut down.
+
+### Cross-surface coordination
+
+If both Claude chat AND AG fire shutdown in overlapping windows:
+- Each runs its own protocol on its own session_id
+- Both write their own archive, handoff, lessons
+- Lessons can cross-reference: AG lesson "Wix API quirk" can cite Claude session that hit the same one, and vice versa
+- Secretary register is shared — both append, no collisions because each entry has unique action_id (8-char hex)
+- save-vault from either surface is fine — git handles concurrent commits via the dispatcher's lease pattern
+
+### Why AG runs this too
+
+The system goal: grow and learn as a unit. AG executes more raw operations than Claude chat, so AG hits more tool gotchas, more edge cases, more subprocess weirdness. If AG sessions die without extracting lessons, the highest-value learning surface is silent. The shutdown protocol is the mechanism that converts AG's runtime experience into compounding canonical knowledge.
+
+---
+
 ## Restart Recovery Checklist (for the NEXT session to use)
 
 At session start after a restart, the next Claude should:
@@ -367,6 +419,7 @@ Commit f3a2c19 pushed.
 - **2026-05-04 (v1.1)** — Secretary integration added as Step 0.5 (mandatory action capture via Lior Ben-David).
 - **2026-05-04 (v2)** — Merged `session-shutdown-protocol.md` into this file. Added: Step 1 process audit, Step 9 Apple Note, Step 10 save-vault, Restart Recovery Checklist appendix, Anti-patterns section, Safety confirmation line. Renumbered cleanly 1–10. File B marked superseded.
 - **2026-05-04 (v2.1)** — Added Step 8 Lessons & Mitigations (mandatory). Bumped Log/Apple Note/save-vault to 9/10/11. Created `canonical/concepts/lessons-learned.md` as rolling canonical. Final shutdown line gains `Lessons: N extracted, M promoted`. Driven by Adrian's gap analysis: actions and decisions were captured, but mistakes/discoveries/tool-gotchas/process-changes were not extracted as a forward-readable record.
+- **2026-05-04 (v2.2)** — Extended `applies_to` to `[claude, antigravity]`. Added Antigravity adaptations section (AG-specific triggers, step deltas, final-line format, cross-surface coordination). System goal: AG runs the protocol on its own windows so AG's runtime learning is captured, not lost. Same pattern as u-protocol — one doctrine, two surfaces.
 
 ## Session references
 - [2026-04-22 hive-mind-archive-protocol](../../raw/sessions/2026-04-22-1800-hive-mind-archive-protocol.md) — Implementation of session archive protocol, ChatGPT export vs Grok export insights, and API stack corrections.
