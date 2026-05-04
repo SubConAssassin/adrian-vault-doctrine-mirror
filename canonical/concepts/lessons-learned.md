@@ -213,3 +213,49 @@ Vault is BOTH. There's no need for a push channel — the user knows where to lo
 **Tags:** `mistake`, `process-change`
 
 ---
+
+### LL-2026-05-05-007 [process-change, mistake] — Stale chats must verify current canonical before promoting anything on shutdown
+
+**Session:** 2601 (chat opened 2026-05-01, briefly re-engaged 2026-05-05 for close-out) · **Handoff:** working/handoffs/2026-05-05-stale-chat-close-team-doctrine-grind-protocol-origin.md
+**Date:** 2026-05-05
+
+**Context:** A 4-day-old chat was briefly re-opened so Adrian could close it cleanly. The chat had originally produced large drafts (canonical/team/* 41-persona doctrine, original grind daemon, original u-protocol). In the 4 days since, parallel AG sessions had refined or superseded much of it (corporate-agent-architecture.md replaced the team model operationally; lessons-learned.md replaced the one-off lessons file; GCS pivot replaced the grind-as-primary approach; Apple Notes was forbidden from system status). Adrian's instruction: "some of this information might be old. Some still might not be set in stone."
+
+**What happened:** Default shutdown-protocol behaviour (Step 7 Promote chat-level decisions to canonical) would have re-promoted stale doctrine from this chat over canonical that had moved on. Caught by Adrian's explicit prompt before any auto-promotion fired.
+
+**Root cause:** Shutdown-protocol v2.3 assumes a session is fresh and its decisions are current. It has no clause for "this chat is days old; verify current canonical state before promoting anything."
+
+**Mitigation / pattern:**
+1. **Stale-chat detection rule:** if `created_at` of the chat (from frontmatter or earliest message) is more than 24h before `closed_at`, treat as stale. Stale-chat shutdown SKIPS Step 7 (canonical promotion) by default. Promotion requires explicit Adrian confirmation per item.
+2. **Pre-shutdown state diff:** for stale chats, before any handoff write, scan canonical for files modified more recently than the chat's `created_at` and that share keywords with the chat's draft topics. List them in the handoff under "What is SUPERSEDED."
+3. **Handoff schema add:** stale-chat handoffs include explicit `## What is SUPERSEDED` and `## What is STILL CURRENT` sections so the next session can disambiguate at a glance.
+4. Hard-rule violations from earlier in the chat (e.g. Apple Notes writes pre-dating the v2.3 ban) get logged in the handoff with a manual-cleanup note for Adrian.
+
+**Promoted to:** This entry. Candidate for a future v2.4 amendment to shutdown-protocol.md adding a "Stale chat" section between "When it fires" and "The ten-step shutdown." Not adding now — one occurrence is signal, two would justify the doctrine extension.
+
+**Tags:** `process-change`, `mistake`
+
+---
+
+### LL-2026-05-05-008 [process-change, discovery] — Re-scan handoffs/ after any long background task before reporting state
+
+**Session:** a228 (Gemini bridge + Apple Notes corpus + infrastructure sweep) · **Handoff:** `working/handoffs/2026-05-05-0117-eb94c46e-session-gemini-bridge-and-infrastructure-sweep.md`
+**Date:** 2026-05-05
+
+**Context:** Session ran a 1h 46min Apple Notes dump as a backgrounded osascript task. While that task was running, four new AG handoffs and one parallel-Claude completion landed in `working/handoffs/`. When Adrian later asked for a "presidential overview" of the chat's state, the naive answer would have flagged issues that had already been resolved by parallel work — the Gemini bridge privacy firewall and the LaunchAgent refresh daemon (exactly the two flags I'd raised hours earlier).
+
+**What happened:** Caught it because I ran `ls -lt working/handoffs/` before composing the overview. Found the parallel completions, read them, integrated into the status report. The risk was: presenting stale flags as live decisions for Adrian, wasting his attention.
+
+**Root cause:** Session-start protocol (read latest handoffs before responding) is canonical. The equivalent rule for long mid-session background tasks is not. A backgrounded task that runs for >5 min is functionally a small session-pause — parallel agents can drop work during it.
+
+**Mitigation / pattern:**
+
+1. **Hard pre-flight before any "what's the state" answer following a long task:** run `ls -lt working/handoffs/ | head -10` and read anything mtime-newer than the task's start time.
+2. **Doctrine extension candidate:** add a "Mid-session handoff re-scan" clause to U-protocol or session-shutdown protocol — fire this whenever a Bash background task with `run_in_background: true` and runtime >5 min completes.
+3. Same logic applies to AG: AG sessions running long tool calls should re-scan AG-to-claude and claude-to-AG queues on completion.
+
+**Promoted to:** This entry. Candidate for a future amendment to U-protocol or shutdown-protocol adding mid-session handoff re-scan as a hard pre-flight.
+
+**Tags:** `process-change`, `discovery`
+
+---
