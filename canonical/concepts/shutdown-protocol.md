@@ -2,7 +2,7 @@
 title: Shutdown Protocol — Graceful Session Close for Claude Chat Sessions
 type: canon
 status: canonical
-version: 2
+version: 2.1
 created: 2026-04-21
 updated: 2026-05-04
 supersedes:
@@ -12,6 +12,7 @@ related:
   - canonical/concepts/dispatcher-protocol.md
   - canonical/concepts/adrian-os-event-bus.md
   - canonical/concepts/adrian-claude-shorthand-protocols.md
+  - canonical/concepts/lessons-learned.md
   - canonical/team/personas/lior-ben-david-secretary.md
 ---
 
@@ -24,6 +25,7 @@ Three specific failure modes the Shutdown Protocol prevents:
 1. **Orphaned leases** — a session holds an active lease, Adrian closes the tab, the lease sits in `working/_locks/` until stale cleanup (up to 2× TTL later), blocking sibling sessions from the same target.
 2. **Lost context** — significant decisions made in chat never make it to canonical. Next session starts with stale knowledge and repeats wasted thinking.
 3. **Silent mid-flight abandonment** — a session writes half of a multi-step op (e.g. 4 of 9 Wix variants) and vanishes; the next session can't tell what's done vs pending.
+4. **Lessons evaporate** — a mistake is made and fixed mid-session; the fix lives in chat memory and dies with the chat. Next session repeats the same mistake.
 
 Shutdown fires explicitly (Adrian triggers it) or implicitly (Claude detects conversation is ending). Either way, it cleans up.
 
@@ -48,7 +50,7 @@ Tab close, browser crash, network loss, device shutdown. These leave leases dang
 
 ---
 
-## The ten-step shutdown
+## The eleven-step shutdown
 
 ### Step 1 — Process audit (30 seconds)
 
@@ -75,7 +77,9 @@ Write a full session archive to `raw/sessions/YYYY-MM-DD-HHMM-<slug>.md`.
 
 This is NOT the handoff note. It is the full knowledge capture — reasoning chains, failed attempts, fixes, challenges, breakthroughs, decisions with their full context. See full schema: `canonical/concepts/session-archive-protocol.md`.
 
-Skip only if the session was pure status-check (Adrian ran `u`, Claude reported, nothing else happened).
+**Mandatory section in every archive:** `## Lessons & Mitigations` (see Step 8 — even if empty, the heading must exist).
+
+Skip the entire archive only if the session was pure status-check (Adrian ran `u`, Claude reported, nothing else happened).
 
 The archive is written EARLY so that even if subsequent steps fail or the session dies, the knowledge is captured.
 
@@ -143,6 +147,9 @@ tags: [session-handoff, <domain tags>]
 ## Decisions made (promote to canonical)
 <any decisions Adrian and Claude made that are not yet in canonical — next session should read + promote>
 
+## Lessons promoted (this session)
+<lesson IDs added to canonical/concepts/lessons-learned.md this shutdown — one-line per entry>
+
 ## Open threads
 <anything Adrian flagged as "think about this" or "pick up later" without concrete next step>
 
@@ -161,17 +168,49 @@ Process:
 - For each, either: update the relevant canonical file directly, or write a `canonical/_pending/` stub if the decision needs Adrian's review before full promotion.
 - Governance dial from event bus is "balanced" — routine updates auto-promote, irreversible or ambiguous ones go to `_pending/`.
 
-### Step 8 — Log shutdown event
+### Step 8 — Extract lessons & mitigations — MANDATORY
+
+Forces explicit extraction of every mistake, discovery, and process change from the session. This step CANNOT be skipped — even if the answer is "no lessons this session." Empty is fine, missing is not.
+
+**Why a separate step from Step 2 (archive) and Step 7 (decisions):**
+- Archives are read *backwards* (you go searching when you remember a problem).
+- Decisions are state changes (this fact is now true).
+- Lessons are read *forwards* — scanned before starting work in a domain to avoid known traps. Different access pattern → different file.
+
+For each lesson identified, classify by tag:
+
+| Tag | Definition |
+|---|---|
+| `mistake` | Error made → root cause → mitigation that prevents recurrence |
+| `discovery` | New technique/pattern/insight worth reusing |
+| `tool-gotcha` | MCP/tool/library quirk + documented workaround |
+| `process-change` | New safeguard added to canonical to prevent a class of error |
+
+**Where lessons live:**
+
+1. **Mandatory section in the session archive** (`raw/sessions/...`) — every archive contains a `## Lessons & Mitigations` heading with subheadings: Mistakes, Discoveries, Tool gotchas, Process changes. Empty subheadings are fine.
+
+2. **Material lessons additionally append** to the rolling canonical: `canonical/concepts/lessons-learned.md` (one growing file, indexed by date + tag, searchable). One entry per lesson, using the schema in that file.
+
+3. **New processes / safeguards** that emerge from a `mistake` or `process-change` lesson get their own canonical file in `canonical/concepts/` (or extend an existing one) — AND a one-liner in `lessons-learned.md` linking to it.
+
+**Promotion rule:** A lesson is "material" (worth promoting to lessons-learned.md) if it would change how a future session approaches similar work. Trivial in-the-moment realisations stay in the session archive only.
+
+**Final shutdown line gains:** `Lessons: N extracted, M promoted.`
+
+See: `canonical/concepts/lessons-learned.md`
+
+### Step 9 — Log shutdown event
 
 Append a line to `working/_events/inbox.ndjson`:
 
 ```json
-{"ts":"<ISO-8601>","category":"session","session_id":"<sid>","status":"shutdown","handoff":"<path if any>","leases_closed":<N>,"canonical_updated":<N>}
+{"ts":"<ISO-8601>","category":"session","session_id":"<sid>","status":"shutdown","handoff":"<path if any>","leases_closed":<N>,"canonical_updated":<N>,"lessons_extracted":<N>,"lessons_promoted":<N>}
 ```
 
 This makes shutdown activity visible to the launchd watcher and to future `u` sweeps.
 
-### Step 9 — Apple Note (phone-findable summary)
+### Step 10 — Apple Note (phone-findable summary)
 
 Short, searchable summary so Adrian can find this session from his phone without opening the laptop.
 
@@ -182,11 +221,12 @@ Body:
 - 1 bullet for outstanding items
 - File path to full closeout report (handoff path)
 - Secretary line: N captured, M open, K overdue
+- Lessons line: N extracted, M promoted (link to lessons-learned.md if any promoted)
 ```
 
 Use `Read and Write Apple Notes:add_note` tool. Folder default: `Notes`.
 
-### Step 10 — save-vault
+### Step 11 — save-vault
 
 After ALL writes are complete, fire save-vault to commit + push:
 
@@ -200,9 +240,9 @@ Per memory directive: every vault edit triggers save-vault. Shutdown bundles the
 
 ## After shutdown
 
-Final message to Adrian is one line:
+Final message to Adrian is one line (longer is OK — comprehensive status matters more than brevity here):
 
-> 🟢 session closed. N leases released, archive at `<path>`, handoff at `<path>`. Secretary: K captured, J open, L overdue. Safe to restart.
+> 🟢 session closed. N leases released, archive at `<path>`, handoff at `<path>`. Secretary: K captured, J open, L overdue. Lessons: N extracted, M promoted. Safe to restart.
 
 After the final message, Claude does not initiate further action in that session unless Adrian explicitly re-engages.
 
@@ -224,8 +264,9 @@ If the session is being closed because something is broken (MCP stack unresponsi
 2. **Skip** Step 7 (canonical promotion). Note in the emergency file: "canonical promotion pending — next session, review this session's chat log."
 3. **Skip** Step 6 schema. Free-text note is fine.
 4. **STILL RUN** Step 3 (Secretary) — actions must survive. If even Secretary is broken, write actions to a free-text file at `working/_secretary/EMERGENCY-YYYY-MM-DD-HHMM.md` for next session to ingest.
-5. **STILL RUN** Step 10 (save-vault) — emergency commits matter most.
-6. **Log** emergency shutdown to inbox.ndjson with `status: emergency-close`.
+5. **STILL RUN** Step 8 (Lessons) — emergency shutdowns are the most lesson-rich sessions. Free-text note to `working/_events/EMERGENCY-LESSONS-YYYY-MM-DD-HHMM.md` if lessons-learned.md is unreachable.
+6. **STILL RUN** Step 11 (save-vault) — emergency commits matter most.
+7. **Log** emergency shutdown to inbox.ndjson with `status: emergency-close`.
 
 Stale lease cleanup (Dispatcher Protocol Rule 4) will handle the dangling leases on a 2× TTL timeline.
 
@@ -239,6 +280,8 @@ Stale lease cleanup (Dispatcher Protocol Rule 4) will handle the dangling leases
 - Don't ask Adrian "are you sure you want to restart?" — if he triggered shutdown, confirm safety and move on
 - Don't kill daemons (overwatch, dashboard, grind) — they're designed to survive restart
 - Don't skip Secretary because "no actions came up" — say so explicitly: `Secretary: 0 captured, M open, K overdue.`
+- Don't skip Lessons because the session "felt smooth" — the smoothest sessions often hide the most reusable patterns. Say `Lessons: 0 extracted` only after honest review, not by default.
+- Don't promote every minor realisation to lessons-learned.md — apply the materiality rule (would it change how a future session approaches similar work?)
 
 ---
 
@@ -258,8 +301,9 @@ At session start after a restart, the next Claude should:
 2. Read newest `working/handoffs/YYYY-MM-DD-HHMM-*-session-*.md` — the last closeout
 3. Read newest `raw/sessions/YYYY-MM-DD-HHMM-*.md` — full archive if context needed
 4. Read `working/_secretary/open-actions.md` — outstanding action queue
-5. Pre-load any files listed in handoff "Next session should"
-6. Execute the first action listed
+5. **Scan `canonical/concepts/lessons-learned.md`** — filter to tags relevant to today's work domain (e.g., if working on Wix, grep `tool-gotcha` + `wix`)
+6. Pre-load any files listed in handoff "Next session should"
+7. Execute the first action listed
 
 This is what the `u` protocol triggers automatically. See `canonical/concepts/u-protocol.md`.
 
@@ -267,14 +311,14 @@ This is what the `u` protocol triggers automatically. See `canonical/concepts/u-
 
 ## Worked example
 
-Session `a1b2` spent 40 minutes updating Merkaba pendant variants on Wix and making two canonical edits. Adrian says "shutdown protocol".
+Session `a1b2` spent 40 minutes updating Merkaba pendant variants on Wix and making two canonical edits. Hit one Wix API quirk mid-session. Adrian says "shutdown protocol".
 
 ```
 # Step 1 — process audit
 ps aux clean. No active extractions.
 
 # Step 2 — session archive
-raw/sessions/2026-04-21-1810-merkaba-variant-update.md written (1.2k words, full reasoning chain)
+raw/sessions/2026-04-21-1810-merkaba-variant-update.md written (1.2k words, full reasoning chain, Lessons & Mitigations section populated)
 
 # Step 3 — Secretary
 2 actions captured: "Propagate sterling silver baseline to Tranquility" (owner: claude-next-session, due: tomorrow), "Update Arcturian Navigator pricing" (owner: adrian, due: null)
@@ -292,22 +336,27 @@ working/handoffs/2026-04-21-1812-c4d5e6f7-session-merkaba-pendant-update.md
   canonical_changes:
     - canonical/businesses/osb/products/merkaba-pendant.md
   decisions: sterling silver baseline confirmed at $988 Large
+  lessons_promoted: [LL-2026-04-21-001]
   next session should: propagate pricing rule to Tranquility and Arcturian Navigator
 
 # Step 7 — promote decision
 Updated canonical/businesses/osb/pricing-rules.md with sterling silver baseline rule.
 
-# Step 8 — log
-inbox.ndjson += {"ts":"...","category":"session","session_id":"a1b2","status":"shutdown",...}
+# Step 8 — extract lessons
+1 lesson extracted, 1 promoted:
+  LL-2026-04-21-001 [tool-gotcha]: Wix variant API silently drops the variant if `option` field is omitted, even when the product has only one option dimension. Workaround: always pass `option: [{name, choice}]` even for single-dimension products. Mitigation file: canonical/concepts/wix-api-gotchas.md (new section added).
 
-# Step 9 — Apple Note
+# Step 9 — log
+inbox.ndjson += {"ts":"...","category":"session","session_id":"a1b2","status":"shutdown","leases_closed":1,"canonical_updated":3,"lessons_extracted":1,"lessons_promoted":1,...}
+
+# Step 10 — Apple Note
 "SESSION CLOSEOUT 2026-04-21 — Merkaba pendant variants" added to Notes folder.
 
-# Step 10 — save-vault
+# Step 11 — save-vault
 Commit f3a2c19 pushed.
 
 # Final line to Adrian
-🟢 session closed. 1 lease released, archive at raw/sessions/2026-04-21-1810-merkaba-variant-update.md, handoff at working/handoffs/2026-04-21-1812-c4d5e6f7-session-merkaba-pendant-update.md. Secretary: 2 captured, 6 open, 0 overdue. Safe to restart.
+🟢 session closed. 1 lease released, archive at raw/sessions/2026-04-21-1810-merkaba-variant-update.md, handoff at working/handoffs/2026-04-21-1812-c4d5e6f7-session-merkaba-pendant-update.md. Secretary: 2 captured, 6 open, 0 overdue. Lessons: 1 extracted, 1 promoted. Safe to restart.
 ```
 
 ---
@@ -317,6 +366,7 @@ Commit f3a2c19 pushed.
 - **2026-04-21 (v1)** — Initial canonical version. Paired with Dispatcher Protocol v1. Installed in response to Adrian's "shutdown protocol" command.
 - **2026-05-04 (v1.1)** — Secretary integration added as Step 0.5 (mandatory action capture via Lior Ben-David).
 - **2026-05-04 (v2)** — Merged `session-shutdown-protocol.md` into this file. Added: Step 1 process audit, Step 9 Apple Note, Step 10 save-vault, Restart Recovery Checklist appendix, Anti-patterns section, Safety confirmation line. Renumbered cleanly 1–10. File B marked superseded.
+- **2026-05-04 (v2.1)** — Added Step 8 Lessons & Mitigations (mandatory). Bumped Log/Apple Note/save-vault to 9/10/11. Created `canonical/concepts/lessons-learned.md` as rolling canonical. Final shutdown line gains `Lessons: N extracted, M promoted`. Driven by Adrian's gap analysis: actions and decisions were captured, but mistakes/discoveries/tool-gotchas/process-changes were not extracted as a forward-readable record.
 
 ## Session references
 - [2026-04-22 hive-mind-archive-protocol](../../raw/sessions/2026-04-22-1800-hive-mind-archive-protocol.md) — Implementation of session archive protocol, ChatGPT export vs Grok export insights, and API stack corrections.
