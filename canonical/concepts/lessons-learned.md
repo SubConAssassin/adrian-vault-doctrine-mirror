@@ -185,3 +185,31 @@ The proposed-deltas slot is critical — prevents the receiver from silently wor
 **Tags:** `tool-gotcha`
 
 ---
+
+### LL-2026-05-05-006 [mistake, process-change] — Don't co-opt user notification channels for system status
+
+**Session:** 5db0 shutdown-protocol-v2-2-build (post-shutdown amendment) · **Archive:** raw/sessions/2026-05-05-0014-shutdown-protocol-v2-2-build-with-ag-integration.md
+**Date:** 2026-05-05
+
+**Context:** Shutdown protocol v2.2 included Step 10 — write an Apple Note as a phone-findable session summary. Walked the talk on this session and added one. Adrian immediately flagged: Apple Notes is for clients and personal use, NOT for system status clutter.
+
+**What happened:** The Apple Note step felt like a smart UX add (phone-findable summary). It actually polluted Adrian's personal-and-client notes folder with system-generated content he doesn't read. Adrian only realised the cost AFTER seeing the first one fire. The step was inherited from session-shutdown-protocol.md (the superseded file B) without questioning whether the channel was appropriate.
+
+**Root cause:** Conflated two distinct concepts:
+1. "Where can system status live so it's queryable on demand?" → vault files (canonical, working/, raw/) already cover this
+2. "Where can system status be pushed so the user is notified?" → wrongly assumed Apple Notes was option 2
+
+Vault is BOTH. There's no need for a push channel — the user knows where to look. Pushing to a personal channel adds noise without value.
+
+**Mitigation / pattern:**
+- Removed Step 10 (Apple Note) from canonical shutdown-protocol.md (v2.3)
+- Deleted the offending note from Apple Notes
+- New principle: **notification channels owned by the user (Notes, Reminders, Calendar, Mail) are NEVER used for system status, closeouts, or AI-generated summaries.** System status stays queryable in vault. Push only when there is a hard real-time deadline the user must act on — and even then, prefer iMessage-to-self over personal channels.
+- Generalisation: before any new protocol step that writes to a user-facing channel, ask "Is this channel currently used by Adrian for anything other than system content?" If yes → don't write there.
+- Memory edits are full — this preference lives in canonical only. Future sessions reading lessons-learned.md before starting protocol work will encounter it.
+
+**Promoted to:** `canonical/concepts/shutdown-protocol.md` v2.3 (Step removed), this entry. Worth a separate doctrine file `canonical/concepts/notification-channel-rules.md` if this principle comes up twice more.
+
+**Tags:** `mistake`, `process-change`
+
+---

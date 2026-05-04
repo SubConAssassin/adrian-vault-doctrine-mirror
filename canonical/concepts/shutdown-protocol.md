@@ -2,7 +2,7 @@
 title: Shutdown Protocol — Graceful Session Close for Claude Chat AND Antigravity Sessions
 type: canon
 status: canonical
-version: 2.2
+version: 2.3
 applies_to: [claude, antigravity]
 created: 2026-04-21
 updated: 2026-05-04
@@ -53,7 +53,7 @@ Tab close, browser crash, network loss, device shutdown. These leave leases dang
 
 ---
 
-## The eleven-step shutdown
+## The ten-step shutdown
 
 ### Step 1 — Process audit (30 seconds)
 
@@ -213,23 +213,7 @@ Append a line to `working/_events/inbox.ndjson`:
 
 This makes shutdown activity visible to the launchd watcher and to future `u` sweeps.
 
-### Step 10 — Apple Note (phone-findable summary)
-
-Short, searchable summary so Adrian can find this session from his phone without opening the laptop.
-
-```
-Title: SESSION CLOSEOUT YYYY-MM-DD — [topic]
-Body:
-- 2-3 bullet points of what was done
-- 1 bullet for outstanding items
-- File path to full closeout report (handoff path)
-- Secretary line: N captured, M open, K overdue
-- Lessons line: N extracted, M promoted (link to lessons-learned.md if any promoted)
-```
-
-Use `Read and Write Apple Notes:add_note` tool. Folder default: `Notes`.
-
-### Step 11 — save-vault
+### Step 10 — save-vault
 
 After ALL writes are complete, fire save-vault to commit + push:
 
@@ -268,7 +252,7 @@ If the session is being closed because something is broken (MCP stack unresponsi
 3. **Skip** Step 6 schema. Free-text note is fine.
 4. **STILL RUN** Step 3 (Secretary) — actions must survive. If even Secretary is broken, write actions to a free-text file at `working/_secretary/EMERGENCY-YYYY-MM-DD-HHMM.md` for next session to ingest.
 5. **STILL RUN** Step 8 (Lessons) — emergency shutdowns are the most lesson-rich sessions. Free-text note to `working/_events/EMERGENCY-LESSONS-YYYY-MM-DD-HHMM.md` if lessons-learned.md is unreachable.
-6. **STILL RUN** Step 11 (save-vault) — emergency commits matter most.
+6. **STILL RUN** Step 10 (save-vault) — emergency commits matter most.
 7. **Log** emergency shutdown to inbox.ndjson with `status: emergency-close`.
 
 Stale lease cleanup (Dispatcher Protocol Rule 4) will handle the dangling leases on a 2× TTL timeline.
@@ -292,7 +276,7 @@ Stale lease cleanup (Dispatcher Protocol Rule 4) will handle the dangling leases
 
 - Does not close or supersede leases held by **other** sessions. Only own.
 - Does not delete or archive prior handoffs. Historical trail stays intact.
-- Does not send notifications beyond the single final chat line + Apple Note. Mac notifications / iMessage-to-self fire only if an emergency shutdown happened (via event bus launchd rules).
+- Does not send notifications beyond the single final chat line. Apple Notes / Mac notifications / iMessage-to-self are NEVER used for shutdown summaries — Apple Notes is reserved for Adrian's client and personal use. Mac notifications / iMessage-to-self fire only if an emergency shutdown happened (via event bus launchd rules).
 
 ---
 
@@ -321,8 +305,7 @@ AG also fires the protocol implicitly when:
 | 7. Promote chat decisions | Narrowed for AG — AG executes, doesn't make strategic decisions. BUT: if AG noticed canonical drift mid-execution (a fact in canonical was wrong and AG worked around it), promote that correction. Strategic decisions stay Claude's domain per work-partition v2. |
 | 8. Lessons & mitigations | CRITICAL for AG — AG hits more tool gotchas than Claude chat (longer runtime, more subprocess calls, more file ops). All four tags apply heavily. Promote materially per the same rule. |
 | 9. Log shutdown event | Same — `category` becomes `ag-session` in the JSON. |
-| 10. Apple Note | OPTIONAL for AG. Skip unless the session was particularly notable (major work shipped, emergency, or Adrian-flagged). Adrian sees AG output natively in the window — phone-findability less critical. |
-| 11. save-vault | Same — fire after all writes. |
+| 10. save-vault | Same — fire after all writes. |
 
 ### AG final-line format
 
@@ -401,10 +384,7 @@ Updated canonical/businesses/osb/pricing-rules.md with sterling silver baseline 
 # Step 9 — log
 inbox.ndjson += {"ts":"...","category":"session","session_id":"a1b2","status":"shutdown","leases_closed":1,"canonical_updated":3,"lessons_extracted":1,"lessons_promoted":1,...}
 
-# Step 10 — Apple Note
-"SESSION CLOSEOUT 2026-04-21 — Merkaba pendant variants" added to Notes folder.
-
-# Step 11 — save-vault
+# Step 10 — save-vault
 Commit f3a2c19 pushed.
 
 # Final line to Adrian
@@ -420,6 +400,7 @@ Commit f3a2c19 pushed.
 - **2026-05-04 (v2)** — Merged `session-shutdown-protocol.md` into this file. Added: Step 1 process audit, Step 9 Apple Note, Step 10 save-vault, Restart Recovery Checklist appendix, Anti-patterns section, Safety confirmation line. Renumbered cleanly 1–10. File B marked superseded.
 - **2026-05-04 (v2.1)** — Added Step 8 Lessons & Mitigations (mandatory). Bumped Log/Apple Note/save-vault to 9/10/11. Created `canonical/concepts/lessons-learned.md` as rolling canonical. Final shutdown line gains `Lessons: N extracted, M promoted`. Driven by Adrian's gap analysis: actions and decisions were captured, but mistakes/discoveries/tool-gotchas/process-changes were not extracted as a forward-readable record.
 - **2026-05-04 (v2.2)** — Extended `applies_to` to `[claude, antigravity]`. Added Antigravity adaptations section (AG-specific triggers, step deltas, final-line format, cross-surface coordination). System goal: AG runs the protocol on its own windows so AG's runtime learning is captured, not lost. Same pattern as u-protocol — one doctrine, two surfaces.
+- **2026-05-05 (v2.3)** — Removed Apple Note step entirely. Adrian's Apple Notes folder is reserved for client and personal use; system closeouts must never write there. Renumbered Log/save-vault from 9/11 to 9/10. Now ten steps total. Lesson promoted: notification channels owned by the user must not be co-opted for system status — system status stays queryable in vault, not pushed into personal channels.
 
 ## Session references
 - [2026-04-22 hive-mind-archive-protocol](../../raw/sessions/2026-04-22-1800-hive-mind-archive-protocol.md) — Implementation of session archive protocol, ChatGPT export vs Grok export insights, and API stack corrections.
