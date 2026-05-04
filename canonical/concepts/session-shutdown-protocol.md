@@ -1,12 +1,27 @@
 ---
-title: Session Shutdown Protocol
+title: Session Shutdown Protocol — SUPERSEDED
 type: canonical-procedure
-priority: MEDIUM — run when Adrian signals session end or restart
+status: superseded
+superseded_by: canonical/concepts/shutdown-protocol.md
+superseded_on: 2026-05-04
+priority: DO NOT USE — see successor
 created: 2026-04-24
 distilled_from: 2026-04-23/24 Hive Mind Assimilation session
 ---
 
-# Session Shutdown Protocol
+> # ⚠️ SUPERSEDED — DO NOT USE
+>
+> This file was merged into **`canonical/concepts/shutdown-protocol.md`** v2.0 on 2026-05-04.
+>
+> The successor file integrates everything below (process audit, save-unsaved-work checklist, lessons extraction, Apple Note, safety confirmation, anti-patterns, restart recovery checklist) into the unified ten-step shutdown sequence.
+>
+> **Use the successor file. This file is kept for historical trail only.**
+>
+> Why merged: two canonical shutdown docs with overlapping but renumbered steps was a foot-gun. On every "shutdown" trigger, Claude had to reconcile both in real time. Single source of truth = no drift.
+
+---
+
+# Session Shutdown Protocol (historical — v1, 2026-04-24)
 
 Standard procedure when Adrian signals end of session, or wants to restart Claude/Mac.
 
@@ -88,8 +103,6 @@ YES / NO + reason
 - Pre-load: [list of files]
 - First action: [what to do first]
 ```
-
----
 
 ---
 
