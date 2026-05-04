@@ -28,7 +28,12 @@ When Adrian types `u` or `U` alone (no other characters):
    - Completed (what AG/last session shipped)
    - Failed/skipped (what didn't land)
    - Decisions needed from President (max 5)
-4. **Stop.** No questions. No "let me know what you'd like." No options. If Adrian wants more detail he'll ask.
+4. **After the three-block report, surface Secretary state in ONE line:**
+   - Format: Secretary: N open actions, K overdue. Top: <most-overdue or top-priority>.
+   - If 0 open: Secretary: clear.
+   - This is non-optional. It runs every U.
+
+5. **Stop.** No questions. No "let me know what you'd like." No options. If Adrian wants more detail he'll ask.
 
 NEVER:
 - Recap prior session

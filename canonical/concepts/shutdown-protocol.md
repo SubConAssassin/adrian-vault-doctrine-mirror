@@ -53,6 +53,25 @@ Skip only if the session was pure status-check (Adrian ran `u`, Claude reported,
 
 The archive is written FIRST so that even if subsequent steps fail or the session dies, the knowledge is captured.
 
+### Step 0.5 — Invoke Secretary (Lior Ben-David) — MANDATORY
+
+Lior captures all action points from this session before any cleanup. This step CANNOT be skipped.
+
+For each action point identified in the session:
+
+1. Append one line to `working/_secretary/action-register.ndjson` with event `open` (or `update`/`complete` if the session resolved a prior action).
+2. Set owner to: persona name, `adrian`, `antigravity`, or `claude-next-session`.
+3. Set due date if explicit; otherwise null.
+4. Set context to current session id + handoff path.
+
+Then regenerate `working/_secretary/open-actions.md` from the full register, sorted: overdue first, then by due date, then by age.
+
+The Secretary is the firewall against "chat forgotten = work forgotten." If Lior step is skipped, action points die with the chat. No exceptions.
+
+Final shutdown line MUST include Secretary status: `Secretary captured N actions, M open total, K overdue.`
+
+See: `canonical/team/personas/lior-ben-david-secretary.md`
+
 ### Step 1 — Sweep own leases
 
 List `working/_locks/` filtered to `session_id == <this session's id>`. Any found are this session's responsibility.
@@ -128,7 +147,7 @@ This makes shutdown activity visible to the launchd watcher and to future `u` sw
 
 ## After shutdown
 
-Final message to Adrian is one line: `🟢 session closed. N leases released, archive at <path>, handoff at <path> (or: no handoff needed).`
+Final message to Adrian is one line: `🟢 session closed. N leases released, archive at <path>, handoff at <path>. Secretary: K actions captured, J open, L overdue.`
 
 After the final message, Claude does not initiate further action in that session unless Adrian explicitly re-engages.
 

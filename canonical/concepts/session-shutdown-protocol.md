@@ -91,6 +91,24 @@ YES / NO + reason
 
 ---
 
+---
+
+## Step 5.5 — Secretary Action Capture (MANDATORY)
+
+Lior Ben-David (Secretary) captures every action point from this session. This step CANNOT be skipped — even on emergency shutdown.
+
+For each action identified:
+
+- Append one line to `working/_secretary/action-register.ndjson`
+- Fields: ts, event (open/update/complete/cancel/defer), action_id (8-char hex), title, owner, due, depends_on, context, notes
+- Then regenerate `working/_secretary/open-actions.md` (sorted: overdue first, then due date, then age)
+
+The Secretary exists because chat-bound actions die when the chat dies. The action register survives all sessions, all chats, all crashes.
+
+Final closeout line includes Secretary status: `Secretary: N captured, M open, K overdue.`
+
+See: `canonical/team/personas/lior-ben-david-secretary.md`
+
 ## Step 6 — Apple Note
 
 Short, searchable, findable from phone:
