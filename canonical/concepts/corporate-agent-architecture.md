@@ -39,6 +39,20 @@ Adrian (CEO) issues audio mandates. Claude (Chief of Staff) intakes/synthesises/
 - Voice / Enlightened by Voice → Voice & Persona dept (diagnostic input)
 - Angel Numbers Community App → Social Media dept (community deployment)
 
+### Skill Department to Team Role Mapping
+
+The vault maps the 7 corporate-dept skills to `shared/personas/team-roster/` roles:
+
+| Department (skill) | Team Role (persona card) |
+|---|---|
+| Copy & Scripting (`mkt-copywriting`) | master-scriptwriter |
+| Voice & Persona (`voice-persona-curator`) | (Adrian / no team-role — owns Adrian's voice) |
+| Post-Production (`mkt-video-postprod`) | production-director |
+| Social Marketing (`mkt-social-deploy`) | social-strategist |
+| Research (`str-trending-research`) | (no team-role — Grok owns this per blueprint) |
+| Legal (`legal-dispute-mgr`) | (need: legal-counsel — flag for future hire) |
+| Finance & Ops (`ops-ledger-keeper`) | chief-accountant |
+
 ## 3. Per-Department Governance Schema
 
 Every department skill MUST declare in its frontmatter:
