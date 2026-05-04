@@ -117,3 +117,71 @@ When unclear, err toward including. Cost of one extra entry is low; cost of repe
 **Tags:** `discovery`, `process-change`
 
 ---
+
+### LL-2026-05-04-003 [discovery, process-change] — One-doctrine-two-surfaces pattern for cross-surface protocols
+
+**Session:** 5db0 shutdown-protocol-v2-2-build · **Archive:** raw/sessions/2026-05-05-0014-shutdown-protocol-v2-2-build-with-ag-integration.md
+**Date:** 2026-05-04
+
+**Context:** Adrian asked to extend shutdown protocol to Antigravity. Naive read = write a parallel AG-shutdown-protocol.md. That would have created the exact duplication problem just resolved by LL-2026-05-04-001.
+
+**What happened:** Recognised the u-protocol already solved this — single canonical doc with `applies_to: [claude, antigravity]` frontmatter and a deltas section. Adopted the same shape for shutdown-protocol.md v2.2.
+
+**Mitigation / pattern:** When a doctrine touches both Claude and AG, write ONE canonical with:
+1. `applies_to: [claude, antigravity]` in frontmatter
+2. Universal body (the protocol body works for both surfaces)
+3. `## <SecondSurface> adaptations` section near the end documenting deltas (triggers, step behaviours, final-line format, edge cases)
+4. Cross-surface coordination subsection (what happens when both surfaces run the protocol concurrently)
+
+Reusable for any future cross-surface doctrine. Don't duplicate.
+
+**Promoted to:** `canonical/concepts/shutdown-protocol.md` v2.2 (uses pattern), this entry.
+
+**Tags:** `discovery`, `process-change`
+
+---
+
+### LL-2026-05-04-004 [discovery, process-change] — Handoff acknowledgment loop = telemetry for doctrine integration
+
+**Session:** 5db0 shutdown-protocol-v2-2-build · **Archive:** raw/sessions/2026-05-05-0014-shutdown-protocol-v2-2-build-with-ag-integration.md
+**Date:** 2026-05-04
+
+**Context:** Per u-protocol authoring rules, handoffs must be self-executing with a defined "done" state. But "doctrine integration" handoffs have no tangible output — the work is internalisation, not file production.
+
+**What happened:** Resolved by requiring the receiving surface to write an acknowledgment file as the only telemetry. File path pattern: `working/handoffs/YYYY-MM-DD-HHMM-<receiver>-to-<sender>-<doctrine-slug>-integrated.md`. File existence IS the proof of integration. Acknowledgment file content includes: confirmation of read, list of internalised triggers/behaviours, optional dry-run results, and — critically — proposed deltas if the receiver sees gaps based on its operational reality.
+
+**Mitigation / pattern:** Canonical pattern for ANY cross-surface doctrine push:
+1. Authoring side writes self-executing handoff to working/handoffs/
+2. Receiving side reads the handoff (via `u` or explicit instruction)
+3. Receiving side writes acknowledgment file back to working/handoffs/ with confirmation + proposed deltas
+4. Authoring side reads ack on next session, marks Secretary action complete, applies any proposed deltas to canonical
+
+The proposed-deltas slot is critical — prevents the receiver from silently working around gaps in the doctrine. Surfaces operational mismatches for canonical update.
+
+**Promoted to:** `canonical/concepts/shutdown-protocol.md` (handoff to AG used this pattern), this entry. Worth lifting into a standalone `canonical/concepts/cross-surface-doctrine-integration.md` if used two more times.
+
+**Tags:** `discovery`, `process-change`
+
+---
+
+### LL-2026-05-04-005 [tool-gotcha] — /working/ is gitignored; save-vault output silent about it
+
+**Session:** 5db0 shutdown-protocol-v2-2-build · **Archive:** raw/sessions/2026-05-05-0014-shutdown-protocol-v2-2-build-with-ag-integration.md
+**Date:** 2026-05-04
+
+**Context:** Wrote a handoff to `working/handoffs/` then ran save-vault. Output only listed the modified canonical file in the commit summary; new handoff file was not mentioned. Initially looked like a write failure.
+
+**What happened:** Verified file existed on disk (6059 bytes, correct path, correct content). `git status` showed "nothing to commit, working tree clean." `git ls-files | grep <handoff>` returned empty. Investigation: `.gitignore` rule `/working/` excludes the entire working directory per `bridge-protocols.md` rule that only canonical/ syncs to the public-facing GitHub mirror.
+
+**Root cause:** save-vault is a thin wrapper around `git add -A && git commit && git push`. It honours .gitignore. Handoffs in /working/ are deliberately local-only. AG reads them via filesystem MCP, not git. So the gitignore is correct behaviour. But save-vault's output gives no signal that working/ files were skipped — it's silent.
+
+**Mitigation / pattern:**
+1. Don't read save-vault silence about working/ files as failure. Verify with `ls` or `git check-ignore -v <path>` before assuming a write failed.
+2. For any handoff-write workflow, add a post-write `ls -la <handoff-path>` to confirm the file exists, since save-vault won't tell you.
+3. If you ever need a working/ file in git for any reason, you'd need to override the gitignore explicitly (`git add -f`) — but think hard about whether it should be in canonical/ instead.
+
+**Promoted to:** This entry. Worth adding to `canonical/concepts/bridge-protocols.md` as a known operational consequence of the gitignore rule.
+
+**Tags:** `tool-gotcha`
+
+---
