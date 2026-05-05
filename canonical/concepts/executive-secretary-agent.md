@@ -1,10 +1,10 @@
 ---
 title: Executive Secretary Agent — Spec
 type: agent-spec
-status: v0.1 — LIVE 2026-05-04 (build complete, briefing scheduled 06:00 WITA daily)
-version: 0.1.0
+status: v0.1.3 — LIVE 2026-05-05 (JSON patch, 48h ingestion)
+version: 0.1.3
 created: 2026-05-04
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 authored_by: claude (CEO / Chief of Staff)
 build_history:
   - 2026-05-04 19:40 — spec written (v0.1)
@@ -341,6 +341,7 @@ Project-state about specific decisions or content items lives in `canonical/stat
 # 13. Versioning
 
 - **v0.1.0 (2026-05-04 — LIVE)** — Python LaunchAgent, file-based briefing, three state files, simplified Mind-pillar guard, "Recently drafted" section per AG amendment
+- **v0.1.3 (2026-05-05 — LIVE)** — Fixed APFS JSON lock contention (Resource deadlock avoided). Added ingestion and parsing for 48-hour parallel burn plans to track in-flight commissions.
 - **v0.1.1 (planned, ~7 days)** — full §5.1 scoring algorithm; full input set per §3 (handoffs scan, _events scan, ceo-execution-schedule parse, cases deadline scan, _locks/_completed scan); YAML frontmatter on output; failure-mode handling (governance-flags); drift-flag detection (7-day surface tracking)
 - **v0.2 (deferred)** — n8n migration if cross-system triggering needed (e.g. Wix scheduled-publish triggers, Calendar integration)
 - **v0.3 (deferred)** — Notification UX (only if 4+ weeks of clean v0.1 operation prove Adrian wants more than file-based)
