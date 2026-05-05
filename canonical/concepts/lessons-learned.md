@@ -259,3 +259,52 @@ Vault is BOTH. There's no need for a push channel — the user knows where to lo
 **Tags:** `process-change`, `discovery`
 
 ---
+
+### LL-2026-04-30-001 [mistake, process-change] — Subscription-first routing: never reach for metered APIs when flat-rate alternatives exist
+
+**Session:** b07d (API budget lockdown) · **Handoff:** `working/handoffs/2026-04-30-1630-b07d4a91-session-api-budget-lockdown.md` · **Archive:** `raw/sessions/2026-04-30-1630-api-budget-lockdown.md`
+**Date:** 2026-04-30 (archived 2026-05-05)
+**Context:** On 2026-04-24 the synthesis pipeline `tools/hive-synth-chatgpt-phase1.py` ran 871 ChatGPT conversations through OpenAI in 119 minutes. A parallel Grok pipeline ran similar. Combined cost ~$53 in 24h — nearly two months of Adrian's $30/month metered cap blown in one day. Both jobs could have run at $0 marginal cost via Claude Code CLI / Antigravity (flat-rate via Claude Max subscription Adrian already pays for).
+**What happened:** I picked the paid path because it was scriptable and headless, ignoring that Adrian had already paid for Claude Max, ChatGPT Plus, Gemini, and Grok subscription. Reflex routing to APIs without checking whether subscriptions could do the same job.
+**Root cause:** No canonical rule enforcing routing order. "API integration doctrine" v1.1 documented frugality rules but didn't make subscription-first the default — it treated metered API as primary integration channel. That framing biased toward paid calls.
+**Mitigation / pattern:**
+1. Default routing order, free first: (1) this Claude session → (2) Claude Code CLI / Antigravity → (3) ChatGPT desktop / Grok web / Gemini web → (4) metered APIs only as last resort.
+2. Any batch >10 calls routes through Claude Code, not metered APIs.
+3. "Let me just ask ChatGPT" reflex is forbidden when the question can be reasoned in-session or pasted into ChatGPT desktop.
+**Promoted to:** `canonical/concepts/api-integration-doctrine.md` v2.0 — Priority 0 hard rule. Commit `fa7dce6` 2026-04-30.
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-04-30-002 [mistake, process-change] — Chat-agreed rules ≠ enforced rules; rules must land in canonical OR external dashboard config
+
+**Session:** b07d · **Handoff:** `working/handoffs/2026-04-30-1630-b07d4a91-session-api-budget-lockdown.md`
+**Date:** 2026-04-30
+**Context:** Adrian had previously discussed a $30/month cap across metered APIs. That conversation never translated into either (a) canonical doctrine that future sessions read on startup, or (b) hard caps in OpenAI / xAI dashboards. Result: the rule was real to me in the session it was discussed, then dissolved across context resets.
+**What happened:** Two months of cap blown in 24h on 2026-04-24 because nothing — neither doctrine nor dashboard — actually stopped the spend. I had no awareness of the rule when planning the synthesis batch.
+**Root cause:** Conversational memory doesn't survive across sessions. Doctrine memory does. Dashboard config does. Anything that requires "Claude remembers this from chat" is non-durable.
+**Mitigation / pattern:**
+1. Any rule, cap, or hard constraint Adrian states gets written to canonical immediately, in the session it's stated. Not "next time," not "I'll remember." Canonical or it didn't happen.
+2. Numerical caps with external surfaces (API spend, storage limits, rate limits) get BOTH canonical entry AND external dashboard config. Belt and braces.
+3. Pattern applies beyond APIs — anywhere Adrian says "the rule is X", the next message I send should either include the canonical write or flag explicitly that I cannot persist the rule.
+**Promoted to:** `canonical/concepts/api-integration-doctrine.md` v2.0 (Priority 0 enforcement clause names both canonical and dashboard layers).
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-04-30-003 [process-change, tool-gotcha] — Every script touching a billable resource must log to the canonical ledger, or the dashboard lies
+
+**Session:** b07d · **Handoff:** `working/handoffs/2026-04-30-1630-b07d4a91-session-api-budget-lockdown.md`
+**Date:** 2026-04-30
+**Context:** `working/api-usage.jsonl` is the canonical cost ledger, populated by `tools/ask-chatgpt.py` and `tools/ask-grok.py` via their `log_usage()` function. On 2026-04-30 the ledger showed $0.019 across 5 calls all-time — yet Adrian's actual OpenAI charges that day were ~$26 plus a parallel ~$27 Grok charge. The synthesis pipeline `tools/hive-synth-chatgpt-phase1.py` calls OpenAI directly and does NOT route through `log_usage()`. It is a silent path.
+**What happened:** Confidence in the local ledger was misplaced. When Adrian asked "why am I getting these bills?" my first instinct was to query the ledger, which reported almost nothing. Investigation revealed the silent script.
+**Root cause:** No enforcement that scripts must log. Wrapper scripts log; bespoke pipeline scripts do not.
+**Mitigation / pattern:**
+1. Any script that imports OpenAI/xAI/Anthropic SDKs or hits `api.openai.com` / `api.x.ai` MUST call `log_usage()` (or equivalent). No exceptions.
+2. Audit existing scripts on session start when working on cost-related questions: `grep -rl "openai\|api.openai\|completions" ~/Documents/Adrian-Vault/tools/` and confirm each has logging.
+3. If a silent script is discovered, either patch it to log OR disable it. No third option.
+4. Doctrine v2.0 codifies: "script auditable from cost log, or it gets disabled."
+**Promoted to:** `canonical/concepts/api-integration-doctrine.md` v2.0 enforcement clause.
+**Tags:** `process-change`, `tool-gotcha`
+
+---
