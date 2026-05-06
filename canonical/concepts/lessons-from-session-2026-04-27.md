@@ -1,11 +1,18 @@
 ---
 title: Lessons from Session — 27 April 2026 (Sequoia meeting voice-memo + AGA tech stack)
-type: session-lessons
+type: lesson
+status: canonical
+tier: 2
+firewall_class: working-internal
 date: 2026-04-27
+last_updated: 2026-04-27
 session_focus: Sequoia meeting voice memo ingest, Tatschl identity resolution, AGA tech stack synthesis
 duration_chat_window: ~3 hours
 spend_apis: ~$0.42 (Whisper API + 2 × Grok-4)
 files_produced: 8 (3 canonical, 3 working drafts, 1 handoff, 1 tool)
+related:
+  - canonical/concepts/lessons-learned.md
+  - canonical/projects/aga-bali/
 ---
 
 # Session lessons — 27 April 2026

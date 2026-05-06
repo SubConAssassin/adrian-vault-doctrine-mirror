@@ -1,9 +1,16 @@
 ---
 title: Postmortem — Why overnight jobs have failed 90% of the time
-type: postmortem
-date: 2026-04-29
-author: claude
+type: lesson
 status: canonical
+tier: 2
+firewall_class: working-internal
+date: 2026-04-29
+last_updated: 2026-04-29
+author: claude
+related:
+  - canonical/concepts/doctrine-no-more-overnight-bouncing.md
+  - canonical/concepts/grind-protocol.md
+  - canonical/concepts/lessons-learned.md
 ---
 
 # Postmortem — Overnight Job Failure Pattern

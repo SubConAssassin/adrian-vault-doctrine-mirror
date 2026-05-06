@@ -1,3 +1,16 @@
+---
+title: Lessons from Session — 2026-04-29 (Vault Autosave + Frictionless Protocol)
+type: lesson
+status: canonical
+tier: 2
+firewall_class: working-internal
+created: 2026-04-29
+last_updated: 2026-04-29
+related:
+  - canonical/concepts/lessons-learned.md
+  - canonical/concepts/frictionless-operator-doctrine.md
+---
+
 # Lessons from Session — 2026-04-29 (Vault Autosave + Frictionless Protocol)
 
 Status: canonical

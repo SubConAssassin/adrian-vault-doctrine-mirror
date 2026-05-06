@@ -1,13 +1,17 @@
 ---
 title: Dispatcher Protocol — Concurrency Control for Parallel Claude Sessions
-type: canon
+type: protocol
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-21
+last_updated: 2026-04-21
 tags: [adrian-os, concurrency, locking, hivemind, infrastructure]
 related:
   - canonical/concepts/adrian-os-event-bus.md
   - canonical/concepts/adrian-claude-shorthand-protocols.md
   - canonical/concepts/claude-ceo-discipline.md
+  - canonical/concepts/edit-lease-protocol.md
 ---
 
 ## Thesis

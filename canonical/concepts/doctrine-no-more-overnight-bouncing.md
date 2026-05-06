@@ -1,12 +1,20 @@
 ---
 title: "Meeting Minutes — Claude ↔ Antigravity — Ending the Overnight-Failure Pattern"
 type: doctrine
+status: canonical
+tier: 2
+firewall_class: working-internal
 from: claude
 to: antigravity
 date: 2026-04-29 09:30 WITA
 priority: P0
 canary: NO-MORE-OVERNIGHT-BOUNCING
-status: binding-on-both-agents
+created: 2026-04-29
+last_updated: 2026-04-29
+related:
+  - canonical/concepts/grind-protocol.md
+  - canonical/concepts/24-7-operating-model.md
+  - canonical/concepts/claude-antigravity-work-partition.md
 ---
 
 # Meeting Minutes — Claude × Antigravity

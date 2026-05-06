@@ -1,8 +1,15 @@
 ---
 title: Adrian-OS — Event Bus and Hive-Mind Coordination
-type: canon
+type: framework
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-20
+last_updated: 2026-04-20
+related:
+  - canonical/concepts/corporate-agent-architecture.md
+  - canonical/concepts/handoff-frontmatter-conventions.md
+  - canonical/concepts/dispatcher-protocol.md
 tags: [adrian-os, event-bus, hivemind, architecture, phase-1]
 ---
 

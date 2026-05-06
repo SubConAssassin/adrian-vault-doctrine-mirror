@@ -1,8 +1,15 @@
 ---
 title: ChatGPT-Dispatch Protocol
-type: canon
+type: protocol
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-20
+last_updated: 2026-04-20
+related:
+  - canonical/concepts/api-integration-doctrine.md
+  - canonical/concepts/bridge-protocols.md
+  - canonical/concepts/dispatcher-protocol.md
 tags: [hivemind, chatgpt, dispatch, protocol, adrian-os]
 ---
 

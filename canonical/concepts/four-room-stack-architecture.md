@@ -1,9 +1,16 @@
 ---
 title: Four-Room Stack Architecture — OpenAI Stack Role Assignment
-type: canon
+type: framework
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-21
+last_updated: 2026-04-21
 supersedes: working/handoffs/2026-04-19-chatgpt-ai-stack-role-allocation.md
+related:
+  - canonical/concepts/api-integration-doctrine.md
+  - canonical/concepts/bridge-protocols.md
+  - canonical/concepts/chatgpt-dispatch-protocol.md
 tags: [hivemind, openai, atlas, codex, chatgpt, architecture, doctrine, adrian-os]
 ---
 

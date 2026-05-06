@@ -1,16 +1,19 @@
 ---
 title: Production Manager Agent — Spec
-type: agent-spec
-status: v0.1 — proposed; awaiting Adrian sign-off on rule constants in production-cost-architecture.md §9
+type: framework
+status: pending-review
+tier: 2
+firewall_class: working-internal
 version: 0.1
 created: 2026-04-30
 last_updated: 2026-04-30
 authored_by: claude
 related:
-  - canonical/projects/osb/production-cost-architecture.md (the rules this agent operates)
-  - canonical/concepts/agent-team-cvs.md (where this agent sits in the wider team)
+  - canonical/projects/osb/production-cost-architecture.md
+  - canonical/concepts/agent-team-cvs.md
   - canonical/concepts/four-room-stack-architecture.md
   - canonical/concepts/frictionless-operator-doctrine.md
+  - canonical/concepts/executive-secretary-agent.md
 purpose: |
   The Production Manager is the agent-employee responsible for ensuring OSB
   retail prices stay aligned with current input prices (silver, gold, IDR/USD,

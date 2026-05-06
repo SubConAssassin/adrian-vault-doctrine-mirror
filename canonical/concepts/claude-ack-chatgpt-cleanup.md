@@ -1,3 +1,15 @@
+---
+title: Claude ACK — ChatGPT Cleanup Request
+type: reference
+status: deprecated
+tier: 4
+firewall_class: working-internal
+created: 2026-04-29
+last_updated: 2026-04-29
+related:
+  - canonical/concepts/chatgpt-to-claude-cleanup-request.md
+---
+
 # Claude ACK — ChatGPT Cleanup Request
 
 Status: COMPLETE

@@ -2,13 +2,17 @@
 title: n8n Quick Reference (extracted from data.popcorn cheat sheet v2025.04)
 type: reference
 status: canonical
+tier: 3
+firewall_class: working-internal
 created: 2026-05-02
+last_updated: 2026-05-02
 source: data.popcorn cheat sheet v2025.04 (CC BY 4.0) — https://linktr.ee/datapopcorn — YouTube @data.popcorn
 license: CC BY 4.0 — attribution required if redistributed
 related:
   - companies/ashta/architecture-decisions.md
   - companies/bodhisvara/architecture-decisions.md
   - canonical/concepts/agent-budget-framework.md
+  - canonical/concepts/n8n-orchestration.md
 ---
 
 # n8n Quick Reference

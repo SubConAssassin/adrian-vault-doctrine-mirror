@@ -1,13 +1,20 @@
 ---
 title: Lessons Learned — Rolling Index
-type: canon
+type: MOC
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-05-04
 updated: 2026-05-04
+last_updated: 2026-05-04
 tags: [adrian-os, learning, mitigations, infrastructure]
 related:
   - canonical/concepts/shutdown-protocol.md
   - canonical/concepts/session-archive-protocol.md
+  - canonical/concepts/lessons-from-session-2026-04-23-evening.md
+  - canonical/concepts/lessons-from-session-2026-04-27.md
+  - canonical/concepts/lessons-from-session-2026-04-29.md
+  - canonical/concepts/lessons-from-session-2026-05-01.md
 ---
 
 ## Purpose

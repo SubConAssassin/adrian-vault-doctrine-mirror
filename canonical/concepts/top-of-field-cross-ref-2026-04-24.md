@@ -1,12 +1,18 @@
 ---
 title: Top-of-Field Operator Cross-Reference — Best-Practice Adoption / Rejection per Business
-type: canonical-doctrine
-status: in-progress (1 of 5 sections complete; 4 pending — partial)
+type: framework
+status: pending-review
+tier: 2
+firewall_class: working-internal
 version: 0.1
 created: 2026-04-30
 last_updated: 2026-04-30
 authored_by: claude (Claude Code, autonomous loop)
 purpose: For each of Adrian's 5 businesses, identify 3 top operators in the category, name ONE specific operating practice to adopt and ONE to deliberately reject. Apply through P1–P15 lens (working/_loop-state/businessman-principles.md). Authenticity gate: never silently impose; flag adopt / consider / reject with reasons; cite where Adrian's voice deliberately diverges.
+related:
+  - canonical/concepts/cross-pollination-map.md
+  - canonical/concepts/business-intelligence-operating-layer-2026-04-24.md
+  - canonical/concepts/methodology-canon.md
 sources_per_section:
   osb: ChatGPT API (gpt-5.4-mini) cross-ref 2026-04-30 — archived `Drive/ChatGPT-Bridge/chatgpt-to-claude/2026-04-29-1645-UTC-chatgpt-claude-api.md`
   ss: pending

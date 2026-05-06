@@ -1,10 +1,18 @@
 ---
 title: CEO Execution Schedule
-type: canonical
+type: protocol
+status: canonical
+tier: 2
+firewall_class: working-internal
 priority: HIGH — this is the doctrine document
 created: 2026-04-24
+last_updated: 2026-04-24
 owner: Claude (as CEO of execution)
 supersedes: ad-hoc commissioning
+related:
+  - canonical/concepts/frictionless-operator-doctrine.md
+  - canonical/concepts/24-7-operating-model.md
+  - canonical/concepts/agent-budget-framework.md
 ---
 
 # CEO Execution Schedule

@@ -1,7 +1,9 @@
 ---
 title: API Integration Doctrine
-type: canonical-doctrine
+type: doctrine
 status: active
+tier: 2
+firewall_class: working-internal
 version: 2.0
 last_updated: 2026-04-30
 last_verified: 2026-04-30

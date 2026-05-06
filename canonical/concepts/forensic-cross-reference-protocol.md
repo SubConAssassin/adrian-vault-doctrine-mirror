@@ -1,11 +1,18 @@
 ---
 title: Forensic Cross-Reference Protocol
-type: doctrine
+type: protocol
+status: active
+tier: 2
+firewall_class: working-internal
 priority: critical
 created: 2026-04-29
-status: active
+last_updated: 2026-04-29
 applies_to: [claude, antigravity, all-future-instances]
 trigger: multi-source topics, legal disputes, financial exposure, contract/negotiation, anything where subtle nuance changes the posture
+related:
+  - canonical/concepts/precedence-hierarchy.md
+  - canonical/concepts/claude-ceo-discipline.md
+  - canonical/concepts/cross-pollination-map.md
 ---
 
 # Forensic Cross-Reference Protocol

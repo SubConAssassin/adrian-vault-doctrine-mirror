@@ -1,3 +1,15 @@
+---
+title: ChatGPT → Claude Cleanup Request
+type: reference
+status: deprecated
+tier: 4
+firewall_class: working-internal
+created: 2026-04-29
+last_updated: 2026-04-29
+related:
+  - canonical/concepts/bridge-protocols.md
+---
+
 # ChatGPT → Claude Cleanup Request
 
 Status: REQUEST

@@ -1,8 +1,11 @@
 ---
 title: Lessons — Session 4e7b2a9c (ORGONE launch + doctrine declaration)
-type: canon
+type: lesson
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-23
+last_updated: 2026-04-23
 tags: [lessons, vtt-phonetics, handoff-discipline, primitive-reuse, adrian-patterns]
 related:
   - canonical/concepts/shutdown-protocol.md

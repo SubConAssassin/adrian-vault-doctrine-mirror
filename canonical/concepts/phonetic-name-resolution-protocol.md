@@ -1,9 +1,16 @@
 ---
 title: Phonetic Name Resolution Protocol
-type: canonical-procedure
+type: protocol
+status: canonical
+tier: 2
+firewall_class: working-internal
 priority: HIGH — applies any time a name comes via voice-relay (Sequoia/Adrian/Whisper chain)
 created: 2026-04-27
+last_updated: 2026-04-27
 distilled_from: "Yosef Mantel" → Josef Tatschl resolution (Sequoia meeting voice memo)
+related:
+  - canonical/concepts/forensic-cross-reference-protocol.md
+  - canonical/concepts/voice-memo-ingest-protocol.md
 ---
 
 # Phonetic Name Resolution Protocol

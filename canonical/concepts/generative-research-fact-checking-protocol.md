@@ -1,9 +1,16 @@
 ---
 title: Generative Research Fact-Checking Protocol
-type: canonical-procedure
+type: protocol
+status: canonical
+tier: 2
+firewall_class: working-internal
 priority: HIGH — applies any time a generative model (Grok, ChatGPT, Claude itself) is used to "audit" external entities
 created: 2026-04-27
+last_updated: 2026-04-27
 distilled_from: Grok-4 first-pass Red Bull APC audit (multiple verifiable fabrications, discarded)
+related:
+  - canonical/concepts/forensic-cross-reference-protocol.md
+  - canonical/concepts/api-integration-doctrine.md
 ---
 
 # Generative Research Fact-Checking Protocol

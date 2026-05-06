@@ -1,10 +1,17 @@
 ---
 title: Session Lessons — 2026-04-23/24 Hive Mind Assimilation
-type: canonical-lessons
+type: lesson
+status: canonical
+tier: 2
+firewall_class: working-internal
 priority: HIGH — pre-load for any future extraction / scripting / multi-agent work
 created: 2026-04-24
+last_updated: 2026-04-24
 session_duration: ~27 hours including reboot
 source_session: Hive Mind Assimilation Phase 1 + Phase 2
+related:
+  - canonical/concepts/lessons-learned.md
+  - canonical/concepts/hive-mind-assimilation-strategy.md
 ---
 
 # Session Lessons — Hive Mind Assimilation

@@ -1,11 +1,18 @@
 ---
 title: Hive Mind Assimilation — Master Strategy
-type: strategy
+type: framework
 status: active
+tier: 2
+firewall_class: working-internal
 created: 2026-04-23
+last_updated: 2026-04-23
 owner: Claude (CEO/execution) + Antigravity (local execution)
 commissioned_by: Adrian Taffinder
 priority: high
+related:
+  - canonical/concepts/hive-mind-resource-map.md
+  - canonical/concepts/corporate-agent-architecture.md
+  - canonical/adrian-corpus/persona-catalog.md
 tags: [strategy, voice-corpus, chatgpt, instagram, assimilation, hive-mind]
 ---
 

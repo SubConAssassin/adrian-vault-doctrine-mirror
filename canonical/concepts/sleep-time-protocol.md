@@ -1,17 +1,19 @@
 ---
 title: Sleep-Time Protocol — Overnight Autonomous Multi-Agent Work
-type: canonical-doctrine
+type: doctrine
 status: active
+tier: 2
+firewall_class: working-internal
 version: 1.0
 created: 2026-04-30 (1:30 AM WITA)
 last_updated: 2026-04-30
 authored_by: claude (Claude Code, CTO mode, post-renderer-pause iteration 11)
 purpose: Codify what actually works for overnight unattended work across Claude Code + Antigravity + Terminal sequencer + external APIs, and capture the failure modes that have caused past overnight attempts to deliver nothing while Adrian slept.
 related:
-  - canonical/concepts/claude-antigravity-work-partition.md (partition v2)
+  - canonical/concepts/claude-antigravity-work-partition.md
   - canonical/concepts/frictionless-operator-doctrine.md
   - canonical/concepts/api-integration-doctrine.md
-  - canonical/concepts/session-lessons-2026-04-24.md (mistake catalogue)
+  - canonical/concepts/session-lessons-2026-04-24.md
   - canonical/roadmaps/hive-mind-implementation-plan-2026-04-24.md
   - working/handoffs/2026-04-30-2055-claude-loop-paused-renderer-runaway-recurrence.md
 tags: [sleep-protocol, overnight, frictionless, multi-agent, partition-v2-companion]

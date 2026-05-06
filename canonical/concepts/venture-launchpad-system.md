@@ -1,3 +1,16 @@
+---
+title: Venture Launchpad System
+type: framework
+status: canonical
+tier: 2
+firewall_class: working-internal
+last_updated: 2026-05-04
+related:
+  - canonical/concepts/launchpad-state.md
+  - canonical/concepts/business-intelligence-operating-layer-2026-04-24.md
+  - canonical/ecosystem/overview.md
+---
+
 # Venture Launchpad System
 
 ## Purpose

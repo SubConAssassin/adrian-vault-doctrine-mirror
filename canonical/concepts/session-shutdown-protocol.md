@@ -1,10 +1,15 @@
 ---
 title: Session Shutdown Protocol — SUPERSEDED
-type: superseded
+type: protocol
 status: superseded
+tier: 4
+firewall_class: working-internal
 superseded_by: canonical/concepts/shutdown-protocol.md
 superseded_on: 2026-05-04
 created: 2026-04-24
+last_updated: 2026-05-04
+related:
+  - canonical/concepts/shutdown-protocol.md
 ---
 
 # ⚠️ SUPERSEDED 2026-05-04

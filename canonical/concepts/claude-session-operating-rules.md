@@ -1,3 +1,16 @@
+---
+title: Claude Session Operating Rules — Lessons from 2026-04-25
+type: lesson
+status: canonical
+tier: 2
+firewall_class: working-internal
+created: 2026-04-25
+last_updated: 2026-04-25
+related:
+  - canonical/concepts/claude-mcp-operating-protocols.md
+  - canonical/concepts/claude-ceo-discipline.md
+---
+
 # Claude Session Operating Rules — Lessons from 2026-04-25
 
 **Created:** 2026-04-25

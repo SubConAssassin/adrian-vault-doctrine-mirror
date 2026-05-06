@@ -1,13 +1,18 @@
 ---
 title: Correction to Agent Team CVs — Antigravity Economics
-type: correction
+type: lesson
 status: superseded
+tier: 3
+firewall_class: working-internal
 superseded_by: canonical/concepts/hive-mind-resource-map.md
 superseded_on: 2026-04-24
 created: 2026-04-18
 last_updated: 2026-04-18
 authored_by: claude (claude.ai session, after Adrian correction)
 amends: canonical/concepts/agent-team-cvs.md
+related:
+  - canonical/concepts/agent-team-cvs.md
+  - canonical/concepts/hive-mind-resource-map.md
 tags: [correction, antigravity, credits, ultra, token-economics]
 ---
 

@@ -1,10 +1,16 @@
 ---
 title: Methodology Canon — Adrian Taffinder's Intellectual Property
-type: canon
+type: framework
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-18
 last_updated: 2026-04-18
 authored_by: claude
+related:
+  - canonical/concepts/cross-pollination-map.md
+  - canonical/adrian-corpus/persona-catalog.md
+  - canonical/concepts/business-intelligence-operating-layer-2026-04-24.md
 tags: [ip, methodology, canon, governance, testing-engine, sacred-geometry, tri-hita-karana]
 ---
 

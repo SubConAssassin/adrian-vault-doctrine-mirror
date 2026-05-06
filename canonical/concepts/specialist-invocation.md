@@ -1,12 +1,16 @@
 ---
 title: Specialist Invocation Protocol
-type: doctrine
+type: protocol
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-21
+last_updated: 2026-04-21
 applies_to: [claude, antigravity, all-agents]
 related:
   - canonical/concepts/hive-mind-resource-map.md
   - canonical/concepts/trust-classes.md
+  - canonical/concepts/corporate-agent-architecture.md
   - procedural/prompts/specialists/
 ---
 

@@ -1,3 +1,16 @@
+---
+title: n8n Orchestration Architecture
+type: framework
+status: canonical
+tier: 2
+firewall_class: working-internal
+last_updated: 2026-04-24
+related:
+  - canonical/concepts/n8n-cheatsheet-reference.md
+  - canonical/concepts/publishing-connectors.md
+  - canonical/concepts/handoff-frontmatter-conventions.md
+---
+
 # n8n Orchestration Architecture
 
 ## Overview

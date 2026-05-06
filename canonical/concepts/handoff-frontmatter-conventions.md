@@ -1,9 +1,12 @@
 ---
 title: Handoff Frontmatter Conventions — Decision Gates + Auto-Loop Discipline
 type: doctrine
-status: ACTIVE
+status: active
+tier: 2
+firewall_class: working-internal
 version: 1.0
 created: 2026-05-06
+last_updated: 2026-05-06
 authority: Adrian directive 2026-05-06 + ChatGPT CEO assessment of BridgeBus paper
 related:
   - canonical/concepts/agent-budget-framework.md

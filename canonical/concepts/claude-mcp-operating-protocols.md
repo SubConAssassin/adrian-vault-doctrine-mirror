@@ -1,3 +1,16 @@
+---
+title: Claude MCP Operating Protocols
+type: protocol
+status: canonical
+tier: 2
+firewall_class: working-internal
+created: 2026-04-24
+last_updated: 2026-04-24
+related:
+  - canonical/concepts/claude-session-operating-rules.md
+  - canonical/concepts/mcp-connector-taxonomy.md
+---
+
 # Claude MCP Operating Protocols
 **Created:** 2026-04-24
 **Source:** Hard lessons from session 2026-04-23/24 where MCP degraded mid-session causing ~1hr of token burn with zero output.

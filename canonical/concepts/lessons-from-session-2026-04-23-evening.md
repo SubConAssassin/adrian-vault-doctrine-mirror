@@ -1,9 +1,16 @@
 ---
 title: Lessons — 2026-04-23 Evening Session
-type: lessons
+type: lesson
+status: canonical
+tier: 2
+firewall_class: working-internal
 session_date: 2026-04-23
+last_updated: 2026-04-23
 duration: ~90 min
 theme: pipeline diagnosis discipline + MCP fragility
+related:
+  - canonical/concepts/lessons-learned.md
+  - canonical/concepts/claude-mcp-operating-protocols.md
 ---
 
 ## Six durable lessons from the Rode Rec resurrection + Overwatch brief intake session.

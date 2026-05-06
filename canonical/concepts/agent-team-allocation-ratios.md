@@ -1,13 +1,18 @@
 ---
 title: Agent Team — Workload Allocation Ratios and Principles
-type: canon
+type: framework
 status: superseded
+tier: 2
+firewall_class: working-internal
 superseded_by: canonical/concepts/hive-mind-resource-map.md
 superseded_on: 2026-04-24
 created: 2026-04-18
 last_updated: 2026-04-18
 authored_by: claude (claude.ai session, after Adrian corrective framing)
 supersedes_framing_in: canonical/concepts/agent-team-cvs-correction-2026-04-18.md
+related:
+  - canonical/concepts/hive-mind-resource-map.md
+  - canonical/concepts/agent-budget-framework.md
 tags: [strategy, agents, ratios, allocation, workload, orchestration]
 ---
 

@@ -1,7 +1,13 @@
 ---
 title: MCP Connector Taxonomy — Local vs Remote
-type: concept
+type: reference
+status: canonical
+tier: 2
+firewall_class: working-internal
 last_updated: 2026-04-21
+related:
+  - canonical/concepts/claude-mcp-operating-protocols.md
+  - canonical/infrastructure/
 tags: [infrastructure, mcp, claude-desktop, operational-knowledge]
 ---
 

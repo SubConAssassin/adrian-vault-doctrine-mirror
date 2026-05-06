@@ -1,7 +1,9 @@
 ---
 title: Content Librarian Agent — Spec
-type: agent-spec
-status: v0.1 — drafted 2026-05-05
+type: framework
+status: pending-review
+tier: 2
+firewall_class: working-internal
 version: 0.1.0
 created: 2026-05-05
 last_updated: 2026-05-05
@@ -10,8 +12,8 @@ related:
   - canonical/concepts/corporate-agent-architecture.md
   - canonical/concepts/executive-secretary-agent.md
   - canonical/concepts/precedence-hierarchy.md
-  - canonical/state/content-index.md (the actual library map)
-  - canonical/adrian-corpus/persona-catalog.md (persona-aware retrieval)
+  - canonical/state/content-index.md
+  - canonical/adrian-corpus/persona-catalog.md
 purpose: |
   The Content Librarian is the cross-cutting agent that indexes, tags,
   and retrieves all content across the vault — text drafts, episodic

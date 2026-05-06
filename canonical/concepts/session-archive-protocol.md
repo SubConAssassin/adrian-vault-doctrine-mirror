@@ -1,13 +1,17 @@
 ---
 title: Session Archive Protocol — Full Chat Knowledge Capture
-type: canon
+type: protocol
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-22
+last_updated: 2026-04-22
 tags: [adrian-os, hive-mind, knowledge-capture, session-management, archive]
 related:
   - canonical/concepts/shutdown-protocol.md
   - canonical/concepts/adrian-claude-shorthand-protocols.md
   - canonical/concepts/bridge-protocols.md
+  - canonical/concepts/session-shutdown-protocol.md
 ---
 
 ## Thesis

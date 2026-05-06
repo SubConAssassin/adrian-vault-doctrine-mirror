@@ -1,11 +1,18 @@
 ---
 title: Claude's CEO Discipline — Question Protocol and Cross-Model Review
-type: canon
-status: needs-review-2026-05-01-bridge-superseded
+type: lesson
+status: pending-review
+tier: 3
+firewall_class: working-internal
 created: 2026-04-20
 updated: 2026-05-01 (added bridge-superseded status)
+last_updated: 2026-05-01
 authored_by: claude (after Adrian's direct feedback on the Antigravity billing miss)
 context: Claude accepted Antigravity's "I need an Anthropic API key" self-report uncritically. Missed the Gemini-native-vision workaround for 3 full exchanges until Adrian himself remembered and pushed back. The $10 wasn't the issue. The reflex was.
+related:
+  - canonical/concepts/api-integration-doctrine.md
+  - canonical/concepts/bridge-protocols.md
+  - canonical/concepts/precedence-hierarchy.md
 tags: [orchestration, discipline, meta, ceo-role, multi-agent]
 ---
 

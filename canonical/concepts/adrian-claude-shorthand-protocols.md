@@ -1,11 +1,18 @@
 ---
 title: Adrian-Claude Shorthand Protocols
-type: canon
+type: protocol
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-04-20
 updated: 2026-04-21
+last_updated: 2026-04-21
 authored_by: claude
 purpose: Token-efficient commands where Adrian's short input triggers a defined Claude action
+related:
+  - CLAUDE.md
+  - canonical/concepts/u-protocol.md
+  - canonical/concepts/precedence-hierarchy.md
 tags: [protocols, shortcuts, communication, efficiency]
 ---
 

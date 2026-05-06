@@ -1,3 +1,15 @@
+---
+title: Publishing & Analytics Connectors
+type: reference
+status: canonical
+tier: 2
+firewall_class: working-internal
+last_updated: 2026-04-24
+related:
+  - canonical/concepts/n8n-orchestration.md
+  - canonical/concepts/api-integration-doctrine.md
+---
+
 # Publishing & Analytics Connectors
 
 ## Overview

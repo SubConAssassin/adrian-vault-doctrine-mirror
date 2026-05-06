@@ -2,6 +2,8 @@
 title: Corporate Agent Architecture (Hive Mind v2)
 type: doctrine
 status: canonical
+tier: 2
+firewall_class: working-internal
 authority: Tier-2 (project-overlay)
 created: 2026-05-04
 last_updated: 2026-05-04

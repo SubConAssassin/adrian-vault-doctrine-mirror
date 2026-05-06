@@ -1,12 +1,18 @@
 ---
 title: Cross-Pollination + Shared IP Map — All 5 Businesses
-type: canonical-doctrine
+type: framework
 status: active
+tier: 2
+firewall_class: working-internal
 version: 1.0
 created: 2026-04-30
 last_updated: 2026-04-30
 authored_by: claude (Claude Code, autonomous loop iteration, post-pause resume)
 purpose: Identify shared substrate, methodology, people, and combinatorial opportunities across OSB, Subconscious Surgery, AGA Bali, AYA, and Ashta. Apply businessman-principles lens (P1–P15 from working/_loop-state/businessman-principles.md). This is the document that turns a 5-business portfolio into one cohesive operating system.
+related:
+  - canonical/concepts/methodology-canon.md
+  - canonical/ecosystem/overview.md
+  - canonical/concepts/business-intelligence-operating-layer-2026-04-24.md
 sources:
   - canonical/projects/osb/business-intelligence-2026-04-24.md
   - companies/subconscious-surgery/business-intelligence-2026-04-24.md

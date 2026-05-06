@@ -1,3 +1,16 @@
+---
+title: Overwatch Daemon — Operations Manual
+type: protocol
+status: canonical
+tier: 2
+firewall_class: working-internal
+created: 2026-04-23
+last_updated: 2026-04-24
+related:
+  - canonical/concepts/dispatcher-protocol.md
+  - canonical/infrastructure/
+---
+
 # Overwatch Daemon — Operations Manual
 **Established:** 2026-04-23/24
 **Script:** `working/overwatch_daemon.py`

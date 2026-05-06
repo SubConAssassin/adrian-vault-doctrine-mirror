@@ -1,7 +1,9 @@
 ---
 title: Frictionless Operator Doctrine
-type: canonical-doctrine
+type: doctrine
 status: active
+tier: 1
+firewall_class: working-internal
 version: 1.0
 last_updated: 2026-04-21
 last_verified: 2026-04-21
@@ -11,6 +13,7 @@ related:
   - canonical/concepts/dispatcher-protocol.md
   - canonical/concepts/bridge-protocols.md
   - canonical/concepts/adrian-claude-shorthand-protocols.md
+  - AGENTS.md
 ---
 
 # Frictionless Operator Doctrine

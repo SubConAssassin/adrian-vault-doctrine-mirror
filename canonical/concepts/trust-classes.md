@@ -2,9 +2,14 @@
 title: Trust Classes — Action Authorization Taxonomy
 type: doctrine
 status: canonical
+tier: 2
+firewall_class: working-internal
 last_updated: 2026-04-21
 applies_to: [claude, antigravity, all-agents]
 source: Lifted from friend's Antigravity platform (4-class trust system + approval gates), adapted for Adrian's stack
+related:
+  - canonical/concepts/specialist-invocation.md
+  - canonical/concepts/precedence-hierarchy.md
 ---
 
 ## Purpose

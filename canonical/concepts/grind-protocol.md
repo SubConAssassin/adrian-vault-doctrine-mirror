@@ -2,8 +2,15 @@
 title: The Grind Protocol — Unbounded Background Assimilation
 type: doctrine
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-05-01
+last_updated: 2026-05-01
 applies_to: [claude, antigravity]
+related:
+  - canonical/concepts/24-7-operating-model.md
+  - canonical/concepts/agent-budget-framework.md
+  - canonical/concepts/doctrine-no-more-overnight-bouncing.md
 ---
 
 # The Grind Protocol

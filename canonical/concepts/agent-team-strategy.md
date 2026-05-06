@@ -1,12 +1,18 @@
 ---
 title: Agent Team Strategy — Capability Map and Work Division
-type: canon
+type: framework
 status: superseded
+tier: 2
+firewall_class: working-internal
 superseded_by: canonical/concepts/hive-mind-resource-map.md
 superseded_on: 2026-04-24
 created: 2026-04-18
 last_updated: 2026-04-18
 authored_by: claude (claude.ai session, confirmed against real web research and tool probes)
+related:
+  - canonical/concepts/hive-mind-resource-map.md
+  - canonical/concepts/agent-team-cvs.md
+  - canonical/concepts/agent-team-allocation-ratios.md
 tags: [strategy, agents, claude, cowork, antigravity, gemini, governance, workflow]
 supersedes: working/handoffs/2026-04-18-resource-strategy-draft (if it exists)
 ---

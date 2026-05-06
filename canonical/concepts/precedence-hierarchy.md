@@ -1,8 +1,17 @@
 ---
 title: Precedence Hierarchy
+type: doctrine
+status: canonical
+tier: 1
+firewall_class: working-internal
+last_updated: 2026-05-03
+related:
+  - AGENTS.md
+  - CLAUDE.md
+  - canonical/concepts/doctrine/knowledge-architecture.md
+  - canonical/concepts/agent-budget-framework.md
 created: 2026-05-03
 purpose: Single source of truth resolution order across all vault doctrine and operational artefacts. Prevents skill-level edits from silently overriding global doctrine.
-status: load-bearing
 authority: Tier-1 doctrine
 ---
 

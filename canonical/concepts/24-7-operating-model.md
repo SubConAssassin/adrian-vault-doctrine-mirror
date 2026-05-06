@@ -2,6 +2,8 @@
 title: 24/7 Operating Model — Adrian + Claude + Antigravity
 type: doctrine
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-05-02
 last_updated: 2026-05-02
 related:

@@ -1,3 +1,16 @@
+---
+title: Apple Mail Access — Canonical Protocol
+type: protocol
+status: canonical
+tier: 2
+firewall_class: working-internal
+created: 2026-04-24
+last_updated: 2026-04-24
+related:
+  - canonical/infrastructure/
+  - canonical/concepts/dispatcher-protocol.md
+---
+
 # Apple Mail Access — Canonical Protocol
 **Established:** 2026-04-24
 **Status:** LIVE — tested and working

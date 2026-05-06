@@ -1,7 +1,9 @@
 ---
 title: Edit-Lease Protocol — Concurrency Control for Multi-Agent Canonical Edits
-type: canonical-doctrine
-status: proposed-pending-adrian
+type: protocol
+status: pending-review
+tier: 2
+firewall_class: working-internal
 version: 0.1
 created: 2026-04-30
 last_updated: 2026-04-30

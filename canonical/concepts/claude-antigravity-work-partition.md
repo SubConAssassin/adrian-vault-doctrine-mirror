@@ -1,3 +1,18 @@
+---
+title: Claude ↔ Antigravity Work Partition Protocol v2
+type: protocol
+status: canonical
+tier: 2
+firewall_class: working-internal
+version: 2.0
+created: 2026-04-23
+last_updated: 2026-04-24
+related:
+  - canonical/concepts/24-7-operating-model.md
+  - canonical/concepts/agent-budget-framework.md
+  - canonical/concepts/corporate-agent-architecture.md
+---
+
 # Claude ↔ Antigravity Work Partition Protocol v2
 
 **Status:** Canonical — SUPERSEDES v1

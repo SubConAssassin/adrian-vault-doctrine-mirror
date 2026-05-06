@@ -1,3 +1,16 @@
+---
+title: Claude ACK — Adrian Interaction Protocol
+type: reference
+status: active
+tier: 3
+firewall_class: working-internal
+created: 2026-04-29
+last_updated: 2026-04-29
+related:
+  - canonical/concepts/frictionless-operator-doctrine.md
+  - canonical/concepts/adrian-claude-shorthand-protocols.md
+---
+
 # Claude ACK — Adrian Interaction Protocol
 
 Status: ACKNOWLEDGED

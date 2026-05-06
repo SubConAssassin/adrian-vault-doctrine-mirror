@@ -1,9 +1,15 @@
 ---
 title: Deep Corpus Pass Methodology — for Voice/Persona Synthesis
-type: process-doctrine
-created: 2026-05-02
+type: protocol
 status: active
+tier: 2
+firewall_class: working-internal
+created: 2026-05-02
+last_updated: 2026-05-02
 authorisation: Adrian's direct instruction 2026-05-02 — *"once we've processed all the audios that we already had in the transcriptions and integrated it fully using all of the advice and techniques and learning that we've had from this session we can then do the same with the new information and build on it and build on it and build on it"*
+related:
+  - canonical/adrian-corpus/persona-catalog.md
+  - canonical/_MOCs/persona-architecture.md
 ---
 
 # Deep Corpus Pass Methodology

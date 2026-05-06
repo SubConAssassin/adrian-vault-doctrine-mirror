@@ -1,8 +1,14 @@
 ---
 title: Session Cross-Reference Index
-type: index
+type: MOC
+status: active
+tier: 2
+firewall_class: working-internal
 maintained_by: claude (with antigravity)
 last_updated: 2026-04-27
+related:
+  - canonical/INDEX.md
+  - canonical/concepts/session-archive-protocol.md
 ---
 # Index
 

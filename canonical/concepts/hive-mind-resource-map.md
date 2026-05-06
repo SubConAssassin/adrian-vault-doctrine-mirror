@@ -1,7 +1,9 @@
 ---
 title: Hive Mind Resource Map
-type: canonical-doctrine
+type: doctrine
 status: active
+tier: 2
+firewall_class: working-internal
 version: 1.0
 last_updated: 2026-04-24
 supersedes: 

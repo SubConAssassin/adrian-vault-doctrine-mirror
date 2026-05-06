@@ -1,13 +1,18 @@
 ---
 title: Antigravity Quota Mechanics — Verified April 2026
-type: correction
+type: lesson
 status: superseded
+tier: 3
+firewall_class: working-internal
 superseded_by: canonical/concepts/hive-mind-resource-map.md
 superseded_on: 2026-04-24
 created: 2026-04-18
 last_updated: 2026-04-18
 authored_by: claude (claude.ai session, after Adrian provided screenshot of actual settings)
 amends: canonical/concepts/agent-team-cvs-correction-2026-04-18.md, canonical/concepts/agent-team-allocation-ratios.md
+related:
+  - canonical/concepts/hive-mind-resource-map.md
+  - canonical/concepts/agent-team-cvs-correction-2026-04-18.md
 tags: [correction, antigravity, quotas, ultra, verified]
 ---
 

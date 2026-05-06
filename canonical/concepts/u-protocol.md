@@ -1,11 +1,17 @@
 ---
 title: The U Protocol — frictionless re-orientation for both surfaces
-type: doctrine
+type: protocol
 status: canonical
+tier: 2
+firewall_class: working-internal
 version: 2.0
 created: 2026-05-01
+last_updated: 2026-05-01
 applies_to: [claude, antigravity]
 supersedes: scattered references in memory edit #24, adrian-claude-shorthand-protocols.md
+related:
+  - canonical/concepts/adrian-claude-shorthand-protocols.md
+  - canonical/concepts/frictionless-operator-doctrine.md
 ---
 
 # The U Protocol

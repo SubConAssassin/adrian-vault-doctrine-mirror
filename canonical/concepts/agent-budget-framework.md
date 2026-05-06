@@ -2,12 +2,15 @@
 title: Agent Budget Framework — The Financial Director Layer
 type: doctrine
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-05-02
 last_updated: 2026-05-03
 related:
   - canonical/concepts/claude-antigravity-work-partition.md
   - canonical/concepts/24-7-operating-model.md
   - canonical/concepts/api-integration-doctrine.md
+  - canonical/concepts/precedence-hierarchy.md
 revision_log:
   - "2026-05-03 — Adrian observed asymmetric leak: Claude weekly 67% used in 3 days (4 days remain) while AG monthly only 2% used in 12 days (9 days remain). Capacity Adrian paid for is evaporating. Three additions made this revision: (a) reset-date awareness as first-class field, (b) burn-asymmetry corrective rule, (c) mandatory token-reporting block in every AG completion handoff."
 ---

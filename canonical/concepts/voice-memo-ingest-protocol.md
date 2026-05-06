@@ -1,9 +1,16 @@
 ---
 title: Voice Memo Ingest Protocol
-type: canonical-procedure
+type: protocol
+status: canonical
+tier: 2
+firewall_class: working-internal
 priority: HIGH — applies any time Adrian references "the voice memo I just made"
 created: 2026-04-27
+last_updated: 2026-04-27
 distilled_from: Sequoia meeting voice memo (39 min, hallucinated on first pass, recovered via chunking)
+related:
+  - canonical/concepts/phonetic-name-resolution-protocol.md
+  - canonical/concepts/deep-corpus-pass-methodology.md
 ---
 
 # Voice Memo Ingest Protocol

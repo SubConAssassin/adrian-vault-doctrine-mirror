@@ -1,14 +1,16 @@
 ---
 title: Vision — Vertically-Integrated Consciousness Empire
-type: concept
-firewall_class: public-shareable (frame); strictly-private (literal Arcturian-soul claim)
+type: vision
 status: canonical
+tier: 2
+firewall_class: working-internal
+firewall_class_note: "frame is public-shareable; literal Arcturian-soul claim is strictly-private — see canonical/adrian-corpus/personal-facts.md"
 created: 2026-05-02
 last_updated: 2026-05-02
 sources:
   - canonical/adrian-corpus/self-narrative/2026-05-01-adrian-dictation-2-vision-and-audit-context.md
-  - canonical/adrian-corpus/personal-facts.md (Arcturian Philosophy Integration)
-  - canonical/ecosystem/overview.md (structural mapping)
+  - canonical/adrian-corpus/personal-facts.md
+  - canonical/ecosystem/overview.md
 related:
   - canonical/ecosystem/overview.md
   - companies/ashta/overview.md

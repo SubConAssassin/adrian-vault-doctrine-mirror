@@ -1,11 +1,14 @@
 ---
 title: Shutdown Protocol — Graceful Session Close for Claude Chat AND Antigravity Sessions
-type: canon
+type: protocol
 status: canonical
+tier: 2
+firewall_class: working-internal
 version: 2.3
 applies_to: [claude, antigravity]
 created: 2026-04-21
 updated: 2026-05-04
+last_updated: 2026-05-04
 supersedes:
   - canonical/concepts/session-shutdown-protocol.md
 tags: [adrian-os, concurrency, session-management, hivemind, infrastructure, antigravity]

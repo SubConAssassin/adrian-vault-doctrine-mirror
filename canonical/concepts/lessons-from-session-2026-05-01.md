@@ -1,8 +1,11 @@
 ---
 title: Lessons from session — 2026-05-01 (Team Doctrine + Grind Protocol)
-type: doctrine
+type: lesson
 status: canonical
+tier: 2
+firewall_class: working-internal
 created: 2026-05-01
+last_updated: 2026-05-01
 applies_to: [claude, antigravity]
 related:
   - canonical/concepts/grind-protocol.md

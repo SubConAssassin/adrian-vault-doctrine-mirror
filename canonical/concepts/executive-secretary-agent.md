@@ -1,7 +1,9 @@
 ---
 title: Executive Secretary Agent — Spec
-type: agent-spec
-status: v0.1.3 — LIVE 2026-05-05 (JSON patch, 48h ingestion)
+type: framework
+status: active
+tier: 2
+firewall_class: working-internal
 version: 0.1.3
 created: 2026-05-04
 last_updated: 2026-05-05
@@ -11,8 +13,10 @@ build_history:
   - 2026-05-04 ~19:45 — AG built state files + script + plist
   - 2026-05-04 19:50 — Claude executed first test briefing (2026-05-05) and loaded LaunchAgent
 related:
-  - canonical/system/executive-infrastructure-proposal.md (parent proposal)
-  - canonical/concepts/production-manager-agent.md (template pattern)
+  - canonical/system/executive-infrastructure-proposal.md
+  - canonical/concepts/production-manager-agent.md
+  - canonical/concepts/content-librarian-agent.md
+  - canonical/concepts/corporate-agent-architecture.md
   - canonical/concepts/corporate-agent-architecture.md
   - canonical/concepts/dispatcher-protocol.md
   - canonical/concepts/ceo-execution-schedule.md

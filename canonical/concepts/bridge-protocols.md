@@ -1,7 +1,9 @@
 ---
 title: Cross-Model Bridge Protocols
-type: canonical-doctrine
+type: doctrine
 status: active
+tier: 2
+firewall_class: working-internal
 version: 1.5
 last_updated: 2026-04-24
 last_verified: 2026-04-24

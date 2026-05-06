@@ -1,7 +1,13 @@
 ---
 title: Launchpad State (Ledger Block)
-type: concept
+type: framework
+status: canonical
+tier: 2
+firewall_class: working-internal
 last_updated: 2026-05-04
+related:
+  - canonical/concepts/venture-launchpad-system.md
+  - canonical/concepts/business-intelligence-operating-layer-2026-04-24.md
 ---
 
 # Launchpad State

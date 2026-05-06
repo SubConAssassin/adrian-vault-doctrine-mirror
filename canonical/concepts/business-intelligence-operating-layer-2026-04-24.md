@@ -1,15 +1,17 @@
 ---
 title: Business Intelligence Operating Layer — navigation index
-type: canonical-concept
+type: MOC
 status: active
+tier: 2
+firewall_class: working-internal
 created: 2026-04-24
 last_updated: 2026-04-24
 authored_by: claude (Claude Code, worktree loving-varahamihira-763853, CEO mode)
 purpose: Single navigation map for the Phase B Business Intelligence docs and their downstream execution packs. Open this when planning cross-business work or onboarding a new agent to the operating layer.
 related:
   - canonical/INDEX.md
-  - canonical/ecosystem/overview.md (CEO-altitude ecosystem framing)
-  - canonical/roadmaps/hive-mind-implementation-plan-2026-04-24.md (Phase B definition)
+  - canonical/ecosystem/overview.md
+  - canonical/roadmaps/hive-mind-implementation-plan-2026-04-24.md
 tags: [navigation, business-intelligence, operating-layer, hive-mind]
 ---
 
