@@ -148,6 +148,6 @@ The test: would a human lawyer with full file knowledge make the response Claude
 
 ## Cross-references
 
-- `canonical/projects/osb/legal/erica/MASTER-CASE-FILE.md` — first instance of this protocol applied
+- `companies/original-siberian-blue/legal/erica/MASTER-CASE-FILE.md` — first instance of this protocol applied
 - Memory edit #28 — pointer to this doctrine
 - `working/handoffs/2026-04-29-session-closeout-erica-deep-synthesis.md` — session that produced this doctrine
