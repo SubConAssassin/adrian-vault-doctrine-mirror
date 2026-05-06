@@ -100,6 +100,6 @@ This way the next instance of Claude reading the deliverable sees the epistemic 
 ## Cross-references
 
 - `canonical/concepts/api-integration-doctrine.md` — when to use which API (this protocol overlays on it)
-- `canonical/projects/aga-bali/sequoia-meeting-2026-04-27.md` §2 CR-2 — case study (rejected first pass, successful second pass)
+- `companies/aga-bali/sequoia-meeting-2026-04-27.md` §2 CR-2 — case study (rejected first pass, successful second pass)
 - `working/drafts-pending/aga-bali-tech-stack-v1.md` source-provenance section — example of methodology note
 - `canonical/concepts/lessons-from-session-2026-04-27.md`

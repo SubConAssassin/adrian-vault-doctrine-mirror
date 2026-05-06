@@ -56,7 +56,7 @@ This is a coordination protocol gap — not yet fixed at architecture level. Ope
 
 Tried to add a memory entry summarising the Tatschl resolution. Got "Maximum number of memories reached" — 30/30. This is fine: the protocol is "Canonical = starting point; latest chat = truth", and canonical files are the durable record. But it means future sessions won't auto-recall the Tatschl identity from memory and will need to read canonical on session-start.
 
-**Generalised lesson:** for any high-stakes session, write the resolution into a *prominent* canonical file early, so it's seen on the next session-start preflight. The Sequoia meeting record at `canonical/projects/aga-bali/sequoia-meeting-2026-04-27.md` §6 is exactly this.
+**Generalised lesson:** for any high-stakes session, write the resolution into a *prominent* canonical file early, so it's seen on the next session-start preflight. The Sequoia meeting record at `companies/aga-bali/sequoia-meeting-2026-04-27.md` §6 is exactly this.
 
 ## Lesson 7 — The "all-at-once" execution principle
 
@@ -71,9 +71,9 @@ Reviewing this session's loop pattern: Adrian gave one rich instruction at the t
 ## Files written this session
 
 ### Canonical (durable)
-- `canonical/projects/aga-bali/sequoia-meeting-2026-04-27.md` — full meeting record + identity resolution + CR status
-- `canonical/projects/aga-bali/sequoia-partnership.md` — updated with MVP shift to Bukit Tenganan, Sergei sauna visit, French builder shareholder offer, two-Sergeis disambiguation
-- `canonical/projects/aga-bali/open-questions.md` — Tatschl resolved, 6 new pending items added
+- `companies/aga-bali/sequoia-meeting-2026-04-27.md` — full meeting record + identity resolution + CR status
+- `companies/aga-bali/sequoia-partnership.md` — updated with MVP shift to Bukit Tenganan, Sergei sauna visit, French builder shareholder offer, two-Sergeis disambiguation
+- `companies/aga-bali/open-questions.md` — Tatschl resolved, 6 new pending items added
 - `canonical/concepts/phonetic-name-resolution-protocol.md` — new
 - `canonical/concepts/generative-research-fact-checking-protocol.md` — new
 - `canonical/concepts/voice-memo-ingest-protocol.md` — new

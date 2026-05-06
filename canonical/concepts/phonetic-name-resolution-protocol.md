@@ -83,6 +83,6 @@ This applies beyond names: place names, technical terms, song titles, foreign-la
 
 ## Cross-references
 
-- `canonical/projects/aga-bali/sequoia-meeting-2026-04-27.md` §6 — full Tatschl resolution case study
+- `companies/aga-bali/sequoia-meeting-2026-04-27.md` §6 — full Tatschl resolution case study
 - `tools/voice-memo-transcribe.py` — chunked Whisper pattern with context prompt; the context prompt itself is a partial defence against this drift (Whisper anchors on names in the prompt vocabulary)
 - `canonical/concepts/lessons-from-session-2026-04-27.md` — session-level lessons including this one

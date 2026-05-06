@@ -11,8 +11,8 @@ sources:
   - canonical/ecosystem/overview.md (structural mapping)
 related:
   - canonical/ecosystem/overview.md
-  - canonical/projects/ashta/overview.md
-  - canonical/projects/aga-bali/overview.md
+  - companies/ashta/overview.md
+  - companies/aga-bali/overview.md
 ---
 
 # The Musk-of-Consciousness Vision

@@ -9,9 +9,9 @@ authored_by: claude (Claude Code, autonomous loop iteration, post-pause resume)
 purpose: Identify shared substrate, methodology, people, and combinatorial opportunities across OSB, Subconscious Surgery, AGA Bali, AYA, and Ashta. Apply businessman-principles lens (P1–P15 from working/_loop-state/businessman-principles.md). This is the document that turns a 5-business portfolio into one cohesive operating system.
 sources:
   - canonical/projects/osb/business-intelligence-2026-04-24.md
-  - canonical/projects/subconscious-surgery/business-intelligence-2026-04-24.md
-  - canonical/projects/aga-bali/business-intelligence-2026-04-24.md
-  - canonical/projects/ashta/business-intelligence-2026-04-24.md
+  - companies/subconscious-surgery/business-intelligence-2026-04-24.md
+  - companies/aga-bali/business-intelligence-2026-04-24.md
+  - companies/ashta/business-intelligence-2026-04-24.md
   - canonical/concepts/methodology-canon.md (IP-1 to IP-N anchor)
   - working/_loop-state/businessman-principles.md (P1–P15 lens)
 related:

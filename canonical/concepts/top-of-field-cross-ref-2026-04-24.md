@@ -17,10 +17,10 @@ related:
   - working/_loop-state/businessman-principles.md
   - canonical/concepts/cross-pollination-map.md
   - canonical/projects/osb/business-intelligence-2026-04-24.md
-  - canonical/projects/subconscious-surgery/business-intelligence-2026-04-24.md
-  - canonical/projects/aga-bali/business-intelligence-2026-04-24.md
+  - companies/subconscious-surgery/business-intelligence-2026-04-24.md
+  - companies/aga-bali/business-intelligence-2026-04-24.md
   - canonical/projects/aya/business-intelligence-2026-04-24.md
-  - canonical/projects/ashta/business-intelligence-2026-04-24.md
+  - companies/ashta/business-intelligence-2026-04-24.md
 tags: [top-of-field, cross-ref, best-practice, adoption-rejection, authenticity-guard]
 ---
 
@@ -113,8 +113,8 @@ tags: [top-of-field, cross-ref, best-practice, adoption-rejection, authenticity-
 
 ### 2.6 Concrete next-7-day SS actions emerging from this cross-ref
 
-1. **Build the SS script-tree document** (Marisa lesson). One canonical doc — `canonical/projects/subconscious-surgery/script-tree.md` — listing the 8-12 most common block-patterns and the precise linguistic Identification questions for each. Adrian dictates from his 1:1 history; Claude formalises.
-2. **Document a kinesthetic Extraction protocol** (Lipton lesson). One canonical doc — `canonical/projects/subconscious-surgery/extraction-kinesthetic-protocol.md` — pairing physical-posture instructions with the surrogate muscle testing for compound evidence.
+1. **Build the SS script-tree document** (Marisa lesson). One canonical doc — `companies/subconscious-surgery/script-tree.md` — listing the 8-12 most common block-patterns and the precise linguistic Identification questions for each. Adrian dictates from his 1:1 history; Claude formalises.
+2. **Document a kinesthetic Extraction protocol** (Lipton lesson). One canonical doc — `companies/subconscious-surgery/extraction-kinesthetic-protocol.md` — pairing physical-posture instructions with the surrogate muscle testing for compound evidence.
 3. **Restart Voital pre/post measurement on every 1:1 retainer block** (Dispenza lesson). Operational change, not a new doc: every 10-hour retainer starts with Voital scan + ends with Voital scan; data archives become the empirical layer that backs every testimonial. Re-activates an SS IP that already exists but is currently dormant per `subconscious-surgery/business-intelligence-2026-04-24.md` §5.
 
 ---
@@ -161,7 +161,7 @@ tags: [top-of-field, cross-ref, best-practice, adoption-rejection, authenticity-
 *(AGA is currently strategically deprioritised waiting for OSB + SS cashflow per `aga-bali/business-intelligence-2026-04-24.md`. The actions below are prep-work that costs nothing now but unblocks the future commit.)*
 
 1. **Draft the cooperative legal entity structure** (Esalen + Bambu rejection lessons combined). Get 2 hours with a Bali-focused lawyer scoping a member-cooperative PT-PMA replacement that holds Class A voting for Adrian and tiered member-equity below. Per `aga-bali/business-intelligence-2026-04-24.md` §2 the previous PT-PMA was exited; this is the structural unblocker.
-2. **Sketch the year-one programmed cadence** (Esalen lesson). One canonical doc — `canonical/projects/aga-bali/programmed-cadence-draft.md` — listing 12 monthly retreat themes for AGA's first operating year, each linked to one of Adrian's IP layers (SS methodology, Ashta cluster work, sacred-geometry architecture deep-dive, longevity-clinic intake, etc.). No commitment to dates yet — just a programming menu.
+2. **Sketch the year-one programmed cadence** (Esalen lesson). One canonical doc — `companies/aga-bali/programmed-cadence-draft.md` — listing 12 monthly retreat themes for AGA's first operating year, each linked to one of Adrian's IP layers (SS methodology, Ashta cluster work, sacred-geometry architecture deep-dive, longevity-clinic intake, etc.). No commitment to dates yet — just a programming menu.
 3. **Build the cross-portfolio biometric data spec** (Kamalaya lesson). One canonical doc — `canonical/concepts/portfolio-biometric-backbone.md` — defining how SS Voital + Ashta Sensie + AGA Bali clinic intake share a unified data schema. This is the technical moat layer; specifying it now (cheap) unlocks compounding measurement value across all 5 businesses later.
 
 ---
@@ -256,9 +256,9 @@ tags: [top-of-field, cross-ref, best-practice, adoption-rejection, authenticity-
 
 *(Ashta is pre-seed pending ~$535k. These are pre-seed-readiness actions that don't require the seed.)*
 
-1. **Build the Ashta research-program framework doc** (IONS lesson). Reframe the existing white paper as a *research program* — open hypotheses, planned pilot studies, success metrics, publication targets. Output: `canonical/projects/ashta/research-program-2026-04-30.md`. This is the document Marcus Schmieke and other Tier-1 investors should read first; it positions Ashta as research, not retreat. Link to the 8-person cluster structure as the primary measurement vehicle.
-2. **Specify the cluster session protocol** (Power-of-Eight lesson). One canonical doc — `canonical/projects/ashta/cluster-session-protocol.md` — defining cadence (suggest biweekly 90-minute sessions), intention-template format, biometric capture mechanics (Sensie API integration points), outcome-log structure for the research database. This is the operational shape members buy into.
-3. **Draft the instrumentation dashboard spec** (HeartMath lesson). One canonical doc — `canonical/projects/ashta/instrumentation-dashboard-spec.md` — defining the personal + cluster-level dashboards: HRV/coherence baselines, session deltas, longitudinal trends, cluster aggregate views, opt-in research data export. Pairs directly with the **portfolio biometric backbone spec** flagged in T10.3 AGA Bali.
+1. **Build the Ashta research-program framework doc** (IONS lesson). Reframe the existing white paper as a *research program* — open hypotheses, planned pilot studies, success metrics, publication targets. Output: `companies/ashta/research-program-2026-04-30.md`. This is the document Marcus Schmieke and other Tier-1 investors should read first; it positions Ashta as research, not retreat. Link to the 8-person cluster structure as the primary measurement vehicle.
+2. **Specify the cluster session protocol** (Power-of-Eight lesson). One canonical doc — `companies/ashta/cluster-session-protocol.md` — defining cadence (suggest biweekly 90-minute sessions), intention-template format, biometric capture mechanics (Sensie API integration points), outcome-log structure for the research database. This is the operational shape members buy into.
+3. **Draft the instrumentation dashboard spec** (HeartMath lesson). One canonical doc — `companies/ashta/instrumentation-dashboard-spec.md` — defining the personal + cluster-level dashboards: HRV/coherence baselines, session deltas, longitudinal trends, cluster aggregate views, opt-in research data export. Pairs directly with the **portfolio biometric backbone spec** flagged in T10.3 AGA Bali.
 
 ---
 
@@ -327,9 +327,9 @@ Adrian's 5-business stack works as a coherent operating system when each busines
 Across the 5 sub-iterations, several of the surfaced next-actions are **canonical-worthy docs that compound across the entire stack** (not single-business artefacts). Listed for prioritisation:
 
 1. **`canonical/concepts/portfolio-biometric-backbone.md`** (T10.3 + 6.3) — unified data schema across SS / AGA Bali / Ashta / AYA. Highest leverage.
-2. **`canonical/projects/aga-bali/programmed-cadence-draft.md`** (T10.3) — year-one retreat menu serving SS Bali Immersion Combo + Ashta Power-of-Eight Combo.
-3. **`canonical/projects/subconscious-surgery/script-tree.md`** (T10.2) — codified SS methodology that AYA also licenses (Combo 3).
-4. **`canonical/projects/ashta/research-program-2026-04-30.md`** (T10.5) — research-program framing for Marcus Schmieke pitch + investor-facing collateral.
+2. **`companies/aga-bali/programmed-cadence-draft.md`** (T10.3) — year-one retreat menu serving SS Bali Immersion Combo + Ashta Power-of-Eight Combo.
+3. **`companies/subconscious-surgery/script-tree.md`** (T10.2) — codified SS methodology that AYA also licenses (Combo 3).
+4. **`companies/ashta/research-program-2026-04-30.md`** (T10.5) — research-program framing for Marcus Schmieke pitch + investor-facing collateral.
 5. **`canonical/projects/aya/session-shape-protocol.md`** + **refusal-policy.md** (T10.4) — locks AYA's product shape against drift.
 6. **`canonical/projects/osb/symbol-library-glossary.md`** + **provenance-card.md** (T10.1) — productises OSB's narrative and physical-collateral layer.
 

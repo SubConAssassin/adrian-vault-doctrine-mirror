@@ -194,10 +194,10 @@ The composition is the moat. Any individual piece can be replicated. The composi
 
 | IP | Codification | Status | Action needed |
 |---|---|---|---|
-| IP-1 Four-Phase Protocol | This canon + `canonical/projects/subconscious-surgery/methodology.md` | Adequate | None immediate |
+| IP-1 Four-Phase Protocol | This canon + `companies/subconscious-surgery/methodology.md` | Adequate | None immediate |
 | IP-2 Testing Engine | This canon + Antigravity architecture doc (pending) | Partial | Commission Antigravity scope |
 | IP-3 Arcturian Design | This canon + scattered OSB chats | Partial | Style guide doc TBC |
-| IP-4 Tri Hita Karana | This canon + `canonical/projects/tri-hita-wte/overview.md` | Adequate | None immediate |
+| IP-4 Tri Hita Karana | This canon + `companies/tri-hita-wte/overview.md` | Adequate | None immediate |
 | IP-5 Group Testing Protocols | This canon | Light | Detailed protocol doc TBC |
 
 ---
@@ -218,7 +218,7 @@ What it DOES do:
 
 ## Related
 - `canonical/ecosystem/shared-infrastructure.md` — primitives and governance recommendations
-- `canonical/projects/subconscious-surgery/methodology.md` — full SS practice detail
-- `canonical/projects/ashta/mvp-scope.md` — testing engine implementation context
-- `canonical/projects/tri-hita-wte/overview.md` — Tri Hita Karana applied
+- `companies/subconscious-surgery/methodology.md` — full SS practice detail
+- `companies/ashta/mvp-scope.md` — testing engine implementation context
+- `companies/tri-hita-wte/overview.md` — Tri Hita Karana applied
 - `working/handoffs/2026-04-18-ecosystem-canonical-built.md` — Antigravity testing-engine scope

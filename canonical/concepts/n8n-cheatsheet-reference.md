@@ -6,8 +6,8 @@ created: 2026-05-02
 source: data.popcorn cheat sheet v2025.04 (CC BY 4.0) — https://linktr.ee/datapopcorn — YouTube @data.popcorn
 license: CC BY 4.0 — attribution required if redistributed
 related:
-  - canonical/projects/ashta/architecture-decisions.md
-  - canonical/projects/bodhisvara/architecture-decisions.md
+  - companies/ashta/architecture-decisions.md
+  - companies/bodhisvara/architecture-decisions.md
   - canonical/concepts/agent-budget-framework.md
 ---
 

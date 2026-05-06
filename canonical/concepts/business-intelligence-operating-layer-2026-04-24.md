@@ -44,11 +44,11 @@ Per `canonical/ecosystem/overview.md` Adrian operates **6 active projects** (not
 
 ```
 canonical/projects/osb/business-intelligence-2026-04-24.md          [B1, Claude, 587 lines]
-canonical/projects/subconscious-surgery/business-intelligence-2026-04-24.md   [B2, AG, 73 lines]
-canonical/projects/ashta/business-intelligence-2026-04-24.md        [B5, AG Track 2, in flight]
-canonical/projects/bodhisvara/business-intelligence-2026-04-24.md   [B4, pending Bodhisvara brief return]
-canonical/projects/aga-bali/business-intelligence-2026-04-24.md     [B3, AG, 71 lines]
-canonical/projects/tri-hita-wte/business-intelligence-2026-04-24.md [B6, not commissioned]
+companies/subconscious-surgery/business-intelligence-2026-04-24.md   [B2, AG, 73 lines]
+companies/ashta/business-intelligence-2026-04-24.md        [B5, AG Track 2, in flight]
+companies/bodhisvara/business-intelligence-2026-04-24.md   [B4, pending Bodhisvara brief return]
+companies/aga-bali/business-intelligence-2026-04-24.md     [B3, AG, 71 lines]
+companies/tri-hita-wte/business-intelligence-2026-04-24.md [B6, not commissioned]
 ```
 
 ## File paths — the execution-pack corpus
@@ -56,8 +56,8 @@ canonical/projects/tri-hita-wte/business-intelligence-2026-04-24.md [B6, not com
 ```
 canonical/projects/osb/week-one-execution-pack-2026-04-28.md        [Claude, 410 lines]
 canonical/projects/osb/authenticity-page-copy-2026-04-24.md         [Claude, 170 lines — Archetype D collateral]
-canonical/projects/subconscious-surgery/week-one-execution-pack-2026-04-28.md  [AG Track 2, in flight]
-canonical/projects/aga-bali/pre-launch-90-day-plan-2026-04-24.md    [AG Track 2, in flight]
+companies/subconscious-surgery/week-one-execution-pack-2026-04-28.md  [AG Track 2, in flight]
+companies/aga-bali/pre-launch-90-day-plan-2026-04-24.md    [AG Track 2, in flight]
 working/drafts/2026-04-24-marcus-schmieke-ashta-angle-email.md      [Claude, 135 lines — investor outreach]
 working/drafts/2026-04-24-bodhisvara-context-gathering-brief.md     [Claude — to gather B4 inputs]
 ```
@@ -72,7 +72,7 @@ working/drafts/2026-04-24-bodhisvara-context-gathering-brief.md     [Claude — 
 
 - **Ashta** uses voice signatures for group consciousness coherence testing in clusters-of-8
 - **Bodhisvara** uses voice signatures for individual psychological diagnosis and therapist matching
-- **Subconscious Surgery** has historical Voital bio-resonance scan data (per `canonical/projects/subconscious-surgery/early-client-sessions-2018.md`) — voice-as-physiological-state evidence
+- **Subconscious Surgery** has historical Voital bio-resonance scan data (per `companies/subconscious-surgery/early-client-sessions-2018.md`) — voice-as-physiological-state evidence
 
 These three may share underlying tech infrastructure even though the product layers differ. Worth a deliberate architectural decision before any of them invests in custom voice-analytics infrastructure.
 
