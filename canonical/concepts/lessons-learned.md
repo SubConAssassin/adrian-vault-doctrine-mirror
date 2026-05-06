@@ -315,3 +315,78 @@ Vault is BOTH. There's no need for a push channel — the user knows where to lo
 **Tags:** `process-change`, `tool-gotcha`
 
 ---
+### LL-2026-05-06-001 [mistake] Asserted filesystem MCP unavailable without checking via tool_search
+
+**Session:** f8b3 · **Handoff:** `working/handoffs/2026-05-06-1545-f8b3a2c1-session-permata-forensic-and-paypal-handoff.md`
+**Date:** 2026-05-06
+**Context:** Adrian initiated this session on iPhone, dropped 12 Permata bank statements, then migrated to MacBook for vault-side work. When he asked me to inventory iCloud statements, I told him three times across multiple turns that the iPad-initiated session "had no filesystem MCP" and he should start a new MacBook chat. He pushed back: "I've done this hundreds of times, why aren't you doing that?"
+**What happened:** I was wrong. The Filesystem MCP, `osascript`, and other vault tools are **deferred tools** — they don't appear in the visible toolset but ARE loadable via `tool_search(query="filesystem")`. The session's tool environment is partial by design; tools load on demand. Session origin device does not gate tool availability — only `tool_search` does.
+**Root cause:** Pattern-matched on a prior pattern ("iPad sessions = limited tools") instead of empirically verifying. Compounded by stating wrong information with confidence and re-stating it under pushback rather than testing.
+**Mitigation / pattern:**
+1. When user requests filesystem/vault/Mac operations and the relevant tool isn't visible: IMMEDIATELY call `tool_search(query="<category>")` BEFORE asserting unavailability.
+2. Default assumption: deferred tools are present. Visible toolset is a subset, not the whole set. The system prompt explicitly states this in `<tool_discovery>`.
+3. If user pushes back on a "tool unavailable" claim: STOP, run `tool_search`, then re-evaluate. Don't double down.
+4. Categories worth `tool_search`-ing reflexively at session start when vault work is implied: `filesystem`, `osascript`, `read text file`, `search files`, `write file`.
+**Promoted to:** This entry. Worth adding a one-liner to `canonical/concepts/claude-mcp-operating-protocols.md` reinforcing the "search before asserting" rule.
+**Tags:** `mistake`, `tool-gotcha`, `process-change`
+
+---
+
+### LL-2026-05-06-002 [discovery] Permata Bank statement filename pattern
+
+**Session:** f8b3 · **Handoff:** `working/handoffs/2026-05-06-1545-f8b3a2c1-session-permata-forensic-and-paypal-handoff.md`
+**Date:** 2026-05-06
+**Context:** Inventorying 29 Permata PDFs in `~/Documents/Accounts/Permata/`. Filenames look like `Transaction History - Permata ME Saver0069 - 652026224646.pdf`.
+**What happened:** Initially assumed the trailing numeric was the statement period. It is actually the **download timestamp** (truncated DDMYYYYHHMMSS). The actual statement month is in the PDF body, on lines 1–3, formatted as e.g. "May 2026" / "June 2025".
+**Root cause:** Permata's export tool encodes when you downloaded, not what you downloaded.
+**Mitigation / pattern:** To inventory a folder of Permata exports:
+```bash
+for f in *.pdf; do
+  month=$(pdftotext -layout "$f" - 2>/dev/null | head -3 | grep -oE '(January|February|March|April|May|June|July|August|September|October|November|December) 20[0-9]{2}' | head -1)
+  echo "$month | $f"
+done | sort
+```
+Same approach likely applies to other Indonesian banks with similar export tooling.
+**Promoted to:** This entry. If we end up with multi-bank statement ingestion, lift to a generic `canonical/concepts/bank-statement-ingestion-patterns.md`.
+**Tags:** `discovery`, `tool-gotcha`
+
+---
+
+### LL-2026-05-06-003 [tool-gotcha] Filesystem MCP allowed paths exclude ~/Downloads
+
+**Session:** f8b3 · **Handoff:** `working/handoffs/2026-05-06-1545-f8b3a2c1-session-permata-forensic-and-paypal-handoff.md`
+**Date:** 2026-05-06
+**Context:** Adrian dropped PayPal screenshots in his Downloads folder. Web Claude could not see them.
+**What happened:** Adrian's local `~/Downloads` is OUTSIDE the Filesystem MCP's allowed directories. Verified via `Filesystem:list_allowed_directories`:
+- `~/Library/Mobile Documents/com~apple~CloudDocs` (iCloud Drive)
+- `~/Documents`
+- `~/Desktop`
+- `~/Library/Application Support/Claude`
+
+The user-level `~/Downloads` is explicitly NOT included. Files there are invisible to web Claude. Claude Code (terminal-based) has full filesystem access and is the right tool for `~/Downloads` reads.
+**Mitigation / pattern:**
+1. When user references "downloads folder", clarify: local `~/Downloads` (Code-only) or iCloud `~/Library/Mobile Documents/.../Downloads` (web-accessible)?
+2. If local `~/Downloads`: either hand off to Code, or ask user to move files into an accessible location (e.g. `~/Documents/<topic>/`).
+3. Worth establishing convention: all working-document drops go into `~/Documents/<topic>/`, never `~/Downloads`. This sidesteps the access issue entirely.
+**Promoted to:** This entry.
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-05-06-004 [process-change] Inter-account transfer netting before P&L view
+
+**Session:** f8b3 · **Handoff:** `working/handoffs/2026-05-06-1545-f8b3a2c1-session-permata-forensic-and-paypal-handoff.md`
+**Date:** 2026-05-06
+**Context:** Adrian's money flows across PayPal ↔ Wise ↔ Permata ↔ Sahabat Sampoerna in various combinations. A single business transaction (e.g. a customer payment landing in PayPal, transferring to Wise, then to Permata) can produce 3+ ledger entries across 3 different account statements.
+**What happened:** Without explicit handling, the same money would be counted as: (a) income on PayPal, (b) expense + income on Wise, (c) income on Permata. Triple-counting on the income side, double-counting on the expense side. Catastrophic for any P&L view.
+**Root cause:** Multi-account flows are inherent to Adrian's setup; the ledger build needs to actively detect and net them out.
+**Mitigation / pattern:** Standing rule for any multi-account financial work:
+1. Build a **transfer matching layer** before classification.
+2. Match heuristic: same date ±3 days, amount ±2% (absorbs FX rate spread), counterparty keyword (`PayPal`, `Wise`, `Transferwise`, `PERMATA GATEWAY`, `BIFAST`, etc.).
+3. Matched pairs → tag as `INTER_ACCOUNT_TRANSFER`, exclude from income/expense classification.
+4. Unmatched candidates that LOOK like transfers (right keywords, no pair found) → flag in **anomaly register** for user confirmation. Don't auto-classify.
+5. Review anomaly register with Adrian before running any P&L summary.
+**Promoted to:** This entry. When `canonical/projects/accounting/` workspace is created (by Code), copy this rule into its README as a standing operating principle.
+**Tags:** `process-change`, `discovery`
+
+---

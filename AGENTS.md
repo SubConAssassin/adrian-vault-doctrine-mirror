@@ -1,12 +1,12 @@
 # Adrian-Vault Operating Doctrine (AGENTS.md)
 **Status:** Canonical Rule of Law for all Autonomous Agents
-**Last updated:** 2026-05-03
+**Last updated:** 2026-05-06
 
 ## 1. Core Invariant (The Single Source of Truth Rule)
 There is one canonical truth per category:
 - **Doctrine** → `AGENTS.md`
 - **Claude runtime** → `CLAUDE.md`
-- **Project state** → `canonical/projects/{project}/_project-ledger.md`
+- **Project state** → `companies/{venture}/ledger.md`
 - **Execution truth** → Verified logs + read-back confirmation
 *Everything else is generated cache, adapter, or external reference only.*
 
@@ -25,7 +25,7 @@ When instructions conflict, agents must follow this strict hierarchy:
 1. System-level safety and platform constraints.
 2. Adrian-Vault `AGENTS.md` doctrine.
 3. `CLAUDE.md` runtime rules.
-4. Active project `_project-ledger.md`.
+4. Active venture `ledger.md`.
 5. Relevant Deep Persona Card (if explicitly routed).
 6. Skill-specific instruction.
 7. Current task request.
@@ -44,7 +44,7 @@ When instructions conflict, agents must follow this strict hierarchy:
   - `tri-hita-wte` — PT Tri Hita WtE Indonesia: modular biomethane, V6.4 framework
   - `ashta` — distributed consciousness research platform
   - `bodhisvara` — voice-analytics/therapist-matching, concept stage, parked
-- **Project Ledgers:** Always read `canonical/projects/{project}/_project-ledger.md` before acting on a project.
+- **Venture Ledgers:** Always read `companies/{venture}/ledger.md` before acting on a venture.
 - **Handoffs:** Agent-to-agent files live in `working/handoffs/`. Read the latest before starting work.
 
 ## 7. Critical Rules

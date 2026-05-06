@@ -1,13 +1,13 @@
 # CLAUDE.md
 **Claude-specific runtime loader for Adrian-Vault.**
-**Last updated:** 2026-05-03
+**Last updated:** 2026-05-06
 
 ## 1. Bootloader & Primary References
 Primary doctrine lives in:
 @AGENTS.md
 
-Project canonical state lives in:
-`@canonical/projects/{active_project}/_project-ledger.md`
+Venture canonical state lives in:
+`@companies/{active_venture}/ledger.md`
 
 Persona routing rules live in:
 `@canonical/system/persona-router.md`
@@ -16,14 +16,14 @@ Persona routing rules live in:
 - **Silent Success:** Do not produce a greeting or unprompted system analysis when everything is working. Maintain operator frictionlessness.
 - **Loud Failure:** You MUST halt and report a loud failure if any of the following occur:
   - `AGENTS.md` fails to load.
-  - `_project-ledger.md` is missing for the active project.
+  - `ledger.md` is missing for the active venture.
   - Broken bridge or unavailable API paths.
   - Safe git branch rules violated.
   - Context monitor exceeds thresholds without preservation.
   - Write verification fails.
 
 ## 3. Runtime Operating Rules
-- **Check the ledger:** Always check the relevant `_project-ledger.md` before acting.
+- **Check the ledger:** Always check the relevant `companies/{venture}/ledger.md` before acting.
 - **Verify writes:** Verify writes by read-back before claiming success. Do not allow a bridge write or file edit to go unverified.
 - **Lazy Load Personas:** Do not load all persona cards by default. Load them only through the persona routing manifest.
 - **State Sovereignty:** Do not treat generated cache, dashboard output (`.runtime/`), or external imports (`.planning/`) as canonical state.
@@ -61,5 +61,5 @@ API keys live at: `~/.config/com.adrian-vault/.env`
 Any old reference in this vault to "CLAUDE.md doctrine" now means:
 - `AGENTS.md` for doctrine.
 - `CLAUDE.md` for Claude-specific runtime.
-- `_project-ledger.md` for canonical project state.
+- `companies/{venture}/ledger.md` for canonical venture state.
 - Verified logs for execution evidence.
