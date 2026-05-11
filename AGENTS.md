@@ -1,6 +1,6 @@
 # Adrian-Vault Operating Doctrine (AGENTS.md)
 **Status:** Canonical Rule of Law for all Autonomous Agents
-**Last updated:** 2026-05-06
+**Last updated:** 2026-05-08 (added §10 Reconciliation Contract)
 
 ## 1. Core Invariant (The Single Source of Truth Rule)
 There is one canonical truth per category:
@@ -68,3 +68,61 @@ Changes require:
 - **Manu** — original Subconscious Surgery website developer; holds the 123.reg domain.
 - **Erica Johnson** — former US OSB distributor, active legal dispute (~$27,848 inventory, Inglewood PD case #261279). Always check the OSB ledger for latest status.
 - **Jade and Mohamed** — AYA co-founders (project deprecated, replaced by Bodhisvara — flagged for archival).
+
+## 10. Reconciliation Contract (added 2026-05-08, Phase 1 build)
+Every operator (Claude live, Claude headless, Antigravity, automation, Adrian, external) MUST read AND write to the operational state kernel. State drift is impossible because state is never overwritten — only appended.
+
+### 10.1 Source-of-truth layers (in precedence order)
+1. **`working/state/events.jsonl`** — append-only event log. THE source of truth for all task / email / deadline / AG / spend / launchagent state. File-locked (fcntl). Schema-validated.
+2. **`working/state/tasks.db`** — SQLite projection of events.jsonl. DERIVED. Rebuildable any time via `tools/ledger.py rebuild`. NEVER edit directly.
+3. **`working/state/tasks-active.md`** — human-readable view. DERIVED. Generated via `tools/ledger.py refresh`. NEVER edit directly.
+
+### 10.2 Write contract
+Every state change is written through `tools/eventlog.py` (Python module or CLI). Never write to events.jsonl by any other path. Required fields per event: `event_id`, `timestamp` (UTC ISO-8601), `actor`, `event_type`, `entity_type`, `entity_id`, `venture`. See `tools/eventlog.py schema` for the full enums.
+
+### 10.3 Read contract
+Every session start, every operator MUST:
+1. Read `working/state/tasks-active.md` for current state
+2. Tail recent events (`tools/eventlog.py tail 30`) for delta since last action
+3. For active correspondence, cross-check `canonical/people/{contact}-timeline.md` frontmatter
+
+### 10.4 Antigravity commission gate
+- No `claude-to-ag-*.md` handoff is filed without `tools/ag_preflight.py check {handoff}` returning all-green.
+- Mandatory frontmatter on every commission: `task_id`, `budget_class`, `objective`, `output_path`, `output_min_words`, `output_required_citations`, `validation_tests`, `deadline`, `checkpoint_at`, `expected_artifacts`.
+- No completion claim is accepted without `tools/ag_verify.py verify {completion} --commission {commission}` returning verified=true.
+- Tier 1 deterministic checks (word count, citation count, placeholder scan, mtime sanity) are mandatory and free.
+- Tier 3 LLM-as-judge is gated to F1+ spend and explicit opt-in via `validation_tests: ["llm_judge: true"]`.
+
+### 10.5 Paid API gate
+Every paid API call goes through `tools/spend_estimator.py`:
+1. Pre-call `estimate` returns token count via `tiktoken` (OpenAI) / Anthropic SDK / heuristic
+2. `gate` hard-exits 78 if estimate exceeds per-call cap (default $1; override via env `SPEND_CAP_USD`)
+3. Post-call `record` emits API_SPEND_RECORDED event with actual usage
+4. Daily cap default $5; override via env `DAILY_CAP_USD`. Hits write DAILY_CAP_HIT event.
+
+### 10.6 Source-of-truth-first for contact state
+For any state question about a known contact ("when did", "last email", "status of"), Gmail MCP `search_threads` then `get_thread` is authoritative. The UserPromptSubmit hook (`~/.claude/hooks/user-prompt-contact-context.sh`) injects timeline-doc frontmatter as a baseline so Claude can never draft from memory alone — but Gmail wins on freshness.
+
+### 10.7 Deadline escalation
+Active deadlines (from `tasks.db.deadline` OR `canonical/people/*-timeline.md` frontmatter `*_deadline` fields) are auto-escalated by `tools/deadline_watcher.py` (LaunchAgent every 4h) at three tiers: T-48h, T-24h, T-6h. Escalation writes:
+- DEADLINE_APPROACHING event (idempotent per task×tier)
+- URGENT inbox handoff at `working/handoffs/{date}-claude-URGENT-deadline-*.md`
+
+### 10.8 Verification gate
+This contract is verified continuously by:
+- `tools/eventlog.py validate` returns 0 errors
+- `tools/ledger.py refresh` rebuilds without crash
+- Every URGENT inbox handoff has a matching task in `tasks.db`
+- The daily briefing reads from events.jsonl, not from session memory
+
+### 10.9 Phase 1 build artifacts (2026-05-08)
+- `tools/eventlog.py` — append-only event log
+- `tools/ledger.py` — SQLite projection + tasks-active.md renderer
+- `tools/spend_estimator.py` — pre/post API spend gate (uses `tools/.api-venv/`)
+- `tools/ag_preflight.py` — pre-commission gate
+- `tools/ag_verify.py` — post-completion verifier
+- `tools/deadline_watcher.py` — T-48/T-24/T-6 escalator
+- `~/.claude/hooks/user-prompt-contact-context.sh` — passive context injection
+- `~/Library/LaunchAgents/com.adrianvault.deadline-watcher.plist` — 4h cadence
+
+Replaces the prior pattern of "Claude updates a static markdown file" with "every operator appends to a shared event log and reads a derived view." Implements the convergent recommendation from ChatGPT (event sourcing), Grok (ACID + tokenizer), and Gemini (passive context + concept-density).
