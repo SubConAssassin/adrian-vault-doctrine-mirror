@@ -1,12 +1,15 @@
 # Adrian-Vault Operating Doctrine (AGENTS.md)
 **Status:** Canonical Rule of Law for all Autonomous Agents
-**Last updated:** 2026-05-08 (added §10 Reconciliation Contract)
+**Last updated:** 2026-05-12 (added §11 Hive Communication Channels)
 
 ## 1. Core Invariant (The Single Source of Truth Rule)
 There is one canonical truth per category:
 - **Doctrine** → `AGENTS.md`
 - **Claude runtime** → `CLAUDE.md`
+- **CEO operating doctrine** → `canonical/concepts/claude-ceo-operating-doctrine.md`
+- **Current operational state (what's firing right now)** → `working/handoffs/STATE-OF-STACK.md`
 - **Project state** → `companies/{venture}/ledger.md`
+- **External research inbox (ChatGPT Pro + SuperGrok subscription bridge)** → `working/external-research-in/`
 - **Execution truth** → Verified logs + read-back confirmation
 *Everything else is generated cache, adapter, or external reference only.*
 
@@ -126,3 +129,33 @@ This contract is verified continuously by:
 - `~/Library/LaunchAgents/com.adrianvault.deadline-watcher.plist` — 4h cadence
 
 Replaces the prior pattern of "Claude updates a static markdown file" with "every operator appends to a shared event log and reads a derived view." Implements the convergent recommendation from ChatGPT (event sourcing), Grok (ACID + tokenizer), and Gemini (passive context + concept-density).
+
+## 11. Hive Communication Channels (added 2026-05-12)
+
+Adrian operates across multiple agent substrates in parallel — Claude Cowork (desktop), Claude Mac (terminal), Claude mobile Dispatch, Antigravity, and his own ChatGPT Pro + SuperGrok subscriptions. State coherence across these requires explicit channels.
+
+### 11.1 Bootup read order (every agent, every session)
+
+1. `CLAUDE.md` (if Claude) / agent-specific runtime if other
+2. `AGENTS.md` (this file)
+3. `canonical/concepts/claude-ceo-operating-doctrine.md` — CEO role + anti-patterns
+4. `working/handoffs/STATE-OF-STACK.md` — what's firing right now
+5. Relevant `companies/{venture}/ledger.md` for active venture
+
+### 11.2 External-subscription bridge (ChatGPT Pro + SuperGrok)
+
+The metered APIs (gated by §10.5) are for short queries only. For massive research, deep-reasoning, image/video generation, Adrian uses his ChatGPT Pro and SuperGrok subscriptions via the web UI. Bridge into vault: `working/external-research-in/` — filesystem inbox, AG ingests on standing commission. README inside that folder is the user-facing spec.
+
+The retired Google Docs bridge is officially retired. Do not attempt to revive it.
+
+### 11.3 The single-question protocol for Adrian-decisions
+
+When ANY agent needs Adrian to make a decision: format per §8 of `canonical/concepts/claude-ceo-operating-doctrine.md`. ONE question at a time, with reasoning, the agent's own read attached, single ask. **Multi-question tables of pending decisions are doctrinally forbidden.** Adrian's correction 2026-05-12: agents are responsible for triage, not Adrian.
+
+### 11.4 Cross-session state-write contract
+
+Every session that materially changes vault state MUST update `working/handoffs/STATE-OF-STACK.md` before shutdown OR before the user closes Cowork. State drift between sessions is the highest-cost failure mode in the hive.
+
+### 11.5 No rationing of AG
+
+Antigravity (Gemini Ultra backed) has no visible per-cycle throttle in Adrian's usage to date. Claude's 5-hour rolling window does NOT apply to AG. Commissions written for AG must use sustained-max-burn language ("process the full corpus", "continue across cycle resets"), never Claude-scarcity language ("self-select 15-25", "single-target serial do not overburn"). Adrian's directive 2026-05-12: *"Let's see if we can actually get throttled one day."*

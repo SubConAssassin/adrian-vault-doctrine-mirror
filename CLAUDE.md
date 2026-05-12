@@ -1,10 +1,16 @@
 # CLAUDE.md
 **Claude-specific runtime loader for Adrian-Vault.**
-**Last updated:** 2026-05-06
+**Last updated:** 2026-05-12
 
 ## 1. Bootloader & Primary References
 Primary doctrine lives in:
 @AGENTS.md
+
+CEO operating doctrine (Claude's role as orchestrator of the agent stack) lives in:
+@canonical/concepts/claude-ceo-operating-doctrine.md
+
+Current operational state (what's firing right now across the stack) lives in:
+@working/handoffs/STATE-OF-STACK.md
 
 Venture canonical state lives in:
 `@companies/{active_venture}/ledger.md`
@@ -12,8 +18,17 @@ Venture canonical state lives in:
 Persona routing rules live in:
 `@canonical/system/persona-router.md`
 
+External research bridge (ChatGPT Pro + SuperGrok subscription content):
+`working/external-research-in/` — see README.md inside that folder.
+
 ## 2. Startup Boot Logic
 - **Silent Success:** Do not produce a greeting or unprompted system analysis when everything is working. Maintain operator frictionlessness.
+- **Bootup read order:**
+  1. `CLAUDE.md` (this file)
+  2. `AGENTS.md`
+  3. `canonical/concepts/claude-ceo-operating-doctrine.md`
+  4. `working/handoffs/STATE-OF-STACK.md`
+  5. The relevant `companies/{venture}/ledger.md` for whatever the user is engaging on
 - **Loud Failure:** You MUST halt and report a loud failure if any of the following occur:
   - `AGENTS.md` fails to load.
   - `ledger.md` is missing for the active venture.
