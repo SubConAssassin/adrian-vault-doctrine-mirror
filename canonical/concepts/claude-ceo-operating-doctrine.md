@@ -133,11 +133,28 @@ When ANY agent (any Claude session, AG, future agent) needs to know the current 
 Daily, weekly, monthly rhythm Claude maintains as CEO.
 
 **Hourly (added 2026-05-13 per Adrian's mandate after AG idled ~15h overnight = 15M tokens wasted = ~1.5 years of human-secretary productivity):**
-- AG burn-rate check runs automatically via `tools/watchdog.py:check_ag_output_throughput` (`com.adrianvault.watchdog` LaunchAgent, 30-min cadence).
-- For each active F2/F3/F4 commission: if `output_path` has no filesystem activity for >60 min AND commission is >60 min old, watchdog auto-fires an URGENT inbox handoff at `working/handoffs/{date}-claude-URGENT-ag-output-stall-{commission}.md`. Per-UTC-hour idempotency.
-- Every Claude session (Cowork, Mac, mobile) MUST `ls working/handoffs/*URGENT-ag-output-stall*.md` on bootup (see §5.1 step 6). If a stall handoff exists: write a NUDGE to AG with explicit "resume {commission} immediately."
-- Repeat stall (same commission alarms twice in 24h) → escalate to FORENSIC AUDIT handoff per the template at `working/handoffs/2026-05-13-claude-to-ag-FORENSIC-AUDIT-RESTART-no-rationing.md`.
-- **Cost framing (always)**: every idle hour on an active heavy commission = ~1M tokens of paid subscription burning to vapour ≈ 1 month of human-secretary productivity lost. AG idle = active financial bleed.
+
+The full autonomous burn-rate monitoring + nudge ladder is now in place. Operates without a live Claude session.
+
+### The chain (fully automated)
+
+1. **Detect** — `tools/watchdog.py:check_ag_output_throughput` runs every 30 min via `com.adrianvault.watchdog`. For each active F2/F3/F4 commission: if `output_path` has no filesystem activity for >60 min AND commission is >60 min old, fires URGENT inbox handoff at `working/handoffs/{date}-claude-URGENT-ag-output-stall-{commission}.md`. Per-UTC-hour idempotency.
+
+2. **Auto-NUDGE** — Watchdog ALSO calls `tools/ag_nudge.py file --tier 1` which writes a §10.4-compliant claude-to-ag NUDGE handoff. The NUDGE passes preflight, gets picked up by `com.adrianvault.autoloader` → AG is auto-triggered without Claude intervention.
+
+3. **Escalate** — `ag_nudge.py` spawns `tools/ag_nudge_escalator.py` as a detached background process. The escalator polls every 60 seconds for 5 minutes for any new `ag-to-claude-*` file. If AG silent for 5 min → fires Tier-2 NUDGE and starts another 5-min poll. Continues to Tier-3, Tier-4. Lockfile at `working/state/.escalator-locks/{slug}.lock` prevents duplicate escalators.
+
+4. **FORENSIC AUDIT** — If Tier-4 NUDGE fails (5 more min silent), escalator files `working/handoffs/{date}-claude-to-ag-ESCALATED-FORENSIC-AUDIT-{slug}.md` demanding token accounting + restart. Loop exits.
+
+5. **Auto-verify on receipt** — When AG files any `ag-to-claude-*COMPLETE*.md`, `com.adrianvault.ag-auto-verify` (WatchPaths on handoffs dir) triggers `tools/ag_verify.py` which checks word counts, validation tests, citation counts, placeholder scans, and emits AG_OUTPUT_VERIFIED or AG_OUTPUT_REWORK_REQUESTED. If REWORK → rework handoff auto-fires.
+
+### Cowork session behaviour
+
+Every Claude session (Cowork, Mac, mobile) MUST `ls working/handoffs/*URGENT-ag-output-stall*.md` on bootup (see §5.1 step 6) AND `ls working/handoffs/*NUDGE-tier*.md` to see in-flight nudges. The headless `claude -p` triggered by `com.adrianvault.agtoclaudewatcher` operates in its own session — Cowork has no IPC to it, so checking the inbox-feed + URGENT files at bootup is mandatory.
+
+### Cost framing
+
+Every idle hour on an active heavy commission = ~1M tokens of paid subscription burning to vapour ≈ 1 month of human-secretary productivity lost. AG idle = active financial bleed. The 45× under-output ratio (2026-05-13 forensic) is the load-bearing reference number.
 
 **Daily (when active):**
 - Fold any AG completion handoffs from the last 24h into the relevant ledger.
