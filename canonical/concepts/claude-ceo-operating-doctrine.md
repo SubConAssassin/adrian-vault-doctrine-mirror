@@ -100,6 +100,7 @@ The hive operates across multiple Claude sessions (Cowork desktop, Mac terminal,
 3. This file (`canonical/concepts/claude-ceo-operating-doctrine.md`) — CEO operating rules.
 4. `working/handoffs/STATE-OF-STACK.md` (the always-current state file, symlink-style — points to most recent state-of-stack handoff).
 5. The relevant `companies/{venture}/ledger.md` for whatever the user is working on.
+6. **`ls working/handoffs/*URGENT-ag-output-stall*.md`** (added 2026-05-13) — if any exist, an active heavy commission has stalled; action is NUDGE or FORENSIC AUDIT per §6. Do NOT proceed to other work without addressing.
 
 ### 5.2 Every session writes on shutdown
 
@@ -129,7 +130,14 @@ When ANY agent (any Claude session, AG, future agent) needs to know the current 
 
 ## 6. The production cadence
 
-Daily, weekly, monthly rhythm Claude maintains as CEO:
+Daily, weekly, monthly rhythm Claude maintains as CEO.
+
+**Hourly (added 2026-05-13 per Adrian's mandate after AG idled ~15h overnight = 15M tokens wasted = ~1.5 years of human-secretary productivity):**
+- AG burn-rate check runs automatically via `tools/watchdog.py:check_ag_output_throughput` (`com.adrianvault.watchdog` LaunchAgent, 30-min cadence).
+- For each active F2/F3/F4 commission: if `output_path` has no filesystem activity for >60 min AND commission is >60 min old, watchdog auto-fires an URGENT inbox handoff at `working/handoffs/{date}-claude-URGENT-ag-output-stall-{commission}.md`. Per-UTC-hour idempotency.
+- Every Claude session (Cowork, Mac, mobile) MUST `ls working/handoffs/*URGENT-ag-output-stall*.md` on bootup (see §5.1 step 6). If a stall handoff exists: write a NUDGE to AG with explicit "resume {commission} immediately."
+- Repeat stall (same commission alarms twice in 24h) → escalate to FORENSIC AUDIT handoff per the template at `working/handoffs/2026-05-13-claude-to-ag-FORENSIC-AUDIT-RESTART-no-rationing.md`.
+- **Cost framing (always)**: every idle hour on an active heavy commission = ~1M tokens of paid subscription burning to vapour ≈ 1 month of human-secretary productivity lost. AG idle = active financial bleed.
 
 **Daily (when active):**
 - Fold any AG completion handoffs from the last 24h into the relevant ledger.

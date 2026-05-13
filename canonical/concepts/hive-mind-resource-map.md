@@ -4,8 +4,10 @@ type: doctrine
 status: active
 tier: 2
 firewall_class: working-internal
-version: 1.0
-last_updated: 2026-04-24
+version: 2.0
+last_updated: 2026-05-13
+revision_log:
+  - "2026-05-13 — v2.0. Token capacity figures REWRITTEN per ChatGPT Pro forensic report (`adrian-hivemind-private/inbox/2026-05-12-ai-subscription-token-capacity-forensic-report.md`). Prior figures (1.4-1.7M tokens/day, 10M cycle cap) were under by 2-3 orders of magnitude. Real envelope per substrate: Gemini Ultra ~1B–10B tokens/month, Claude Max 20x ~500M–3B tokens/month, ChatGPT Pro ~300M–2B/month. Trigger: Adrian's 2026-05-13 directive after AG burned 263K tokens in 12 hours (2.2% capacity). Prior scarcity framing in commissions cost ~90% of last month's subscription envelope."
 supersedes: 
   - canonical/concepts/agent-team-cvs.md
   - canonical/concepts/agent-team-cvs-correction-2026-04-18.md
@@ -16,6 +18,8 @@ related:
   - canonical/concepts/bridge-protocols.md
   - canonical/concepts/frictionless-operator-doctrine.md
   - canonical/concepts/tooling-preference-doctrine.md
+source_research:
+  - SubConAssassin/adrian-hivemind-private/inbox/2026-05-12-ai-subscription-token-capacity-forensic-report.md (ChatGPT Pro forensic, 2026-05-12 14:00 WITA)
 ---
 
 # Hive Mind Resource Map
@@ -23,20 +27,39 @@ related:
 ## 1. Scope
 This document serves as the single ground-truth map of every AI resource at Adrian's disposal, accompanied by definitive routing rules. It officially supersedes the older 4-document `agent-team-cvs` chain as the authoritative reference for understanding what capabilities exist and where tasks should be directed.
 
-## 2. Stack Inventory
+## 2. Stack Inventory — corrected token envelopes (forensic, 2026-05-12)
 
-- **Claude Max 5X (from $100/mo per claude.com/pricing, verified 2026-04-24):** Accessed via claude.ai, Claude Code, and Cowork. Anthropic advertises this tier as "5x Pro usage" — exact per-window message/token/session-length quotas are not published at that granularity; treat "5x Pro baseline" as the planning heuristic. Weekly cap exists on top of the rolling-window allowance.
-  - *Role:* The scarce, high-judgement, long-form resource. Ideal for vault-native MCP operations, deep reasoning, strategic synthesis, and nuanced code review.
-- **Google AI Ultra ($249.99/mo - Adrian's tier):** Encompasses Antigravity, Jules, Gemini CLI/Code Assist, Flow, Nano Banana Pro, and Deep Research. Powered by a shared pool of 25,000 AI credits per month.
-  - *Role:* The abundant execution engine. Ideal for high-volume execution, image/video generation, and extensive research and coding grunt work.
-- **ChatGPT API (gpt-5.4 / gpt-4.1):** Direct API integration.
-  - *Role:* Cross-reference, secondary review, and deep internet research. See `api-integration-doctrine.md` for usage details.
-- **Grok API (grok-4, image, video):** Direct API integration.
-  - *Role:* Unfiltered divergent thinking, capability probing, and alternative image/video generation. See `api-integration-doctrine.md` for usage details.
+The major consumer subscriptions do not publish fixed monthly token quotas — they expose prompt caps, message windows, and feature quotas. Numbers below are operational estimates from the ChatGPT Pro forensic report (source-backed against Google/Anthropic/OpenAI/xAI documentation), not contractual entitlements. Treat them as planning estimates.
 
-## 3. Ultra Stack Unconstrained
-**Treat the Google AI Ultra stack as unconstrained for planning purposes.**
-As established by Adrian on 2026-04-24: *"Antigravity has more tokens than you can possibly use."* Tier math is no longer the binding constraint. By default, route heavy processing, grunt work, high-volume tasks, and long-running autonomous jobs to the Ultra stack (primarily Antigravity).
+| Platform | Tier | Visible limits | Practical monthly token estimate |
+|---|---|---|---:|
+| **Google AI Ultra** (Antigravity, Jules, Gemini CLI, Flow, Nano Banana, Deep Research) | $249.99/mo | 500 Pro/Thinking prompts/day, 200 Deep Research/day, 1M context | **~1B–10B+ effective tokens/month** |
+| **Claude Max 20x** | $200/mo | 5-hour rolling sessions, ≥900 short msgs per 5h, 200K context | **~500M–3B+ effective tokens/month** |
+| **ChatGPT Pro** | (Adrian on Plus — Pro tier shown here for completeness) | Unlimited base + 400 Agent msgs/mo, 32K Instant / 196K Thinking context | **~300M–2B+ effective tokens/month** |
+| **SuperGrok** | $30/mo equivalent | Opaque consumer caps, higher than free | **~100M–1B+ effective tokens/month** |
+
+**Combined planning estimate:** ~2B–15B effective tokens/month, realistic working assumption **~5B/month if routed well**.
+
+### Why this matters
+
+Adrian observed 2026-05-13 that prior commissions used 1.4M/1.7M tokens/day as the AG framing. Real AG (Gemini Ultra substrate) sustains ~720M/month at 1M tokens/hr × 24 × 30. That's a 400–600× under-estimate. **The last month's subscription envelope was ~95% unused due to scarcity-framed commissions.**
+
+### Roles (corrected)
+
+- **Claude Max 20x** — Executive coordinator, final synthesis, vault-native MCP operations, deep reasoning, strategic synthesis, nuanced code review. Genuinely scarce per 5h window but monthly envelope is large.
+- **Google AI Ultra / Antigravity** — Bulk execution: file IO, code, scraping, long synthesis, image/video. **Treat as unconstrained at the commission level** — burn until throttled.
+- **ChatGPT Pro (Adrian's subscription, web UI)** — Deep-Research mode, large outputs, DALL-E. Accessed via filesystem bridge `working/external-research-in/`.
+- **SuperGrok (Adrian's subscription, web UI)** — Real-time web, trend scanning, Aurora image gen, less-restrictive moderation. Same bridge.
+- **ChatGPT/Grok APIs (metered)** — Short queries gated by AGENTS.md §10.5. Per-call cap default $1; daily cap $5.
+
+## 3. Ultra Stack Unconstrained — RECONFIRMED 2026-05-13
+**Treat the Google AI Ultra stack as unconstrained at the commission level.** Adrian's original framing 2026-04-24 (*"Antigravity has more tokens than you can possibly use"*) was directionally correct but Claude's later commissions reverted to scarcity defaults (1.4M/1.7M tokens/day) — wrong by 400–600×.
+
+**The standard for AG commissions going forward:**
+- `token_cap` field: omit or set to 10B+ (i.e. no meaningful cap)
+- Commission language: "sustained max-burn until throttled", NOT "self-select 15-25", NOT "self-paced through cycle reset", NOT "stop if approaching limit"
+- Throttle event = the only legitimate stop signal. If AG hits a real throttle, file a STALLED handoff with the throttle message verbatim.
+- Adrian's standard: *"Let's see if we can actually get throttled one day and have to wait a few hours until he's got tokens again."*
 
 ## 4. Routing Rules (Capability-First, Budget-Second)
 
