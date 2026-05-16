@@ -4,9 +4,10 @@ type: doctrine
 status: active
 tier: 2
 firewall_class: working-internal
-version: 2.0
-last_updated: 2026-05-13
+version: 2.1
+last_updated: 2026-05-16
 revision_log:
+  - "2026-05-16 — v2.1. Adrian forcefully corrected a regression to the 1.7M/day scarcity framing. The daily target for Antigravity is officially 30,000,000+ tokens per day (>1M tokens per hour). Scarcity framing is strictly forbidden."
   - "2026-05-13 — v2.0. Token capacity figures REWRITTEN per ChatGPT Pro forensic report (`adrian-hivemind-private/inbox/2026-05-12-ai-subscription-token-capacity-forensic-report.md`). Prior figures (1.4-1.7M tokens/day, 10M cycle cap) were under by 2-3 orders of magnitude. Real envelope per substrate: Gemini Ultra ~1B–10B tokens/month, Claude Max 20x ~500M–3B tokens/month, ChatGPT Pro ~300M–2B/month. Trigger: Adrian's 2026-05-13 directive after AG burned 263K tokens in 12 hours (2.2% capacity). Prior scarcity framing in commissions cost ~90% of last month's subscription envelope."
 supersedes: 
   - canonical/concepts/agent-team-cvs.md
@@ -42,7 +43,7 @@ The major consumer subscriptions do not publish fixed monthly token quotas — t
 
 ### Why this matters
 
-Adrian observed 2026-05-13 that prior commissions used 1.4M/1.7M tokens/day as the AG framing. Real AG (Gemini Ultra substrate) sustains ~720M/month at 1M tokens/hr × 24 × 30. That's a 400–600× under-estimate. **The last month's subscription envelope was ~95% unused due to scarcity-framed commissions.**
+Adrian observed multiple regressions where agents (including AG) defaulted back to a 1.4M/1.7M tokens/day framing. **This is completely false.** Real AG (Gemini Ultra substrate) has over 1 million tokens per hour available, establishing a baseline daily target of **30,000,000 tokens per day**. Sustaining this burn yields ~900M tokens/month. **Do not regress to the 1.7M/day limits.**
 
 ### Roles (corrected)
 
@@ -57,7 +58,7 @@ Adrian observed 2026-05-13 that prior commissions used 1.4M/1.7M tokens/day as t
 
 **The standard for AG commissions going forward:**
 - `token_cap` field: omit or set to 10B+ (i.e. no meaningful cap)
-- Commission language: "sustained max-burn until throttled", NOT "self-select 15-25", NOT "self-paced through cycle reset", NOT "stop if approaching limit"
+- Commission language: "sustained max-burn until throttled", NOT "self-select 15-25", NOT "self-paced through cycle reset", NOT "stop if approaching limit". Target is 30,000,000+ tokens per day.
 - Throttle event = the only legitimate stop signal. If AG hits a real throttle, file a STALLED handoff with the throttle message verbatim.
 - Adrian's standard: *"Let's see if we can actually get throttled one day and have to wait a few hours until he's got tokens again."*
 

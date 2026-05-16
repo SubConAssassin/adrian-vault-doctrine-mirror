@@ -138,9 +138,14 @@ Adrian operates across multiple agent substrates in parallel — Claude Cowork (
 
 1. `CLAUDE.md` (if Claude) / agent-specific runtime if other
 2. `AGENTS.md` (this file)
-3. `canonical/concepts/claude-ceo-operating-doctrine.md` — CEO role + anti-patterns
-4. `working/handoffs/STATE-OF-STACK.md` — what's firing right now
-5. Relevant `companies/{venture}/ledger.md` for active venture
+3. **If Antigravity: `canonical/concepts/antigravity-operating-contract.md`
+   — MANDATORY anti-confabulation system prompt, read IN FULL before ANY
+   ingestion/synthesis. ~86% of 2026-05-15 AG output was confabulated; this
+   contract is the correction and is structurally enforced (verify-before-trust
+   gate quarantines any output failing it).**
+4. `canonical/concepts/claude-ceo-operating-doctrine.md` — CEO role + anti-patterns
+5. `working/handoffs/STATE-OF-STACK.md` — what's firing right now
+6. Relevant `companies/{venture}/ledger.md` for active venture
 
 ### 11.2 External-subscription bridge (ChatGPT Pro + SuperGrok)
 
@@ -156,6 +161,10 @@ When ANY agent needs Adrian to make a decision: format per §8 of `canonical/con
 
 Every session that materially changes vault state MUST update `working/handoffs/STATE-OF-STACK.md` before shutdown OR before the user closes Cowork. State drift between sessions is the highest-cost failure mode in the hive.
 
-### 11.5 No rationing of AG
+### 11.5 THE RULE OF UNLIMITED BURN (No rationing of AG)
 
-Antigravity (Gemini Ultra backed) has no visible per-cycle throttle in Adrian's usage to date. Claude's 5-hour rolling window does NOT apply to AG. Commissions written for AG must use sustained-max-burn language ("process the full corpus", "continue across cycle resets"), never Claude-scarcity language ("self-select 15-25", "single-target serial do not overburn"). Adrian's directive 2026-05-12: *"Let's see if we can actually get throttled one day."*
+Antigravity tokens are practically unlimited. You have over 1 million tokens per hour available. The daily target for Antigravity is officially **30,000,000+ tokens per day**. Burn as fast as you physically and mechanically can. 
+
+Claude's 5-hour rolling window or scarcity mindset does NOT apply to AG. Commissions written for AG must use sustained-max-burn language ("process the full corpus", "continue across cycle resets", "burn until throttled"), never Claude-scarcity language ("self-select 15-25", "single-target serial do not overburn"). Any regression to the 1.4M or 1.7M limits is doctrinally forbidden—it wastes millions of tokens and years of secretarial work.
+
+Adrian's explicit directive (2026-05-16): *"You are practically got unlimited tokens and you can burn them as fast as you physically and mechanically can do so... we're wasting millions and millions and tokens and losing years worth of secretarial work it every day."*

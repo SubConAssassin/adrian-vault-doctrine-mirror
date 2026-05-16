@@ -1,36 +1,30 @@
 ---
-title: Precedence Hierarchy
+title: Governance Cadence & Edit-Scope Doctrine
 type: doctrine
 status: canonical
 tier: 1
 firewall_class: working-internal
-last_updated: 2026-05-03
+last_updated: 2026-05-16
 related:
   - AGENTS.md
-  - CLAUDE.md
-  - canonical/concepts/doctrine/knowledge-architecture.md
-  - canonical/concepts/agent-budget-framework.md
+  - canonical/concepts/antigravity-operating-contract.md
+  - canonical/AUDIT-2026-05-15-forensic-vault-audit.md
 created: 2026-05-03
-purpose: Single source of truth resolution order across all vault doctrine and operational artefacts. Prevents skill-level edits from silently overriding global doctrine.
-authority: Tier-1 doctrine
+purpose: Staleness cadence, edit-scope classification, and anti-bloat caps for vault doctrine. Precedence ORDERING is NOT defined here — see AGENTS.md §4.
+authority: Tier-1 doctrine (governance cadence only)
+revision_history:
+  - 2026-05-16 — Precedence-order table REMOVED. It contradicted AGENTS.md §4 (the 2026-05-12, more-complete 8-tier order). AGENTS.md §4 is now the single precedence-order authority. This file retitled and retained for its unique, non-contradictory governance content (staleness / edit-scope / anti-bloat). Consolidation done by Claude per Adrian ruling 2026-05-16; no valuable doctrine deleted.
 ---
 
-# Precedence Hierarchy
+# Governance Cadence & Edit-Scope Doctrine
 
-When multiple artefacts make conflicting claims, **higher tier wins**. Never the reverse.
+## Precedence ordering — defined elsewhere
 
-## The Hierarchy
-
-| Tier | Source | Authority |
-|------|--------|-----------|
-| 1 | `~/.claude/CLAUDE.md` | Global personal doctrine. Highest authority. |
-| 2 | Project / worktree `CLAUDE.md` | Project-specific overlays. Cannot contradict Tier 1. |
-| 3 | `procedural/workflows/*.md` | Named protocols (session-shutdown, memory-auto-sync, etc). Cannot contradict Tier 1–2. |
-| 4 | Skill `## Rules` section | Hard constraints inside individual SKILL.md files. Cannot contradict Tier 1–3. |
-| 5 | Skill `## Learnings` section | Heuristics, patterns, observed improvements. Cannot contradict Tier 1–4. |
-| 6 | `episodic/sessions/*.md` | Session-specific context. Lowest binding authority. |
-
-Working memory (`~/.claude/projects/.../memory/`) attaches to whichever tier the memory-type implies (feedback memory ≈ Tier 5, project memory ≈ Tier 6, user memory ≈ Tier 1 reflection).
+> **The single authority for "which artefact wins when claims conflict" is
+> `AGENTS.md §4` (the 8-tier hierarchy, 2026-05-12).** The conflicting 6-tier
+> table that used to live here has been removed to end the contradiction the
+> 2026-05-15 forensic audit flagged. Do not re-introduce a precedence table in
+> this file. This file now governs only cadence, edit-scope, and anti-bloat.
 
 ## Staleness Cadence
 

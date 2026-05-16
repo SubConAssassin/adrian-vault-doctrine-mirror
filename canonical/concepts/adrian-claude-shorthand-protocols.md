@@ -156,9 +156,12 @@ Collapse sections with zero entries. If nothing is in flight, single line: `🟢
 
 ---
 
-## Command: `shutdown` / `end` / `close` / `bye` / `done for now` / `goodbye`
+## Command: `shutdown` / `end session` / `close out` / `done for now` / `bye` / `goodbye` (Explicit) OR Implicit Sign-offs
 
-**Trigger:** Adrian's message is any of these, alone or as a clear sign-off (e.g. `shutdown`, `shutdown protocol`, `end session`, `close out`, `done for now`, `bye`, `goodbye`, `speak tomorrow`, `catch you later`, `that's all`).
+**Explicit Triggers:** Adrian's message is any of these, alone or as a clear command: `shutdown`, `shutdown protocol`, `end session`, `close out`, `done for now`, `bye`, `goodbye`.
+*(Antigravity also accepts: `close window`, `wrap up`, `shut it down`)*
+
+**Implicit Triggers:** Adrian's message includes clear conversation-ending phrases such as `that's all`, `we're done`, `I'm off`, `catch you later`, `speak tomorrow`, or a thank-you that reads as a sign-off.
 
 **Action:** Execute the full **Shutdown Protocol** — graceful session close. Full doctrine: `canonical/concepts/shutdown-protocol.md`.
 
