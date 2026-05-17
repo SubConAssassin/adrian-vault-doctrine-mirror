@@ -203,9 +203,18 @@ changed?), affirmation stay/go deltas}`.
 4. Outcome-measurement instrument (how "charge gone / behaviour changed" is
    captured per platform) — design needed before the §8 loop can train.
 
-## 10. Firewall (re-stated — load-bearing)
-This document is the **mechanism**. It is strictly-private internal IP.
-Public/client/marketing framing is and remains ONLY: *"Language is my
-scalpel. I listen to how you frame what's blocking you. The proof is the
-outcome."* No slot grammar, no muscle testing, no chakra/frequency, no
-tapping is ever described externally. This file = source code, not copy.
+## 10. Firewall (re-stated — load-bearing; Adrian-clarified 2026-05-17)
+This document is the **mechanism = the proprietary product**. The firewall
+is a **public top-of-funnel boundary, NOT an all-disclosure ban** (Adrian
+direct ruling 2026-05-17):
+- **Public / top-of-funnel** (homepage, ads, sales/landing pages incl.
+  Mastermind sales page, social, blog): ONLY *"Language is my scalpel. I
+  listen to how you frame what's blocking you. The proof is the outcome."*
+  No slot grammar, no muscle testing, no chakra/frequency, no tapping.
+- **Inside the paid Mastermind program:** this exact method is **taught in
+  its entirety** — it IS the proprietary product members pay for. Not
+  secret-from-members.
+- **This file:** strictly-private internal IP / AI-infra source code — the
+  same proprietary method codified for the platform to learn. Never leaks to
+  public marketing; legitimately lives in Mastermind curriculum + the AI
+  infrastructure. Source code, not copy.
