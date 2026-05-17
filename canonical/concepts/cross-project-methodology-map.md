@@ -6,7 +6,9 @@ tier: 1
 firewall_class: working-internal
 authored_by: claude (cowork, Adrian-commissioned forensic synthesis)
 grounding: Every principle cites a real, forensically-verified Stefi/Tristen client transcript synthesis. NOTHING here is inferred from confabulated material.
-supersedes_for_build: The muscle-testing/kinesiology/HRV/biometric "methodology" in canonical/projects/ss.md, consolidated-knowledge-base.md, and the Ashta business-case/research docs — all forensically confirmed confabulated (see canonical/AUDIT-2026-05-15-forensic-vault-audit.md §2b). Build from THIS file, not those.
+supersedes_for_build: "CORRECTED 2026-05-17 (see §0 doctrine-correction). The INSTRUMENTED fabrications (Sensie SDK, HRV/RMSSD, biometric-congruence engine, Orgone sensors, crystal-skull quantum anchors) in the Ashta business-case/research docs remain confabulated — do NOT build from those. BUT muscle-testing/empath-surrogate testing itself is Adrian's GROUNDED historical method (Finding B, 4 sources) and IS build-safe — see canonical/concepts/ss-processing-statement-algorithm.md (strictly-private mechanism). consolidated-knowledge-base.md §2.2 is grounded IP, not confab."
+doctrine_change_log:
+  - "2026-05-17 — Adrian-ruled correction (AGENTS.md §8). §0 'muscle-testing = zero grounding/confabulation' was Stefi/Tristan-subset-scoped and corpus-wide wrong; corrected to: muscle-testing/empath-surrogate = grounded real IP; only the instrumented/biometric wrapper was confabulation. Reason: Finding B (4 corroborating sources) + ss-processing-statement-algorithm.md. Public firewall unchanged."
 purpose: The single build-safe source for "what Adrian's method actually is and how it should shape the Ashta and Bodhisvara user experience." UI/application layer only — backend tech deliberately out of scope per Adrian's instruction.
 ---
 
@@ -14,13 +16,37 @@ purpose: The single build-safe source for "what Adrian's method actually is and 
 
 ## 0. The hard rule this document exists to enforce
 
+> ⚠ **DOCTRINE CORRECTION 2026-05-17 (Adrian-ruled, AGENTS.md §8 tracked
+> change).** The original §0 over-generalised. The "grep returns zero"
+> finding was scoped to the **Stefi/Tristan voice-note subset only** (that
+> *is* what the 259 transcripts were). Finding B has since established,
+> across **4 independent grounded sources** (2018-Dec-14 own session; the
+> Gleb client session; Recording 48; Cristina 2022 voice note), that
+> **muscle-testing / empath-surrogate testing IS Adrian's real, documented
+> historical method** — grounded IP, not confabulation. It is now the spine
+> of `canonical/concepts/ss-processing-statement-algorithm.md`. The line
+> below is corrected accordingly.
+
 Adrian's instruction, verbatim: *"let's not invent modalities from
-non-existent information."* A grep of all 259 real client transcripts for
-`muscle test / kinesiology / sway test / HRV / biometric` returns **zero**.
-Adrian's actual method, as evidenced in the real sessions, is **verbal,
-relational, and ritual** — not instrumented. Every "biometric congruence
-engine" claim in the vault is confabulation and is firewall-breaching. This
-document is the antidote: only what the transcripts actually show.
+non-existent information."* That rule still stands — but it bans **inventing
+instrumented mechanisms that never existed**, not Adrian's real method.
+Precisely:
+
+- **GROUNDED (real IP — build from this):** muscle-testing / empath-surrogate
+  testing as Adrian's diagnostic to locate the body-source and theme. Multi-
+  source corroborated (Finding B). The Stefi/Tristan voice notes simply did
+  not narrate the mechanism — absence there ≠ absence everywhere
+  (per `memory/feedback-ssot-vs-corroboration.md`).
+- **STILL CONFABULATION (never build from these):** the *instrumented*
+  fabrications — Sensie SDK, HRV/RMSSD, "biometric congruence engine",
+  Orgone sensors, crystal-skull quantum anchors. These remain invented and
+  firewall-breaching (see `canonical/AUDIT-2026-05-16-confab-resweep.md`).
+
+The distinction: Adrian's diagnostic is a **real practitioner skill**
+(empath-surrogate muscle testing); the confabulation was wrapping it in
+fake hardware/biometric telemetry. Build the AI infra to *learn the
+practitioner skill from data* (see the algorithm §2/§7-8), never to
+simulate fake instrumentation.
 
 SS public framing remains as the firewall mandates: *"Language is my scalpel /
 I listen to how you frame what's blocking you / the proof is the outcome."*
