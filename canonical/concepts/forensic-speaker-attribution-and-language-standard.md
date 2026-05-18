@@ -30,15 +30,16 @@ The corpus, read correctly, is **exculpatory**: it shows Adrian was deliberately
 4. **No "case" construction.** Synthesis produces neutral, source-bounded summaries. It does NOT assemble accusations, "legal materiality", "admissions registers", or "malpractice schemas". Legal characterisation is a human/lawyer act on grounded evidence, never an AI synthesis default.
 5. **STOP-and-ASK over infer.** Any ambiguity in speaker or intent → flag and ask. Never resolve ambiguity by fabrication.
 
-## 2. Speaker attribution method (tiered; acoustic is authoritative)
+## 2. Speaker attribution method (tiered)
 
-The raw transcripts are undiarized Whisper dumps (`sender: Tristan/Adrian`, no per-utterance labels). Text alone CANNOT yield correct attribution — proven. Therefore:
+**Cardinal correction (Adrian, 2026-05-18):** the source data is per-message named. There is *no real ambiguity* for message archives — every voice/text message is individually attributed in the platform export. The `sender: Tristan/Adrian` frontmatter is a **thread-participants placeholder**, NOT a per-message label, and must NEVER be treated as resolved truth or used to guess. AG's failure was ignoring the available source naming and inventing attribution. The tiers, in priority order:
 
-- **Tier 0 — Acoustic (authoritative, overrides all text tiers).** `tools/voiceprint-diarize.py`: build Adrian's ECAPA voiceprint from his known-solo clips (`working/deep-extraction/transcripts/voice-memos/*`), then per-turn "Adrian vs not-Adrian" by embedding similarity on every multi-speaker recording. Local, £0. **Environment prerequisite (currently blocked):** speechbrain/torch require a Python 3.11 venv (`tools/requirements-diarize.txt`); system Python is 3.14. ECAPA model already cached at `~/.cache/huggingface/.../spkrec-ecapa-voxceleb`. Fixing this env is the first execution step.
-- **Tier 1 — Text fallback (only where audio is genuinely unavailable).** `canonical/brand/adrian-speaker-attribution-lexicon.md` + `adrian-speaker-attribution-mastermind-protocol.md` + chronological echo resolution + role/greeting cues. Whisper Americanises British speech → the spelling channel is INVALID for audio-derived text (lexicon §3). Output an explicit confidence; anything below high-confidence = `SPEAKER_UNVERIFIED`.
-- **Tier 2 — none.** There is no "reasonable guess" tier. Unprovable = flagged, not assigned.
+- **Tier S — Source-export join (AUTHORITATIVE, deterministic; the interim path, do NOW).** Every message archive (WhatsApp/iMessage/messenger) has a platform export (`_chat.txt`, format `[DD/MM/YYYY, HH:MM:SS] Sender: text`) that names every message. Resolve each per-message transcript's true sender by **joining it to its export line by timestamp/order**. This is a data join, not inference — zero ambiguity, no acoustic required. Replace the `sender: X/Adrian` placeholder with the joined per-message sender. Prerequisite: locate the source export per archive (the tristan/stefi audio was extracted from an export; the `_chat.txt` must be located/restored — the join key is timestamp).
+- **Tier M — Mastermind name-anchor context protocol.** Group sessions are the ONLY genuinely un-named multi-speaker case. Use `canonical/brand/adrian-speaker-attribution-mastermind-protocol.md` (the Adrian-directed 2026-05-17 name-anchor method) + chronology + addressing cues. Interim, pending acoustic verification.
+- **Tier 0 — Acoustic (gold standard / verification; NOT a prerequisite for Tier S).** `tools/voiceprint-diarize.py` (ECAPA voiceprint, local, £0). Most accurate; use to *verify* Tier S/M and to resolve genuinely un-named audio. Environment currently blocked (speechbrain/torch need a py3.11 venv; ECAPA model cached). **Do NOT block the named-message corpus on this** — Tier S stands on its own.
+- **No guess tier.** Anything not resolvable by S, M, or 0 is `SPEAKER_UNVERIFIED` — flagged, never assigned. The thread-participants placeholder is not a resolution.
 
-Acoustic (Tier 0) overrides any conflicting text inference, always.
+Priority where they conflict: Tier 0 (acoustic) > Tier S (source export) > Tier M. In practice Tier S is deterministic and sufficient for message archives; acoustic is confirmation.
 
 ## 3. Adrian's language signature — the characterisation rubric
 
@@ -64,13 +65,16 @@ Each rebuilt file:
 
 `canonical/concepts/antigravity-operating-contract.md` is amended: AG is **prohibited** from (a) assigning a speaker without Tier-0 grounding, (b) applying any legal/accusatory template, (c) inferring intent or escalating source language. On any speaker/intent ambiguity AG must STOP-and-ASK via an `ag-to-claude` question, never synthesise through it. AG produces extraction + neutral summary only; all characterisation of Adrian's language follows §3. (To be wired in full as a follow-on step in this mission.)
 
-## 6. Execution plan (Claude-direct forensic; massive resource use; memory-safe)
+## 6. Execution plan (Claude-direct forensic; memory-safe)
 
-1. **Fix the Tier-0 environment** — create the py3.11 venv, `pip install -r tools/requirements-diarize.txt`, smoke-test `voiceprint-diarize.py` on one recording. (Honest blocker today; first task.)
-2. **Inventory the real audio corpus** — confirm what is actually in `working/deep-extraction/transcripts/audio/` and which raw transcripts have recoverable audio (Tier 0 eligible) vs text-only (Tier 1, lower-confidence, flagged).
-3. **Build Adrian's voiceprint reference** from known-solo clips.
-4. **Diarize all multi-speaker recordings**, memory-safe (small batches, write-and-release, ≤2 concurrency, checkpoint each batch — the protocol that held on 2026-05-18; the earlier crash was memory pressure).
-5. **Claude-direct re-synthesis** per §3/§4 — Claude adjudicates every Adrian characterisation; subagents only for breadth extraction, never for the attribution/characterisation judgement.
-6. **Wire the AG contract amendment** (§5) so this can never recur.
+**Interim track — Tier S (do now, no blocker):**
+1. **Locate the source exports.** For tristan-archive / stefi-archive / each message archive, find or restore the platform `_chat.txt` (or messages.json) the audio/messages were extracted from. This is the join key holder.
+2. **Build the deterministic join.** Map every per-message transcript → its export line by timestamp/order → write the TRUE per-message sender, replacing the `sender: X/Adrian` placeholder. This is the speaker truth for message archives — no acoustic needed.
+3. **Claude-direct grounded re-synthesis** of the joined corpus per §3/§4 (verbatim quotes, true sender, Adrian's hedged language preserved and characterised non-advisory, neutral source-bounded summary, no legal template). Subagents for breadth extraction only; Claude adjudicates every Adrian characterisation.
 
-Sequence is fixed. Speaker truth (Tier 0) precedes any synthesis. No synthesis ships before this standard's checks pass.
+**Gold-standard / verification track — Tier 0 (parallel, not blocking):**
+4. Fix the diarizer env (py3.11 venv, `tools/requirements-diarize.txt`; ECAPA cached), build Adrian's voiceprint, diarize as **verification** of Tier S and as the resolver for genuinely un-named audio. Memory-safe (small batches, write-and-release, ≤2 concurrency, checkpoint — the protocol that held 2026-05-18).
+
+**Mastermind — Tier M:** apply the name-anchor protocol; acoustic-verify later.
+
+**Always-on:** AG contract amendment (§5) is wired. No synthesis ships whose every attribution is not Tier S / M / 0 grounded; the thread-participants placeholder is never a resolution. Tier S is sufficient and is the unblock — do not wait on acoustic for the named corpus.

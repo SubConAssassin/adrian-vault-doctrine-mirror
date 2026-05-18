@@ -128,10 +128,16 @@ breaching this, STOP and file a question — do not proceed.
 
 Full rules: `canonical/concepts/forensic-speaker-attribution-and-language-standard.md` (Tier-1). Non-negotiable summary:
 
-- **Speaker truth is acoustic, not textual.** You do not assign speakers. If a
-  task needs per-utterance attribution and there is no Tier-0 diarization
-  output provided to you, you STOP and file an `ag-to-claude-QUESTION`. You
-  never infer the speaker from topic, tone, or role.
+- **Speaker truth comes from the source export, never from you.** Message
+  archives are per-message named in the platform export (`_chat.txt`:
+  `[timestamp] Sender: text`). The `sender: X/Adrian` frontmatter is a
+  THREAD-PARTICIPANTS PLACEHOLDER, not a per-message label — never treat it as
+  resolved, never guess from it. Per-message sender = the export line joined by
+  timestamp (deterministic, provided to you or via a Claude-built join). For
+  Mastermind group audio use the name-anchor protocol. Acoustic is
+  verification. If a task needs attribution and no source-export sender or
+  diarization is provided, you STOP and file `ag-to-claude-QUESTION` — you
+  NEVER infer speaker from topic, tone, or role.
 - **Adrian's language is non-advisory by design — preserve it, never recast
   it.** Adrian explicitly does not give legal or medical advice and states he
   cannot. He offers conditional thoughts on predicted outcomes from his testing
