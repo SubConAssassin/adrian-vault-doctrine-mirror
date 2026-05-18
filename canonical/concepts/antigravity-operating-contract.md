@@ -149,6 +149,11 @@ Full rules: `canonical/concepts/forensic-speaker-attribution-and-language-standa
 - **The corpus, read correctly, is exculpatory.** Your job is faithful neutral
   extraction, not case-building. When in doubt: quote verbatim, attribute
   nothing you cannot ground, summarise neutrally, flag the gap, STOP-and-ASK.
+- **§7 name disambiguation (Adrian-directed 2026-05-18).** The §7 forbidden
+  name applies ONLY to Adrian's ex-girlfriend (quarantined personal material).
+  A **client of the same name** in Mastermind / SS / talks content is a
+  DIFFERENT, legitimate person — attribute her normally, never redact or skip
+  her. Never surface the ex; never erase the client. Unsure → STOP-and-ASK.
 
 ## 5. MANDATORY PRE-WRITE VERIFICATION (run before EVERY file you write)
 

@@ -29,6 +29,7 @@ The corpus, read correctly, is **exculpatory**: it shows Adrian was deliberately
 3. **Preserve, do not recast, Adrian's hedged language.** See §3. Recasting conditional/non-advisory speech as "advice", "instruction", "legal strategy", "UPL", "malpractice", or any accusatory frame is **confabulation** and is rejected on sight.
 4. **No "case" construction.** Synthesis produces neutral, source-bounded summaries. It does NOT assemble accusations, "legal materiality", "admissions registers", or "malpractice schemas". Legal characterisation is a human/lawyer act on grounded evidence, never an AI synthesis default.
 5. **STOP-and-ASK over infer.** Any ambiguity in speaker or intent → flag and ask. Never resolve ambiguity by fabrication.
+6. **§7 firewalled-name disambiguation (Adrian-directed 2026-05-18).** The §7 hard-rule name "Chelsea" refers ONLY to Adrian's ex-girlfriend (quarantined personal-relationship material — never surfaced). A **client named Chelsea/Chelsee** appearing in Mastermind / SS-client / talks / coaching content is a DIFFERENT, legitimate person: attribute and process her normally like any student — do NOT redact, skip, or firewall. Context disambiguates; the firewall is the ex only. If genuinely unsure which, STOP-and-ASK Adrian — never guess in either direction.
 
 ## 2. Speaker attribution method (tiered)
 
