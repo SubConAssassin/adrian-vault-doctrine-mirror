@@ -247,3 +247,18 @@ push are ungated and still escalate genuine stalls. This is the GUI keystroke
 path's structural ceiling and is the strongest concrete argument for the
 Phase-2 headless/file-queue control plane — the guard makes the failure *safe*,
 not *absent*.
+
+> **⚠️ SUPERSEDED/CORRECTED 2026-05-19 (reconciliation at chat-down of the
+> originating 2026-05-16 `dazzling-herschel` session).** The rule above —
+> *"re-check the frontmost process name; proceed ONLY if it is `Antigravity`"*
+> — was itself the bug. Antigravity.app is an **Electron** app:
+> `get name of first application process whose frontmost is true` returns
+> **`"Electron"`**, never `"Antigravity"`, so the guard aborted **every**
+> cycle even with AG genuinely frontmost. The prompter became a silent no-op
+> for ~2 days → the chronic "42 URGENT burn-stall tier-5" handoffs.
+> **Authoritative fix:** gate on **`bundle identifier == com.google.antigravity`**
+> (version/localisation-proof), applied across all 7 gate sites in the 3 loops.
+> Root cause + fix: `episodic/sessions/2026-05-17-electron-gate-rootcause-and-overnight-forensic.md`
+> and memory `feedback-ag-keystroke-frontmost-or-abort.md` (Identity-check
+> clause). The *frontmost-or-abort principle* stands; only the name-string
+> implementation was wrong. Do NOT re-introduce a `name == "Antigravity"` check.
