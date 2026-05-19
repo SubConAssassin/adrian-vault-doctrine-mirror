@@ -13,6 +13,19 @@ Utility: `grep "^## \[" wiki/log.md | tail -5` returns the last 5 operations.
 
 ---
 
+## [2026-05-19] update | Tidy-up shutdown — remote access doctrine filed
+
+Old chat reviewed and closed. New knowledge extracted from post-shutdown conversation:
+- Discovered Claude Code Remote Control (Feb 2026) — the native solution for phone→Mac access
+- Clarified architecture: Claude app conversations use Anthropic servers, Mac not involved
+- Clarified Dispatch vs Remote Control vs Local LLM vs Tailscale
+- Created `[[remote-access-doctrine]]` as permanent canonical reference
+- Updated `[[session-lessons-2026-05-05]]` Lesson 2 with corrected fix (Remote Control, not Tailscale-only)
+
+Safe to close. All work committed.
+
+---
+
 ## [2026-05-05] update | Session shutdown — phone remote test
 
 Adrian prompted from phone while out. Session ran on Linux vault mirror (doctrine only — not Mac-native).

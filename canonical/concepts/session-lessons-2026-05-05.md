@@ -11,11 +11,15 @@ The `adrian-vault-doctrine-mirror` GitHub repo contains `canonical/concepts/` on
 
 **Fix required:** Either (a) Mac-native Claude Code session is the endpoint for all phone prompts, or (b) a broader vault mirror is maintained with non-sensitive project/people data included.
 
-## Lesson 2 — Phone → Mac remote execution is not yet working
+## Lesson 2 — Phone → Mac remote execution: native solution exists
 
-The chatgpt-dispatch-protocol and CEO execution schedule assume a Claude Code session is running on the Mac and reachable. This session (Linux server) is not that. When Adrian is remote, there is currently no bridge to the Mac's local execution environment. The Mac cannot receive or execute commands.
+**UPDATED 2026-05-19:** The fix is simpler than originally recorded. Anthropic released **Claude Code Remote Control** in February 2026. Run `claude remote-control` in Terminal on the Mac; the Claude iOS/Android app then connects directly to that session. Full vault access, all MCP servers, all local tools — through the mobile Claude app. Outbound HTTPS only, no open ports, no router config.
 
-**Fix required:** Tailscale + persistent Claude Code session on the Mac, OR a proper remote-access daemon. This needs to be set up and verified while Adrian is physically at the Mac before next trip.
+**One constraint:** Terminal must stay open and awake on Mac. Session times out after ~10 min offline. For the Mac Studio setup, this means leaving it always-on at home with `claude remote-control` running in a persistent tmux window.
+
+**Tailscale** remains the backup/complement — install on both Mac and iPad, then SSH via Blink Shell or Termius for pure terminal access when Remote Control isn't needed.
+
+**Action:** Set up and test `claude remote-control` on the Mac before the America trip. Verify from iPad. Then it's solved.
 
 ## Lesson 3 — Email monitoring daemon does not exist
 
