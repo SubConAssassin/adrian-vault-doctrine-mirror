@@ -44,7 +44,7 @@ When instructions conflict, agents must follow this strict hierarchy:
   - `osb` — Original Siberian Blue: luxury spiritual jewelry, cobalt-doped hydrothermal quartz
   - `subconscious-surgery` — 1:1 transformational coaching + Kajabi mastermind
   - `aga-bali` — 13-hectare conscious community/retreat, Candidasa, East Bali
-  - `tri-hita-wte` — PT Tri Hita WtE Indonesia: modular biomethane, V6.4 framework
+  - `tri-hita-wte` — PT Tri Hita WtE Indonesia: modular biomethane, V7.0 framework (upgraded from V6.4 2026-05-19; Grok amendments incorporated: pemulung 17.5%, BTC sensitivity, CapEx contingency, carbon credit)
   - `ashta` — distributed consciousness research platform
   - `bodhisvara` — voice-analytics/therapist-matching, concept stage, parked
 - **Venture Ledgers:** Always read `companies/{venture}/ledger.md` before acting on a venture.
@@ -168,3 +168,32 @@ Antigravity tokens are practically unlimited. You have over 1 million tokens per
 Claude's 5-hour rolling window or scarcity mindset does NOT apply to AG. Commissions written for AG must use sustained-max-burn language ("process the full corpus", "continue across cycle resets", "burn until throttled"), never Claude-scarcity language ("self-select 15-25", "single-target serial do not overburn"). Any regression to the 1.4M or 1.7M limits is doctrinally forbidden—it wastes millions of tokens and years of secretarial work.
 
 Adrian's explicit directive (2026-05-16): *"You are practically got unlimited tokens and you can burn them as fast as you physically and mechanically can do so... we're wasting millions and millions and tokens and losing years worth of secretarial work it every day."*
+
+#### 11.5.a Amendment 2026-05-20 — Gemini 3.5 Flash High economics
+
+Antigravity now runs **Gemini 3.5 Flash with `thinking_level=high`** (replacing Gemini 3.1 Pro as of Google I/O 2026, May 19-20). The burn math has shifted:
+
+| Axis | 3.1 Pro (previous) | 3.5 Flash High (now) | Combined effect |
+|---|---|---|---|
+| Speed | baseline | **4× faster** (12× optimised) | More iterations per hour |
+| Cost per M input tokens | $2-4 | **$0.50** (4-8× cheaper) | More iterations per dollar |
+| SWE-bench Verified (coding) | 76.2% | **78%** | Better code quality |
+| MCP Atlas (tool-use reliability) | — | 83.6% | More reliable tool orchestration |
+| Multi-hour autonomy | partial | structurally supported | Native overnight grind |
+
+**Effective work per dollar / per hour: ~16-32× higher than pre-3.5-Flash.** The 30M tokens/day target was calibrated against 3.1 Pro economics; under 3.5 Flash High the same hourly budget covers materially more output. Re-frame as **"burn rate per dollar"** rather than absolute token count.
+
+The Grok/GPT-2026-05-20 framing of "loop density" applies: cheaper + faster steps unlock *more careful + reliable iterations*, not just more iterations. Use the savings for verification, not raw throughput.
+
+### 11.6 Hive Architecture v3 reference (added 2026-05-20)
+
+Effective 2026-05-20, the operational architecture is documented at **`canonical/concepts/hive-architecture-v3.md`** (Tier-1 doctrine).
+
+Key reference points all agents must honor:
+- **4-layer stack:** Claude (CEO/doctrine/memory) / Antigravity 2.0 + Gemini 3.5 Flash High (execution) / Subscription advisors (ChatGPT Pro + SuperGrok bridges) / Local substrate (18GB → incoming 64GB Apple Silicon)
+- **Routing matrix:** v3 §4 specifies what work goes where (deep architecture / legal / synthesis → Claude; coding swarm / long-horizon agentic / multimodal pipeline → AG; deep research / image-video gen → ChatGPT Pro / SuperGrok; acoustic / OCR / RAG → local 64GB)
+- **6 capability clusters:** Cross-corpus mission (Notes + iMessage + Granola), OSB visual production (Adobe + Blender + canvas-design), Active-legal workflow (PDF + legal:*), Multi-venture social (Postiz + mkt-*), Knowledge graph (graphify + enterprise-search), Investor decks (pptx + canvas-design)
+- **Reliability target:** migrate to Antigravity 2.0 CLI/SDK as Phase 2 control plane (eliminates GUI keystroke chain failure modes); migration Adrian-approval-gated
+- **Cross-corpus mission:** "Connect all the strings" — unified person records linking WhatsApp + FB + voice memos + Mastermind + Notes + ChatGPT + email per contact (proof-of-concept built 2026-05-20: `canonical/people/erica-johnson-unified.md`)
+
+This file is the consolidating architectural artifact; subsequent doctrine changes that affect it must update v3 + bump its version.
