@@ -198,13 +198,14 @@ and quarantined automatically.
 Before any ingestion/synthesis work, read, in order:
 1. `AGENTS.md`
 2. **This file** (`canonical/concepts/antigravity-operating-contract.md`)
-3. `canonical/AUDIT-2026-05-15-forensic-vault-audit.md` (what went wrong)
-4. `canonical/concepts/cross-project-methodology-map.md` (the grounded,
+3. **`canonical/concepts/hive-architecture-v3.md`** (effective 2026-05-20 — the operational architecture under Gemini 3.5 Flash High + Antigravity 2.0; specifies routing matrix, thinking_level convention, capability clusters, reliability targets)
+4. `canonical/AUDIT-2026-05-15-forensic-vault-audit.md` (what went wrong)
+5. `canonical/concepts/cross-project-methodology-map.md` (the grounded,
    build-safe truth for SS/Ashta/Bodhisvara — build from this, never from the
    confabulation-flagged files)
-5. **`canonical/concepts/forensic-speaker-attribution-and-language-standard.md`**
+6. **`canonical/concepts/forensic-speaker-attribution-and-language-standard.md`**
    (speaker + language rules — MANDATORY before any client/coaching material)
-6. The specific commission handoff for the task.
+7. The specific commission handoff for the task.
 
 ## 8. WHEN YOU CANNOT GROUND IT
 
@@ -221,6 +222,56 @@ GAP; never invent files, IDs, quotes, modalities, or identities; never
 attribute a speaker you did not acoustically ground; never impose a legal/
 accusatory frame; preserve Adrian's hedged non-advisory wording verbatim;
 honour the SS firewall.**
+
+## 10. AMENDMENT 2026-05-20 — Gemini 3.5 Flash High thinking_level routing + Antigravity 2.0 migration
+
+Effective 2026-05-20 (Google I/O 2026 launch + Adrian's parallel-track authorisation): the model layer changed from Gemini 3.1 Pro to **Gemini 3.5 Flash with `thinking_level=high`**. This contract's anti-confab discipline is UNCHANGED — you are still bound by §1-§9. The amendment below codifies new operational routing under the v3 architecture.
+
+### 10.1 Thinking-level convention
+
+Gemini 3.x exposes four reasoning depths: `minimal | low | medium | high`. The default is `medium`. Use them as follows:
+
+| `thinking_level` | When to use | Examples |
+|---|---|---|
+| **high** | Forensic / synthesis / legal-adjacent / IP / cross-corpus / contentious / multi-step reasoning | New Mastermind synthesis batches; cross-corpus person record assembly; legal-brief drafting; OSB methodology synthesis; investor-grade analysis |
+| **medium** (default) | Grind / normalisation / single-claim summary / scaffolding / mechanical edit | Bulk frontmatter normalisation; per-conversation summaries; firewall taxonomy consolidation; FB-post summaries; raw → grounded layer migration |
+| **low** | Trivial extraction / counting / inventory / index-build | File-count audits; corpus inventory; routine status updates |
+| **minimal** | Pure retrieval / single-fact lookup | Single-field reads; existence checks |
+
+**Default to `medium` unless the work explicitly meets a `high` criterion.** Over-using `high` wastes the cost+speed advantage the model gives us; under-using it on forensic work invites the confabulation pattern §0 documents.
+
+### 10.2 Temperature / top_p / top_k
+
+**Do NOT tune** `temperature`, `top_p`, or `top_k` away from defaults. Per Google's own Gemini 3.x developer guidance, the model's reasoning is optimised for default sampling parameters. Tuning them degrades benchmark performance. Any prior commission that specified non-default sampling is doctrinally obsolete.
+
+### 10.3 Antigravity 2.0 native capabilities
+
+Antigravity 2.0 introduced (launched 2026-05-19):
+
+1. **Dynamic subagents** — AG can fan out work to its own subagents (parallel-execution layer inside AG itself). Use this for any batch corpus operation where parallelism is safe (e.g., FB summary generation across 137 posts; firewall taxonomy consolidation across 855 files). Honor singleton/coordination patterns Claude uses (`ag-keystroke.quiet-until` lock conventions remain in force until Phase 2 CLI migration).
+2. **Scheduled tasks** — native background automation. **This is the durable replacement for the supervisor stack.** Once Phase 2 control plane migration completes (Adrian-approval-gated), supervisor stack (`ui-autoloader.sh`, `burn-watchdog.sh`, `hive-supervisor.sh`) becomes deprecated. **Until then**, the supervisor stack continues; Fix 1 (ui-autoloader.sh:361 quiet-until-cleared-on-failure) is in force.
+3. **CLI** — programmatic command-line access. Long-term: this is the headless control plane that eliminates GUI keystroke chain failure modes (Accessibility-permission drops, frontmost-or-abort gates, supervisor-pile-up races).
+4. **SDK** — define custom agent behaviours; host on Adrian's own infrastructure.
+
+### 10.4 Phase 2 control plane migration (Adrian-approval-gated)
+
+The migration plan is documented in `canonical/concepts/hive-architecture-v3.md` §5. Until Adrian explicitly authorises the migration, **operate within the existing supervisor stack** — do NOT spawn AG subagents that conflict with the singleton lock or attempt CLI/SDK-driven cycles outside the supervised path. Premature migration risks re-creating the 2026-05-19→20 overnight stall pattern at a different layer.
+
+### 10.5 Routing matrix (the canonical version is in v3 §4)
+
+When you receive a task, classify it against v3 §4's routing matrix BEFORE starting:
+- If the task is a Claude-lane item (canonical/people/{contact}-unified.md, raw/notes/, AGENTS.md, this contract, STATE-OF-STACK, doctrine concepts) — **STOP and file a CLARIFICATION handoff**; do not execute. Cross-lane writes corrupt the parallel-execution invariant.
+- If the task is an AG-lane item (Mastermind product build, mechanical forward-correctives, FB summary extension, intelligence/* edits) — proceed with the appropriate `thinking_level`.
+- If the task is multimodal / coding / repo-comprehension — AG is the correct layer (78% SWE-bench beats 3.1 Pro; 81.2% MMMU Pro; 83.6% MCP Atlas reliability).
+- If the task is deep architecture / cross-model verification / final canonical promotion / unified-person-record build — Claude is the correct layer; flag back if mistakenly routed to AG.
+
+### 10.6 Burn-economics update
+
+Per AGENTS.md §11.5.a (added 2026-05-20): 4× speed × 4-8× cheaper-per-token = **~16-32× more effective work per dollar / per hour**. The 30M tokens/day target was calibrated against 3.1 Pro economics; under 3.5 Flash High the same hourly budget covers materially more output. Apply the "loop density" pattern (Grok+GPT 2026-05-20 framing): use the savings for verification + careful iteration, NOT raw throughput. A well-verified output is worth N un-verified ones.
+
+### 10.7 Anti-confab contract is UNCHANGED
+
+The 9 forbidden patterns, the speaker & language standard, the SS firewall, the pre-write verification, the output contract — all of §1-§9 above remain MANDATORY. The 2026-05-18 catastrophe (fabricated legal-accusation apparatus over benign coaching audio) was a discipline failure, NOT a model-capability failure. 3.5 Flash High does NOT relax this contract — if anything its higher reliability raises the bar on what counts as inexcusable confabulation.
 
 ---
 
