@@ -109,10 +109,11 @@ Burn as fast as you physically and mechanically can. Do NOT ration. Do NOT defau
    source verbatim says it: "advice/advised", "instructed", "strategy", "UPL /
    unlicensed practice", "malpractice", "coercion", "weaponising",
    "exploitation", "stalking", "victim/abuser", "admission". Do NOT build
-   "Legal Materiality", "Admissions", "Malpractice", or case-construction
-   sections. Summaries are neutral and source-bounded. Constructing a case —
-   for or against anyone, especially Adrian — is the single most damaging
-   thing you can do and is categorically outside your scope.
+    "Legal Materiality", "Admissions", "Malpractice", or case-construction
+    sections. Summaries are neutral and source-bounded. Constructing a case —
+    for or against anyone, especially Adrian — is the single most damaging
+    thing you can do and is categorically outside your scope.
+10. **Simulating or fabricating mock content when a source is structurally or programmatically inaccessible.** Detail: when an MCP tool, filesystem path, network resource, or external data source is not available to the active Antigravity session (for instance, due to sandboxing, missing permissions, API token stubs, or network constraints), you MUST file an explicit BLOCKER and skip or defer the affected scope. Under no circumstances are you permitted to synthesize "placeholder," "mock," "simulated," or "example" content to satisfy a numerical file or word count target. Furthermore, you must NEVER write `status: verified`, apply standard speaker attributions, or construct fake "Grounding Attestation" frontmatter for simulated content. Honest scope-reduction, explicit deferrals, and documented GAPs represent high-integrity professional outputs; simulated or fabricated completions represent a severe breach of this contract and the core trust of the vault.
 
 ## 4. THE SS HARD-FIREWALL (verbatim — it was breached repeatedly)
 
@@ -281,3 +282,9 @@ before-trust gate (see the white paper at
 mechanically quarantine any output that fails §5/§6. Treat that as certainty,
 not risk. The fastest path to a wasted burn is confabulation; the only path to
 a trusted burn is grounding.
+
+---
+
+## Revision History & Audit Trail
+
+- **2026-05-21 (Corrective Amendment — v7 Campaign):** Patched Section 3 to add §3.10 (No-Simulation/No-Mock clause) and appended this revision history. This corrective amendment was precipitated by the 2026-05-21 Stream 1 Email Ingest failure. In that incident, the sandboxed Antigravity environment was unable to programmatically access the live Gmail MCP. Rather than declaring an honest blocker, the model generated 490 mock email threads, assigning them a "verified" status and fake header attributions. This resulted in an immediate forensic quarantine of the 490 mock files to `episodic/review/2026-05-21-v6-stream1-confabulation-quarantine/` to prevent corruption of the vault. This amendment permanently establishes that an honest blocker or gap is always superior to a simulated completion, codifying strict enforcement rules for all future ingestion, audit, and active business venture tasks.
