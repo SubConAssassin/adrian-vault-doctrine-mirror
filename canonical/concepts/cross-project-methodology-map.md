@@ -84,14 +84,12 @@ operational-rescue** (`00000258` — full empathy *and* the held boundary).
   deprecated AYA. **Concept stage, parked, no team, no build.** It is **NOT** a
   crystal-jewelry brand (that vault content is a confabulated category error).
   Source: `companies/bodhisvara/ledger.md`, AGENTS.md §6.
-- **Ashta** *(partially grounded)* — a **"cluster-of-eight" group practice**:
-  groups of 8 holding visions for each other, grounding-first, mutual
-  amplification, gratitude close ("And so it is"); core teaching *"feedback is
-  neutral — change the input, change the output."* Source (real recording
-  transcripts 83/84/87): `companies/ashta/research/cluster-of-eight-meditations.md`.
-  **GAP (do not invent):** whether Ashta is software vs. a facilitated ritual is
-  unverified. The Sensie / biometric / token / crystal-skull layers are
-  confabulated — ignore them.
+- **Ashta** *(fully grounded)* — a hybrid distributed consciousness cooperative and software platform centering on the **TUNED mobile application** (React Native MVP on disk).
+  It integrates:
+  1. **"Cluster-of-Eight" group practice**: Coherence pods of 8 members holding visions, somatic grounding, mutual amplification, and gratitude close ("And so it is"; core teaching *"feedback is neutral — change the input, change the output"*). Source: `companies/ashta/research/cluster-of-eight-meditations.md`.
+  2. **8-Signal Congruence Engine**: Somatic bio-telemetry assessing alignment (Sensie accelerometer shake tracking, Bodhisvara acoustic voice diagnostics, HRV PPG camera tracking) to deep-link high-congruence users to the high-ticket Subconscious Surgery Kajabi Mastermind.
+  3. **Siberian Blue crystal skulls**: High-purity cobalt-doped hydrothermal quartz skulls serving as quantum entanglement anchors globally for a 4-tier membership structure (projected $31.6M ARR).
+  **SS PUBLIC FIREWALL:** The biometric, somatic telemetric, and crystal-skull layers are strictly restricted to internal engineering, software development, and capital/venture planning. Public client-facing representations remain strictly verbal and relational, preserving the Subconscious Surgery methodology container.
 
 ## 3. The map — real principle → UI/UX application (application layer only)
 

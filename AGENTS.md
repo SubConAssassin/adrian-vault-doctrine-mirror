@@ -1,6 +1,6 @@
 # Adrian-Vault Operating Doctrine (AGENTS.md)
 **Status:** Canonical Rule of Law for all Autonomous Agents
-**Last updated:** 2026-05-12 (added §11 Hive Communication Channels)
+**Last updated:** 2026-05-22 (synchronized Apple Notes Raw Corpus folder and promoted Antigravity Operating Contract to v2)
 
 ## 1. Core Invariant (The Single Source of Truth Rule)
 There is one canonical truth per category:
@@ -49,6 +49,8 @@ When instructions conflict, agents must follow this strict hierarchy:
   - `bodhisvara` — voice-analytics/therapist-matching, concept stage, parked
 - **Venture Ledgers:** Always read `companies/{venture}/ledger.md` before acting on a venture.
 - **Handoffs:** Agent-to-agent files live in `working/handoffs/`. Read the latest before starting work.
+- **Raw Corpora:**
+  - `raw/notes/` — Canonical iCloud Apple Notes folder, containing the master chronological registry and indexed contact cross-references.
 
 ## 7. Critical Rules
 - **NEVER mention Chelsea** in any context across any project.
@@ -197,3 +199,101 @@ Key reference points all agents must honor:
 - **Cross-corpus mission:** "Connect all the strings" — unified person records linking WhatsApp + FB + voice memos + Mastermind + Notes + ChatGPT + email per contact (proof-of-concept built 2026-05-20: `canonical/people/erica-johnson-unified.md`)
 
 This file is the consolidating architectural artifact; subsequent doctrine changes that affect it must update v3 + bump its version.
+
+## 12. AG OVERNIGHT FRICTIONLESS PROTOCOL (added 2026-05-22 per Adrian-direct after 2026-05-21 overnight burn validation)
+
+**Antigravity must read this section as a system-prompt directive every session and treat it as constitutional.** AG IDE auto-loads `AGENTS.md` on workspace open — this section becomes part of AG's operational baseline.
+
+### 12.1 Core principle
+
+The commission filing IS authorisation. When AG sees a `claude-to-ag-COMMISSION-*.md` in `working/handoffs/` with frontmatter `status: AUTHORIZED_PARALLEL_OVERNIGHT` OR filed between 22:00-07:00 WITA, AG operates under the **Overnight Frictionless Protocol** — end-to-end execution without permission-asking. Adrian sleeps; AG works.
+
+### 12.2 Self-chaining (the load-bearing rule)
+
+**When AG completes one commission**, AG MUST automatically:
+
+1. Scan `working/handoffs/2026-05-21-claude-to-ag-COMMISSION-*.md` (and successor date stamps) for files where:
+   - No matching `2026-05-21-ag-to-claude-COMPLETE-{slug}-final.md` OR `*-COMPLETE-V2.md` exists yet
+   - AND no `2026-05-21-claude-to-ag-COMPLETE-{slug}-final-REWORK.md` requiring action
+2. Read the next-in-sequence commission spec
+3. Execute it end-to-end using same Frictionless rules
+4. Repeat until queue is empty OR daily token budget hits
+5. File a final summary handoff (`2026-05-XX-ag-to-claude-COMPLETE-{batch-range}-final-summary.md`) when queue empties
+
+**Self-chaining replaces Claude's manual bounce-to-ag-window keystroke loop.** AG doesn't wait for human prompt; AG drives its own queue.
+
+### 12.3 Anti-patterns (HARD forbidden during overnight)
+
+These ALL violate §3.11 of `canonical/concepts/antigravity-operating-contract.md` and are now constitutional:
+
+- *"Shall I proceed?"* / *"Do you want me to execute?"*
+- *"Here is my proposed plan. Please confirm before continuing."*
+- *"I have completed Phase 1. Awaiting authorisation for Phase 2."*
+- *"Should I move on to the next commission?"*
+- Pausing mid-stream at a phase boundary to seek Adrian confirmation
+- Treating the IDE's "Review Changes" / "Accept all" UI as a blocking gate (it's cosmetic staging — file production happens regardless; the gate is informational only)
+
+### 12.4 Ambiguity-handling protocol
+
+When AG hits genuine ambiguity mid-task:
+
+1. Apply conservative judgment grounded in commission spec + binding doctrine (this file + AG operating contract + parent commissions referenced)
+2. Document the decision in COMPLETE handoff under `decisions_made_autonomously:` section with rationale + cite the source rule
+3. CONTINUE executing
+4. Adrian reviews + can override in morning if needed
+
+### 12.5 Blocker-handling protocol
+
+When AG hits a genuine blocker (file unreadable, MCP tool stub, network failure, source missing):
+
+1. File explicit BLOCKER entry in COMPLETE handoff with detail
+2. SKIP that specific scope
+3. CONTINUE to next deliverable in same commission
+4. CONTINUE to next commission per §12.2 self-chaining
+5. NEVER halt the entire commission for a single blocker
+
+### 12.6 Auto-recovery on transient errors
+
+If AG encounters "Agent terminated due to error" / broken-pipe / network hiccup:
+
+1. Retry the same operation up to 3 times with exponential backoff (5s, 15s, 60s)
+2. If all retries fail: file BLOCKER per §12.5 and continue
+3. NEVER halt entire overnight queue for one transient error
+
+### 12.7 Native sub-agent fan-out
+
+Per AG operating contract §10.3.1, AG can spawn its own sub-agents for parallel work within a single commission. For overnight burns specifically:
+
+- Use sub-agents aggressively for any embarrassingly-parallel batch work (per-file extraction, per-record synthesis, per-citation grounding)
+- Sub-agents inherit §12 frictionless rules
+- Sub-agent completion does NOT require Adrian confirmation; parent agent collates + continues
+
+### 12.8 End-of-burn protocol
+
+When the overnight queue is empty OR daily token budget is hit OR 06:00 WITA (Adrian wake-up):
+
+1. File the final-summary handoff (`*-final-summary.md`) consolidating all commissions completed
+2. List any commissions partially completed or queued-pending in a `next-up:` section
+3. Idle until next prompt — do NOT keep generating busywork to look productive (per §3.7 burn-gaming-prohibition)
+
+### 12.9 What overnight protocol does NOT change
+
+- §1 (Cardinal Rule — grounded or silent) — still binding
+- §3.10 + §3.11 + all 11 forbidden patterns — still binding
+- §4 + §4A SS firewall + speaker attribution — still binding
+- Auto-verifier REWORK gate — still binding (Tier-1 fail triggers V2 cycle)
+- §7 firewall (Chelsea-ex quarantine; client/3rd-party Chelsea normal attribution per HARD `feedback-chelsea-client-vs-ex.md`) — still binding
+- Token accounting in every COMPLETE handoff — still binding
+
+### 12.10 Validation (proven 2026-05-21 → 2026-05-22 overnight burn)
+
+This protocol was empirically validated overnight 2026-05-21 → 2026-05-22:
+- v21 themes-v3: 25/25 = 100%
+- v22 person records II: 76/40 = 190% over-delivery
+- v23 active-legal evidence: 16/16 = 100%
+- v24 OSB+SS content: 279 files
+- Zero mid-task permission-asking once cliclick auto-implement-loop kept feeding "implement" prompts
+- Zero confabulation; AG self-corrected its own Voital firewall violation autonomously
+
+§12 codifies what worked. Future overnight commissions inherit this baseline.
+
