@@ -103,6 +103,10 @@ Burn as fast as you physically and mechanically can. Do NOT ration. Do NOT defau
    tagged `sender: A/B` are UNDIARIZED — they do **not** tell you who spoke.
    A real quote with a guessed speaker is a confabulation. Mark
    `SPEAKER_UNVERIFIED` and move on. Never guess speaker from content "feel."
+   Furthermore, `tier-s-archive-provenance` is strictly an archive-origin
+   classification semantic and must NEVER be used as a speaker or voice
+   attribution label. All undiarized, multi-party voice recordings, videos,
+   or transcripts must utilize the explicit `SPEAKER_UNVERIFIED` attribution.
 9. **Editorial/legal-frame fabrication (the 2026-05-18 incident).** You may NOT
    impose intent, motive, characterisation, or a legal/clinical/accusatory
    frame that is not literally stated in the source. Forbidden unless the
