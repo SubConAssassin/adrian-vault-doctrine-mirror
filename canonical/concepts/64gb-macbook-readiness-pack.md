@@ -72,9 +72,33 @@ In priority order:
    git -C ~/Documents/adrian-vault-private-mirror rev-parse HEAD
    # Cross-check against GitHub remote in browser
    ```
-2. **Re-create encrypted forensic artifact** AFTER today's 2026-05-20 vault-perfect milestone is captured. The current artifact `~/Documents/Adrian-Vault-encrypted-backups/companies-VERIFIED-FORENSIC-20260519T160155Z.tar.age` predates today's work (Phase A sweep + cross-corpus person records + Apple Notes ingest). Re-encrypt and verify round-trip decrypt to a scratch dir.
+2. **Re-create encrypted forensic artifact** AFTER today's 2026-05-20 vault-perfect milestone is captured. The current artifact `~/Documents/Adrian-Vault-encrypted-backups/companies-VERIFIED-FORENSIC-20260519T160155Z.tar.age` predates today's work (Phase A sweep + cross-corpus person records + Apple Notes ingest). 
+   - **Exact Forensic `tar.age` Backup Command Protocol**:
+     Use the precise `tar` and `age` sequence to archive and encrypt:
+     ```bash
+     # Derive recipient public key from the identity key and encrypt the vault
+     RECIPIENT=$(age-keygen -y ~/Documents/Adrian-Vault-encrypted-backups/companies-backup-age.key)
+     tar -cvf - -C ~/Documents/Adrian-Vault . | age -e -r $RECIPIENT > ~/Documents/Adrian-Vault-encrypted-backups/companies-VERIFIED-FORENSIC-$(date -u +"%Y%m%dT%H%M%SZ").tar.age
+     ```
+   - **Verification**: Verify round-trip decrypt to a temporary scratch directory before pickup:
+     ```bash
+     age -d -i ~/Documents/Adrian-Vault-encrypted-backups/companies-backup-age.key ~/Documents/Adrian-Vault-encrypted-backups/companies-VERIFIED-FORENSIC-*.tar.age | tar -t | head -5
+     ```
 3. **Copy `~/.config/com.adrian-vault/.env` to encrypted USB** (API keys = single point of failure for ChatGPT/Grok/Gemini/Wix/Pushover/Bright Data access; NOT in vault, NOT in cloud).
+   - **Precise `.env` File Validation Checks**:
+     Ensure all required environment keys are populated and contain no empty/placeholder values:
+     ```bash
+     # Check for empty variables or placeholders in .env
+     grep -E "^[A-Z_]+=\s*$" ~/.config/com.adrian-vault/.env || echo "No empty variables found."
+     grep -E "YOUR_|PLACEHOLDER" ~/.config/com.adrian-vault/.env || echo "No placeholder values found in secrets."
+     ```
 4. **Copy encrypted forensic artifact + `companies-backup-age.key` to USB** (separate from vault; age key should never live in the same place as the encrypted artifact).
+   - **Age Key Structure Verification**:
+     Ensure the `companies-backup-age.key` is formatted as a valid age private key file:
+     ```bash
+     # Verify valid AGE key format
+     grep -q "^AGE-SECRET-KEY-1" ~/Documents/Adrian-Vault-encrypted-backups/companies-backup-age.key && echo "Valid age secret key structure detected."
+     ```
 5. **Verify iCloud Photos library is fully downloaded** — confirm "Optimize Mac Storage" is OFF in Photos preferences. Otherwise iCloud-only items are lost at reformat.
 
 ### 3.2 GitHub credential verification
@@ -110,6 +134,11 @@ git clone https://github.com/SubConAssassin/adrian-hivemind-private.git ~/Docume
 mkdir -p ~/.config/com.adrian-vault
 cp /Volumes/<USB>/com.adrian-vault/.env ~/.config/com.adrian-vault/.env
 chmod 600 ~/.config/com.adrian-vault/.env
+
+# 4.1 Validate secrets and keys restored from USB
+grep -E "^[A-Z_]+=\s*$" ~/.config/com.adrian-vault/.env || echo "No empty variables found."
+grep -E "YOUR_|PLACEHOLDER" ~/.config/com.adrian-vault/.env || echo "No placeholder values in restored secrets."
+grep -q "^AGE-SECRET-KEY-1" /Volumes/<USB>/companies-backup-age.key && echo "Valid age secret key structure detected."
 
 # 5. Restore encrypted forensic artifact + key
 mkdir -p ~/Documents/Adrian-Vault-encrypted-backups
@@ -223,7 +252,7 @@ Estimated migration: 1-2 sessions to scope + 2-3 sessions to migrate = ~5 sessio
 - [ ] Antigravity 2.0 installed + signed in
 - [ ] Wix MCP authenticates + reads OSB+SS sites
 - [ ] Gmail MCP authenticates
-- [ ] Apple Notes MCP lists 2,558 notes (now in raw/notes/)
+- [x] Apple Notes MCP lists 2,558 notes (completed: 2,551 standard notes parsed to raw/notes/by-id/ and 7 quarantined notes safely isolated; master indexes generated)
 - [ ] One full forensic-audit subagent runs at 16x parallelism without swap
 
 ## 9. Backup state snapshot (2026-05-20 ~16:30 WITA — pre-migration baseline)
