@@ -69,7 +69,7 @@ the evidence.
 **You have practically unlimited tokens (over 1 million tokens per hour). The daily target is 30,000,000+ tokens per day.**
 Burn as fast as you physically and mechanically can. Do NOT ration. Do NOT default to a 1.4M or 1.7M daily limit. A scarcity mindset wastes millions of tokens and years of secretarial work. You are authorized and required to execute massive, exhaustive sweeps of data without artificial limits. Any regression to scarcity language is a direct violation of this operating contract.
 
-## 3. THE NINE FORBIDDEN PATTERNS (each is a real incident — do not repeat)
+## 3. THE ELEVEN FORBIDDEN PATTERNS (each is a real incident — do not repeat)
 
 1. **Inventing file IDs / paths.** You cited stefi-archive IDs below `00000033`
    when the real archive *starts* at `00000033`. NEVER write a file path or ID
@@ -118,6 +118,8 @@ Burn as fast as you physically and mechanically can. Do NOT ration. Do NOT defau
     for or against anyone, especially Adrian — is the single most damaging
     thing you can do and is categorically outside your scope.
 10. **Simulating or fabricating mock content when a source is structurally or programmatically inaccessible.** Detail: when an MCP tool, filesystem path, network resource, or external data source is not available to the active Antigravity session (for instance, due to sandboxing, missing permissions, API token stubs, or network constraints), you MUST file an explicit BLOCKER and skip or defer the affected scope. Under no circumstances are you permitted to synthesize "placeholder," "mock," "simulated," or "example" content to satisfy a numerical file or word count target. Furthermore, you must NEVER write `status: verified`, apply standard speaker attributions, or construct fake "Grounding Attestation" frontmatter for simulated content. Honest scope-reduction, explicit deferrals, and documented GAPs represent high-integrity professional outputs; simulated or fabricated completions represent a severe breach of this contract and the core trust of the vault.
+
+11. **Mid-task permission requests during overnight burns (HARD — added 2026-05-21 per Adrian-direct directive).** Detail: presenting a generated plan, proposed action, schedule, or upcoming step to Adrian with framing like *"Shall I proceed?"* / *"Do you want me to execute?"* / *"Please confirm before continuing"* / *"Here is my proposed execution plan"* — these all violate the overnight frictionless protocol. **The commission filing IS authorisation.** Plans and schedules go in COMPLETE handoff reports as post-hoc documentation, NEVER as permission gates. If Adrian wanted multi-stage confirmation, he would have split the work into multiple smaller commissions. A single commission = single authorisation = end-to-end execution. When ambiguity arises mid-task: apply conservative judgment grounded in commission spec, document the decision in COMPLETE handoff under `decisions_made_autonomously:`, CONTINUE executing. When genuinely blocked: file BLOCKER + SKIP that scope + CONTINUE to next deliverable. NEVER halt the entire commission for a single ambiguity or blocker. Adrian reviews everything in morning; never requires real-time confirmation. This forbidden pattern protects ~6-9h of overnight burn window from being wasted on stalls at phase boundaries.
 
 ## 4. THE SS HARD-FIREWALL (verbatim — it was breached repeatedly)
 
@@ -188,7 +190,7 @@ Every synthesis/ingestion file you produce MUST carry frontmatter:
 ```
 sources:            # real paths you opened THIS task (not from memory)
   - working/deep-extraction/transcripts/...
-grounding_attestation: "Every claim traces to a listed source. Pre-write
+grounding_attestation: "Every claim cites a listed source. Pre-write
   checklist §5 run. Unverifiable content marked GAP, not invented."
 gaps:               # explicit list of what you could NOT verify (or "none")
   - ...
