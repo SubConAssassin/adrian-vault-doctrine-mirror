@@ -6,24 +6,42 @@ tier: 1
 firewall_class: working-internal
 authored_by: claude (cowork, Adrian-commissioned forensic synthesis)
 grounding: Every principle cites a real, forensically-verified Stefi/Tristen client transcript synthesis. NOTHING here is inferred from confabulated material.
-supersedes_for_build: "CORRECTED 2026-05-17 (see §0 doctrine-correction). The INSTRUMENTED fabrications (Sensie SDK, HRV/RMSSD, biometric-congruence engine, Orgone sensors, crystal-skull quantum anchors) in the Ashta business-case/research docs remain confabulated — do NOT build from those. BUT muscle-testing/empath-surrogate testing itself is Adrian's GROUNDED historical method (Finding B, 4 sources) and IS build-safe — see canonical/concepts/ss-processing-statement-algorithm.md (strictly-private mechanism). consolidated-knowledge-base.md §2.2 is grounded IP, not confab."
+supersedes_for_build: "SCOPE-CORRECTED 2026-05-22 (see §0). This document's authority is bounded to SS-practitioner verbal/relational/ritual METHOD only (evidence base = 259 Stefi/Tristan client transcripts). It does NOT govern Ashta venture-specification. Ashta's instrumented layers (Sensie/accelerometer, HRV, voice/biometric congruence engine, crystal-skull/Siberian Blue coherence anchors, tokenomics) are AUTHENTIC FOUNDING CANON, NOT confabulation — their authoritative definitions live in companies/ashta/ledger.md + companies/ashta/intelligence/2026-05-22-ashta-whitepaper-vFINAL.md, NOT here. Public firewalls on customer-facing representations of those mechanisms remain in force. Adrian's muscle-testing/empath-surrogate method is grounded IP (Finding B, 4 sources) — see canonical/concepts/ss-processing-statement-algorithm.md."
+authority_scope: "SS-practitioner verbal/relational/ritual method (the application/UX layer). NOT Ashta venture-spec — for that, read companies/ashta/ledger.md + 2026-05-22-ashta-whitepaper-vFINAL.md."
 doctrine_change_log:
   - "2026-05-17 — Adrian-ruled correction (AGENTS.md §8). §0 'muscle-testing = zero grounding/confabulation' was Stefi/Tristan-subset-scoped and corpus-wide wrong; corrected to: muscle-testing/empath-surrogate = grounded real IP; only the instrumented/biometric wrapper was confabulation. Reason: Finding B (4 corroborating sources) + ss-processing-statement-algorithm.md. Public firewall unchanged."
-purpose: The single build-safe source for "what Adrian's method actually is and how it should shape the Ashta and Bodhisvara user experience." UI/application layer only — backend tech deliberately out of scope per Adrian's instruction.
+  - "2026-05-22 — SCOPE-CORRECTION (AGENTS.md §8). This document's authority is bounded to SS-practitioner method ONLY; it does NOT govern Ashta venture-spec. The 2026-05-18 purge cascade (it deleted Ashta crystal-skulls/tokenomics/Sensie/biometric-engine as 'confabulation' citing this doc's §2) was an unauthorized over-extrapolation from the 259-transcript SS subset to the whole venture (category error: client session notes ≠ venture spec). Founding layers restored as canonical for Ashta. Authority for Ashta venture canon = companies/ashta/ledger.md + 2026-05-22-ashta-whitepaper-vFINAL.md. Reason: Adrian-direct 2026-05-22 + passover working/handoffs/2026-05-22-claude-to-next-session-ashta-passover.md. Forward-corrective: working/handoffs/2026-05-22-claude-to-ag-FORWARD-CORRECTIVE-ashta-no-repurge.md."
+purpose: The single build-safe source for "what Adrian's METHOD actually is and how it should shape the Ashta and Bodhisvara user experience." UI/application layer only — backend tech + Ashta venture-spec deliberately out of scope (see authority_scope). For Ashta venture canon, read the Ashta ledger + vFINAL white paper.
 ---
 
 # Cross-Project Methodology Map
 
 ## 0. The hard rule this document exists to enforce
 
-> ⚠ **SCOPE-CORRECTED 2026-05-22 (Adrian-directed, §12 frictionless execution).** 
-> The post-audit purge of Ashta's founding layers (Sensie SDK, HRV PPG, Siberian Blue 
-> crystal-skulls, and tokenomics) was an unauthorized drift cascade. These layers have 
-> been verified as authentic founding canon across six independent venture-spec files 
-> and the active React Native codebase on disk. The "STILL CONFABULATION" designation 
-> is strictly revoked for Ashta's venture-specification layer. The firewalls against 
-> customer-facing public representations of these mechanisms remain in full force, but 
-> they are fully authorized for internal engineering, product architecture, and venture planning.
+> ⚠ **SCOPE-CORRECTED 2026-05-22 (Adrian-directed). This document governs the SS-PRACTITIONER METHOD ONLY — it does NOT govern Ashta venture-spec.**
+>
+> **What this document's authority covers:** Subconscious Surgery's verbal / relational / ritual
+> practitioner method and how it shapes the Ashta + Bodhisvara *application/UX* layer. Its evidence
+> base is the **259 Stefi/Tristan client transcripts** — client *session* material, not venture
+> *specification*.
+>
+> **What it does NOT cover:** Ashta's venture-specification, business model, tech architecture, or
+> capital structure. For that, the authoritative sources are
+> **`companies/ashta/ledger.md`** + **`companies/ashta/intelligence/2026-05-22-ashta-whitepaper-vFINAL.md`** —
+> NOT this file.
+>
+> **Why this correction exists:** the 2026-05-18 "purge cascade" deleted Ashta's founding layers
+> (Sensie/accelerometer, HRV PPG, the voice/biometric congruence engine, Siberian Blue crystal-skull
+> coherence anchors, tokenomics) as "confabulation" — citing this document's §2. That was a **category
+> error**: the layers were simply not *narrated in the 259 client transcripts*, and absence there ≠
+> absence in the venture (`memory/feedback-ssot-vs-corroboration.md`). Adrian confirmed (2026-05-22)
+> these layers are **authentic founding canon, NOT confabulation.** The "STILL CONFABULATION"
+> designation is **strictly revoked** for Ashta's venture layer.
+>
+> **The firewall that remains:** customer-facing PUBLIC representations of those mechanisms stay
+> firewalled (SS framing remains verbal/relational/ritual). The layers are fully authorised for
+> internal engineering, product architecture, and venture planning — as defined in the Ashta ledger +
+> vFINAL, not here.
 
 > ⚠ **DOCTRINE CORRECTION 2026-05-17 (Adrian-ruled, AGENTS.md §8 tracked
 > change).** The original §0 over-generalised. The "grep returns zero"
@@ -77,6 +95,13 @@ Signature move across the corpus: **separate validation-of-feeling from
 operational-rescue** (`00000258` — full empathy *and* the held boundary).
 
 ## 2. What Ashta and Bodhisvara genuinely are (grounded only)
+
+> **Scope note (2026-05-22):** the descriptions below are a secondary, application-layer snapshot.
+> They are NOT the governing Ashta venture-spec — for the authoritative current design (hub-and-spoke
+> entities, two-tier governance, three scoreboards, financial model, the full congruence/biometric
+> engine, crystal-skull coherence anchors, tokenomics), read **`companies/ashta/ledger.md`** +
+> **`2026-05-22-ashta-whitepaper-vFINAL.md`**. Where this snapshot and those differ, the ledger/vFINAL
+> win.
 
 - **Bodhisvara** *(well-grounded)* — a **voice-analytics diagnostic that matches
   a person's vocal/psychological pattern to a therapist with a proven track
