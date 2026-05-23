@@ -69,71 +69,71 @@ Columns:
 
 | # | Cohort Name | FB 1:1 | Apple Notes | Mstr | Record |
 |---|---|---|---|---|---|
-| 1 | Iyalaje oje | ✓ 190m | - | - | - |
-| 2 | Nelli Nel | ✓ 44m | - | - | - |
-| 3 | Zakiya Moore | ✓ 354m | 1 | - | - |
-| 4 | Mekia Lawrence | ✓ 26m | - | - | - |
-| 5 | Lakisha snipe | ✓ 1m | 1 | - | - |
-| 6 | Audra dukes | ✓ 95m | 1 | - | - |
-| 7 | Lavish so key | - | - | - | - |
-| 8 | **Guinevere Marshall** | - | - | 1 | **✓** [[guinevere-unified]] |
-| 9 | Rachele millions | ✓ 40m | - | - | - |
-| 10 | Amythest orchid | ✓ 235m | 1 | - | - |
-| 11 | Meaghann D'Aundrea | ✓ 9m | - | - | - |
-| 12 | Teresa Bestuzheva | ✓ 2m | 1 | - | - |
-| 13 | FiFi Halbinsel | ✓ 50m | 1 | - | - |
-| 14 | Star Queen | - | 14 (substring FP likely) | 3 (FP) | - |
-| 15 | Jazznea smith | - | - | - | - |
-| 16 | Nia Purposedriven | ✓ 1m | 12 (substring FP likely) | 2 (FP) | - |
-| 17 | Shatanyaer Pitt | ✓ 120m | 1 | - | - |
-| 18 | JuLen mojillo | - | - | - | - |
-| 19 | Ra Bey | ✓ 109m | 232 (substring FP — "ra" matches many) | 17 (FP) | - |
-| 20 | Shronda Williams | - | - | - | - |
-| 21 | Valerie Kearney | ✓ 23m | 1 | - | - |
-| 22 | Kettta rising | - | - | - | - |
-| 23 | Clansandra whitlock | - | - | - | - |
-| 24 | Trecola Lowe | ✓ 5m | - | - | - |
-| 25 | Semore Nik | - | - | - | - |
-| 26 | Shiva billions | ✓ 2m | 3 (substring FP likely) | - | - |
-| 27 | Monica MonNica | ✓ 19m | 1 | - | - |
-| 28 | Shin M Asoler | - | - | - | - |
-| 29 | Candace Howard | ✓ 77m | 2 | - | - |
-| 30 | Vivian Vazquez | ✓ 3m | - | - | - |
-| 31 | Dona Wilson | - | 3 | - | - |
-| 32 | Trisha smith | ✓ 7m | 1 | - | - |
-| 33 | Shri Shanti | ✓ 78m | 4 (some substring FP) | - | - |
-| 34 | Tennile Bland | - | - | - | - |
-| 35 | Shante price | ✓ 2m | - | - | - |
-| 36 | Simon Si-ante Dilks | ✓ 210m | - | - | - |
-| 37 | **Chelsee DeLuna** | ✓ 16m (Bast DeLuna group) | 1 (0462) + 1 (0472 roster) | (`Chelsea shares` ambiguous — Adrian-decision-gated) | **✓** [[chelsea-deluna-unified]] |
-| 38 | Nessa K Falconer | ✓ 192m | - | - | - |
-| 39 | Ramanan Musing | - | - | - | - |
-| 40 | Al Valente | ✓ 11m | - | - | - |
-| 41 | Omo Uzezi | ✓ 10m | - | - | - |
-| 42 | **Liz Brown** | **✓ 456m** | - | - | - |
-| 43 | Ermias Tashema Haynes | ✓ 14m | - | - | - |
-| 44 | Alexa Lea | ✓ 20m | 6 (some substring FP) | - | - |
-| 45 | Tracy Smith | ✓ 14m | - | - | - |
-| 46 | Al Alleyne | ✓ 78m | - | - | - |
-| 47 | Jenise Gidson | ✓ 3m | - | - | - |
-| 48 | Adama Kamara | ✓ 130m | - | - | - |
-| 49 | Lakeisha Michelle | ✓ 9m | - | - | - |
-| 50 | Tamiko Riviere | ✓ 11m | - | - | - |
-| 51 | LaNika ShereenSmith Dancy | ✓ 48m | - | - | (Subscribers-list lead, paid Bronze) |
-| 52 | Christina Lawson | ✓ 8m | - | - | - |
-| 53 | Karina D Sanders | ✓ 1m | - | - | - |
-| 54 | **Rhonda Rhondi Henderson** | (handle uses rhondi spelling, finds via separate grep) ✓ 67m | 2 | 1 | **✓** [[rhonda-henderson-unified]] |
-| 55 | Cheryl Hodges | ✓ 2m | - | - | - |
-| 56 | Tia Te'aire | - | 18 (substring FP likely — "tia" matches many) | 2 (FP) | - |
-| 57 | Deardra Yerger | ✓ 3m | - | - | - |
-| 58 | Alice Gary | ✓ 36m | - | - | - |
-| 59 | **Tiffany Madison** | ✓ 52m | - | - | (DISTINCT from Tiffany Collins; see §5) |
-| 60 | LaTia Thomas | ✓ 45m | 1 | - | - |
-| 61 | Adrienne Brown | ✓ 2m | - | - | - |
-| 62 | Maliqa Underwood | ✓ 10m | - | - | - |
-| 63 | Angel Bella (Angel Wild) | - | - | - | - |
-| 64 | Sonya Muhammad | ✓ 11m | - | - | - |
-| 65 | Leslie robinson | - | - | - | ("Leslie robinson $199" — paid Bronze, $199 price point) |
+ | 1 | Iyalaje oje | ✓ 190m | - | - | **✓** [[iyalaje-oje-unified]] | 
+ | 2 | Nelli Nel | ✓ 44m | - | - | **✓** [[nelli-nel-unified]] | 
+ | 3 | Zakiya Moore | ✓ 354m | 1 | - | **✓** [[zakiya-moore-unified]] | 
+ | 4 | Mekia Lawrence | ✓ 26m | - | - | **✓** [[mekia-lawrence-unified]] | 
+ | 5 | Lakisha snipe | ✓ 1m | 1 | - | **✓** [[lakisha-snipe-unified]] | 
+ | 6 | Audra dukes | ✓ 95m | 1 | - | **✓** [[audra-dukes-unified]] | 
+ | 7 | Lavish so key | - | - | - | **✓** [[lavish-so-key-unified]] | 
+ | 8 | **Guinevere Marshall** | - | - | 1 | **✓** [[guinevere-unified]] | 
+ | 9 | Rachele millions | ✓ 40m | - | - | **✓** [[rachele-millions-unified]] | 
+ | 10 | Amythest orchid | ✓ 235m | 1 | - | **✓** [[amythest-orchid-unified]] | 
+ | 11 | Meaghann D'Aundrea | ✓ 9m | - | - | **✓** [[meaghann-daundrea-unified]] | 
+ | 12 | Teresa Bestuzheva | ✓ 2m | 1 | - | **✓** [[teresa-bestuzheva-unified]] | 
+ | 13 | FiFi Halbinsel | ✓ 50m | 1 | - | **✓** [[fifi-halbinsel-unified]] | 
+ | 14 | Star Queen | - | 14 (substring FP likely) | 3 (FP) | **✓** [[star-queen-unified]] | 
+ | 15 | Jazznea smith | - | - | - | **✓** [[jazznea-smith-unified]] | 
+ | 16 | Nia Purposedriven | ✓ 1m | 12 (substring FP likely) | 2 (FP) | **✓** [[nia-purposedriven-unified]] | 
+ | 17 | Shatanyaer Pitt | ✓ 120m | 1 | - | **✓** [[shatanyaer-pitt-unified]] | 
+ | 18 | JuLen mojillo | - | - | - | **✓** [[julen-mojillo-unified]] | 
+ | 19 | Ra Bey | ✓ 109m | 232 (substring FP — "ra" matches many) | 17 (FP) | **✓** [[ra-bey-unified]] | 
+ | 20 | Shronda Williams | - | - | - | **✓** [[shronda-williams-unified]] | 
+ | 21 | Valerie Kearney | ✓ 23m | 1 | - | **✓** [[valerie-kearney-unified]] | 
+ | 22 | Kettta rising | - | - | - | **✓** [[kettta-rising-unified]] | 
+ | 23 | Clansandra whitlock | - | - | - | **✓** [[clansandra-whitlock-unified]] | 
+ | 24 | Trecola Lowe | ✓ 5m | - | - | **✓** [[trecola-lowe-unified]] | 
+ | 25 | Semore Nik | - | - | - | **✓** [[semore-nik-unified]] | 
+ | 26 | Shiva billions | ✓ 2m | 3 (substring FP likely) | - | **✓** [[shiva-billions-unified]] | 
+ | 27 | Monica MonNica | ✓ 19m | 1 | - | **✓** [[monica-monnica-unified]] | 
+ | 28 | Shin M Asoler | - | - | - | **✓** [[shin-asoler-unified]] | 
+ | 29 | Candace Howard | ✓ 77m | 2 | - | **✓** [[candace-howard-unified]] | 
+ | 30 | Vivian Vazquez | ✓ 3m | - | - | **✓** [[vivian-vazquez-unified]] | 
+ | 31 | Dona Wilson | - | 3 | - | **✓** [[dona-wilson-unified]] | 
+ | 32 | Trisha smith | ✓ 7m | 1 | - | **✓** [[trisha-smith-unified]] | 
+ | 33 | Shri Shanti | ✓ 78m | 4 (some substring FP) | - | **✓** [[shri-shanti-unified]] | 
+ | 34 | Tennile Bland | - | - | - | **✓** [[tennile-bland-unified]] | 
+ | 35 | Shante price | ✓ 2m | - | - | **✓** [[shante-price-unified]] | 
+ | 36 | Simon Si-ante Dilks | ✓ 210m | - | - | **✓** [[simon-dilks-unified]] | 
+ | 37 | **Chelsee DeLuna** | ✓ 16m (Bast DeLuna group) | 1 (0462) + 1 (0472 roster) | (`Chelsea shares` ambiguous — Adrian-decision-gated) | **✓** [[chelsea-deluna-unified]] | 
+ | 38 | Nessa K Falconer | ✓ 192m | - | - | **✓** [[nessa-falconer-unified]] | 
+ | 39 | Ramanan Musing | - | - | - | **✓** [[ramanan-musing-unified]] | 
+ | 40 | Al Valente | ✓ 11m | - | - | **✓** [[al-valente-unified]] | 
+ | 41 | Omo Uzezi | ✓ 10m | - | - | **✓** [[omo-uzezi-unified]] | 
+ | 42 | **Liz Brown** | **✓ 456m** | - | - | **✓** [[liz-brown-unified]] | 
+ | 43 | Ermias Tashema Haynes | ✓ 14m | - | - | **✓** [[ermias-tashema-haynes-unified]] | 
+ | 44 | Alexa Lea | ✓ 20m | 6 (some substring FP) | - | **✓** [[alexa-lea-unified]] | 
+ | 45 | Tracy Smith | ✓ 14m | - | - | **✓** [[tracy-smith-unified]] | 
+ | 46 | Al Alleyne | ✓ 78m | - | - | **✓** [[al-alleyne-unified]] | 
+ | 47 | Jenise Gidson | ✓ 3m | - | - | **✓** [[jenise-gidson-unified]] | 
+ | 48 | Adama Kamara | ✓ 130m | - | - | **✓** [[adama-kamara-unified]] | 
+ | 49 | Lakeisha Michelle | ✓ 9m | - | - | **✓** [[lakeisha-michelle-unified]] | 
+ | 50 | Tamiko Riviere | ✓ 11m | - | - | **✓** [[tamiko-riviere-unified]] | 
+ | 51 | LaNika ShereenSmith Dancy | ✓ 48m | - | - | **✓** [[lanika-dancy-unified]] | 
+ | 52 | Christina Lawson | ✓ 8m | - | - | **✓** [[christina-lawson-unified]] | 
+ | 53 | Karina D Sanders | ✓ 1m | - | - | **✓** [[karina-d-sanders-unified]] | 
+ | 54 | **Rhonda Rhondi Henderson** | (handle uses rhondi spelling, finds via separate grep) ✓ 67m | 2 | 1 | **✓** [[rhonda-henderson-unified]] | 
+ | 55 | Cheryl Hodges | ✓ 2m | - | - | **✓** [[cheryl-hodges-unified]] | 
+ | 56 | Tia Te'aire | - | 18 (substring FP likely — "tia" matches many) | 2 (FP) | **✓** [[tia-te-aire-unified]] | 
+ | 57 | Deardra Yerger | ✓ 3m | - | - | **✓** [[deardra-yerger-unified]] | 
+ | 58 | Alice Gary | ✓ 36m | - | - | **✓** [[alice-gary-unified]] | 
+ | 59 | **Tiffany Madison** | ✓ 52m | - | - | **✓** [[tiffany-madison-unified]] | 
+ | 60 | LaTia Thomas | ✓ 45m | 1 | - | **✓** [[latia-thomas-unified]] | 
+ | 61 | Adrienne Brown | ✓ 2m | - | - | **✓** [[adrienne-brown-unified]] | 
+ | 62 | Maliqa Underwood | ✓ 10m | - | - | **✓** [[maliqa-underwood-unified]] | 
+ | 63 | Angel Bella (Angel Wild) | - | - | - | **✓** [[angel-bella-unified]] | 
+ | 64 | Sonya Muhammad | ✓ 11m | - | - | **✓** [[sonya-muhammad-unified]] | 
+ | 65 | Leslie robinson | - | - | - | **✓** [[leslie-robinson-unified]] | 
 
 ## 4. Other 2022 cohort participants NOT in 0472 but built today
 
