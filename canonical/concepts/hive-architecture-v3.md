@@ -271,6 +271,8 @@ Pre-v3: Claude orchestrates AG via GUI keystroke chain (`ui-autoloader.sh`) supe
 
 **v3 reliability target: migrate to Antigravity 2.0 CLI/SDK control plane.**
 
+> ⚠️ **REALITY STAMP (2026-05-29, audit `wf_a691ad22`):** `tools/ag_cli_driver.py` is **NOT built.** Everything in this §5 below — the "Phase 2 Control Plane", the failure-modes-eliminated list, the migration plan — is **aspirational and Adrian-approval-gated, NOT live.** The ONLY working AG driver today is the GUI keystroke feeder (`ag-feeder.py` / `ag-feeder-multi.py` / `bounce-to-ag-window.sh`), and it still misfires (typed into a code editor; hit Record instead of Send — 2026-05-29). AG 2.0 does expose a CLI/SDK (obs 5228, 2026-05-26) but it is sandbox-restricted and **unverified for programmatic prompt-injection**. Do NOT route work assuming a reliable programmatic AG control plane exists. The genuine decision — authorise a time-boxed spike to prove the CLI/SDK can drive AG — is tracked in `canonical/concepts/cross-model-automation-protocol.md §8` (the reconciling authority for cross-model automation).
+
 ### Phase 2 Control Plane (specced 2026-05-15 by ChatGPT Pro review; now buildable via AG 2.0 CLI/SDK)
 
 Components:

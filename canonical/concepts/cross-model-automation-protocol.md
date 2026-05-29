@@ -55,6 +55,8 @@ This is Adrian's #1 distrust, and the audit found it is **structural, not incide
 
 The one load-bearing rule: **computer-use locks every browser to "read" (screenshot only).** The only autonomous in-browser surface is the **Claude-in-Chrome extension** (`mcp__Claude_in_Chrome__*`). Native apps (ChatGPT Mac app) are "full" tier and drivable by computer-use — but computer-use costs an approval tap per call and can disconnect.
 
+> ✅ **PROVEN OPERATIONAL 2026-05-30:** Claude drove Adrian's logged-in **Gemini** subscription end-to-end via the Chrome extension — navigated, typed, submitted, and extracted the answer as text — **no paste, no API cost, no taps.** **Grok (SuperGrok)** and **ChatGPT (Plus)** sessions confirmed live the same session; identical mechanism. This is the no-paste subscription "depth tier" Adrian asked for, and it is the recommended default for cross-model prompting whenever the Mac + Chrome are on and the extension is paired. Step-by-step: `procedural/workflows/chrome-subscription-driving-runbook.md`. Metered API is the headless fallback when the extension is unpaired/blocked. (Note: the ChatGPT account is **Plus**, not Pro — Pro-only Deep Research depth is not present.)
+
 | Target | Best driver TODAY | Autonomy | Hard limits | Still needs a human |
 |---|---|---|---|---|
 | **ChatGPT Pro** (depth) | GitHub bridge round-trip (paste prompt+Deposit Footer → repo → `hivemind-sync` → vault) | partial | the in-UI paste + connector Confirm is not scripted | paste prompt; press Confirm |
