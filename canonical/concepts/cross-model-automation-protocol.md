@@ -55,7 +55,7 @@ This is Adrian's #1 distrust, and the audit found it is **structural, not incide
 
 The one load-bearing rule: **computer-use locks every browser to "read" (screenshot only).** The only autonomous in-browser surface is the **Claude-in-Chrome extension** (`mcp__Claude_in_Chrome__*`). Native apps (ChatGPT Mac app) are "full" tier and drivable by computer-use — but computer-use costs an approval tap per call and can disconnect.
 
-> ✅ **PROVEN OPERATIONAL 2026-05-30:** Claude drove Adrian's logged-in **Gemini** subscription end-to-end via the Chrome extension — navigated, typed, submitted, and extracted the answer as text — **no paste, no API cost, no taps.** **Grok (SuperGrok)** and **ChatGPT (Plus)** sessions confirmed live the same session; identical mechanism. This is the no-paste subscription "depth tier" Adrian asked for, and it is the recommended default for cross-model prompting whenever the Mac + Chrome are on and the extension is paired. Step-by-step: `procedural/workflows/chrome-subscription-driving-runbook.md`. Metered API is the headless fallback when the extension is unpaired/blocked. (Note: the ChatGPT account is **Plus**, not Pro — Pro-only Deep Research depth is not present.)
+> ✅ **PROVEN OPERATIONAL on ALL THREE 2026-05-30:** Claude drove Adrian's logged-in **Gemini**, **Grok/SuperGrok**, AND **ChatGPT (Plus)** end-to-end via the Chrome extension — navigate → type → submit → extract answer as text — **no paste, no API cost, no taps.** Proof: Gemini named itself; Grok "I am Grok built by xAI"; ChatGPT answered as **GPT-5.5 Thinking** — a model the metered API key CANNOT reach, so this path beats the API for depth, not just cost. This is the no-paste subscription "depth tier" Adrian asked for and the recommended default for cross-model prompting whenever the Mac + Chrome are on and the extension is paired. Step-by-step: `procedural/workflows/chrome-subscription-driving-runbook.md`. Metered API is the headless fallback when the extension is unpaired/blocked. (ChatGPT account is **Plus**, not Pro — Pro-only Deep Research depth is not present, but GPT-5.5 Thinking IS.)
 
 | Target | Best driver TODAY | Autonomy | Hard limits | Still needs a human |
 |---|---|---|---|---|
@@ -131,6 +131,13 @@ These are the "key points Adrian missed." Each is verbatim-grounded in the corpu
 
 ## 8. The one genuine decision for Adrian
 
+> **RESOLVED 2026-05-30 — all three engines have PROVEN headless CLIs; the AG keystroke feeder is obsolete.** No `ag_cli_driver.py` needed — Google shipped it. All three tested live on Adrian's subscriptions, $0/sub-billed, no GUI, no keystrokes, no taps:
+> - **Antigravity / Gemini** → `agy -p "<prompt>"` (Antigravity 2.0 CLI v1.0.3 at `~/.local/bin/agy`, already authed via the IDE's Google login, runs **Gemini 3.5 Flash**). Flags: `--dangerously-skip-permissions`, `--continue`/`-c`, `--conversation`, `--add-dir`, `--sandbox`, `--print-timeout`. Install: `curl -fsSL https://antigravity.google/cli/install.sh | bash`. **THIS REPLACES THE ENTIRE cliclick KEYSTROKE FEEDER** — the single biggest reliability win in the stack.
+> - **Grok** → `~/.grok/bin/grok -p "<prompt>"` (SuperGrok, **Grok 4.3**) — `--effort max`/`--agents`/`--best-of-n`/`--output-format json`/`--mcp`/worktrees. Auth: `~/.grok/auth.json` (device-code, driven via Chrome).
+> - **ChatGPT** → `codex exec "<prompt>"` (ChatGPT **Plus**, **GPT-5.5**) — `--skip-git-repo-check`, `-m model`, `--sandbox`, MCP. Auth: `~/.codex/auth.json` (browser OAuth, driven via Chrome).
+>
+> The §8 decision below (spike an AG CLI?) is **RESOLVED: it exists and works.** Remaining work is *migration*, not a spike: route AG execution through `agy -p` (one parcel = one `agy -p` call, capture stdout, verify) and retire the keystroke feeder + its watchdog/nudge/autoloader scaffolding. Keep the feeder as a 30-day fallback per standard migration discipline. **Cross-model verification is now trivial too:** use `codex exec`/`grok -p` to adversarially fact-check `agy` output against its cited sources — finally a real Tier-3 truth-judge (the one that's been a stub).
+
 Everything in §6 is done. Everything in §7 except **T3** is CEO-decidable and will be sequenced without needing Adrian. **T3 is the one real fork**, because it is L-effort, explicitly Adrian-gated in hive-v3 §5, and carries real uncertainty (AG 2.0's CLI/SDK prompt-injection + headless filesystem access is asserted-but-unproven; observation 5228 flags sandbox restrictions).
 
 **Recommended:** authorise a **time-boxed spike** (not a full migration) — one throwaway commission driven end-to-end via the AG CLI/SDK to prove programmatic prompt-injection + headless write, **keeping the keystroke feeder as the live engine until the spike passes.** If it works, migrate with the feeder as a 30-day fallback. If the spike fails, we keep hardening the feeder and stop pretending the control plane is coming.
@@ -147,6 +154,23 @@ This is the single highest-leverage reliability move in the stack: it would elim
 - **Metered API: subscription-first; one-shot; surface-before-spend; degrade to the best available model, never a worse one.**
 
 ---
+
+## 10. Shipped implementation (2026-05-30) — the "migrate + verify" build
+
+Two tools retire the fragile keystroke feeder and finally fill the Tier-3 truth-judge. Both built + tested live 2026-05-30.
+
+**`tools/ag_cli_dispatch.py` — headless AG dispatch (replaces the cliclick feeder).**
+- `python3 tools/ag_cli_dispatch.py --prompt "<task, incl. WRITE TO: path>" --output <path>` → runs `agy -p … --dangerously-skip-permissions --add-dir <vault>`, captures stdout, verifies the output file (PRODUCED ≥300 B / THIN / MISSING; exit 0/3/4).
+- `--parcel <file>` reads prompt + `output_path`/`WRITE TO:` from an existing feeder parcel (drop-in).
+- `--verify codex|grok` chains a cross-model fact-check on the output (exit 5 if fabrications).
+- PROVEN: `agy` did the work + wrote a vault file headless in 18.5 s, rc=0, verified. No GUI, no coordinates, no frontmost requirement, no idle-crash.
+
+**`tools/cross_verify.py` — cross-model truth-judge (the real Tier-3).**
+- `python3 tools/cross_verify.py --content <file> --sources <file|dir|glob> --verifier codex|grok` → a DIFFERENT model fact-checks every verifiable claim against the sources; JSON verdict; exit 5 if `fabrications_found`.
+- PROVEN: codex (GPT-5.5) caught both planted fabrications (a fake testimonial + a fake "$24,997 Founder tier / 50 spots") and passed the 2 real claims.
+- Run it on AG's generative output (AG/Gemini writes → codex/grok verifies) — catches invented testimonials/pricing that the form-only Tier-1 verifier misses by design.
+
+**Migration:** point AG parcels at `ag_cli_dispatch.py --verify codex`; once a few real parcels run clean, retire `ag-feeder.py` / `ag-feeder-multi.py` + the watchdog/nudge/autoloader scaffolding (keep as a 30-day fallback per migration discipline). This is the end of the keystroke era.
 
 ## Revision history
 - **2026-05-29** — Created from the 6-agent cross-model automation audit (`wf_a691ad22`). Repaired + hardened the GitHub bridge, fixed the `ask-chatgpt.py` fallback bug, recovered 8 dropped threads, established the honest routing matrix. Reconciling authority over `bridge-protocols.md` (transport) and `hive-architecture-v3.md §5` (AG control reliability). — Claude (Opus 4.8, CEO)
