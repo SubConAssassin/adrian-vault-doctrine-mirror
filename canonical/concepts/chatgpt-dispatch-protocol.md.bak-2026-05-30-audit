@@ -1,7 +1,7 @@
 ---
 title: ChatGPT-Dispatch Protocol
 type: protocol
-status: superseded
+status: canonical
 tier: 2
 firewall_class: working-internal
 created: 2026-04-20
@@ -12,9 +12,6 @@ related:
   - canonical/concepts/dispatcher-protocol.md
 tags: [hivemind, chatgpt, dispatch, protocol, adrian-os]
 ---
-
-> ⚠️ **SUPERSEDED 2026-05-30** — `bin/chatgpt-dispatch.sh` was built then deleted; this protocol is dead. Live authority: `canonical/concepts/cross-model-automation-protocol.md` (agy / grok / codex CLIs + Chrome driving).
-
 
 ## What this is
 

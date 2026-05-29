@@ -1,7 +1,7 @@
 ---
 title: n8n Orchestration Architecture
 type: framework
-status: superseded
+status: canonical
 tier: 2
 firewall_class: working-internal
 last_updated: 2026-04-24
@@ -10,9 +10,6 @@ related:
   - canonical/concepts/publishing-connectors.md
   - canonical/concepts/handoff-frontmatter-conventions.md
 ---
-
-> ⚠️ **SUPERSEDED 2026-05-30** — n8n was abandoned (Docker/local hosting too brittle); no replacement built. Not part of the live stack.
-
 
 # n8n Orchestration Architecture
 

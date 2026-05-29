@@ -1,7 +1,7 @@
 ---
 title: Cross-Model Bridge Protocols
 type: doctrine
-status: partially-superseded
+status: active
 tier: 2
 firewall_class: working-internal
 version: 1.5
@@ -18,9 +18,6 @@ related:
   - canonical/concepts/dispatcher-protocol.md
   - canonical/concepts/adrian-claude-shorthand-protocols.md
 ---
-
-> ⚠️ **PARTIALLY SUPERSEDED 2026-05-30** — the Google Drive courier is RETIRED. Live cross-model bridge = GitHub; authority: `canonical/concepts/cross-model-automation-protocol.md`.
-
 
 # Cross-Model Bridge Protocols
 
