@@ -3,6 +3,7 @@ title: Hive Architecture v3 — Post-Audit, Post-3.5-Flash, Pre-64GB-MacBook
 type: architecture-doctrine
 tier: 1
 date: 2026-05-20
+hardware_update: "2026-05-30 — the 64GB MacBook HAS ARRIVED: Apple M1 Max, 64GB, 10-core (8P+2E), verified via system_profiler. All 'incoming/arriving/pre-64GB/gating-on-arrival' framing below is now RESOLVED — the Layer-4 'At 64GB' column is the live state. The 18GB-memory-pressure narrative is historical. Local LLM inference / ECAPA / Whisper-large / vault embeddings / 16x fan-out are now locally feasible (chip is M1 Max not the speculated M3/M4, but RAM is the binding constraint and it's met)."
 authored_by: claude (cowork, Phase F.1 — synthesizing 4 discovery subagents + Gemini 3.5 Flash research + Grok/GPT + ChatGPT advisor inputs + my own capabilities)
 firewall_class: working-internal
 supersedes: |
@@ -37,7 +38,7 @@ The week of 2026-05-15 → 2026-05-20 changed every major axis of the hive simul
 1. **Model layer:** Antigravity swapped from Gemini 3.1 Pro to Gemini 3.5 Flash High (a structurally faster, cheaper, more capable model — co-designed for agentic workflows).
 2. **Platform layer:** Antigravity 2.0 launched (native subagents, scheduled tasks, CLI, SDK — eliminating the keystroke-chain failure mode that caused the 2026-05-19→20 7.5h overnight stall).
 3. **Audit layer:** Vault-perfect achieved (50+ corpora dispositioned, catastrophe pattern definitively absent across ~1,500 audited canonical files, 52 §7 quarantine events, zero RAW remaining).
-4. **Hardware layer:** 64GB Apple Silicon MacBook arriving (replacing 18GB Mac currently in YELLOW-bordering-RED memory pressure with 240MB free + 1.22GB swap active).
+4. **Hardware layer:** ✅ ARRIVED 2026-05-30 — Apple M1 Max, 64GB, 10-core (replaced the 18GB Mac that was in YELLOW-bordering-RED memory pressure). Memory pressure resolved.
 5. **Doctrine layer:** Adrian explicitly authorised parallel-track work (audit + product build concurrent, not sequential — master plan §0 amended).
 
 This file is the synthesis: what the hive looks like now, what work routes where, and how to execute the next phase at full velocity.
@@ -143,7 +144,7 @@ The hive is no longer "Claude + AG + advisors." It's now a four-layer stack.
 - Bridge research = raw ore, not finished doctrine
 - Drive/GitHub-push claims by Grok specifically are 100% unreliable
 
-### Layer 4: Local Substrate (current 18GB → incoming 64GB Apple Silicon)
+### Layer 4: Local Substrate (✅ 64GB Apple M1 Max — arrived 2026-05-30; the "At 64GB" column below is now live)
 
 **Current state (18GB):** memory-pressured; cloud-redirect required per resource-partition-protocol.md for: ECAPA acoustic, Whisper large-v3, Photos.sqlite OCR, local LLMs, vault embedding indices, 16x subagent fan-out.
 
