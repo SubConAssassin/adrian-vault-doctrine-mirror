@@ -1,0 +1,87 @@
+# Productivity Multiplier Reckoning — Before vs After the 2026 Stack Upgrades
+
+**Status:** Tier-1 doctrine. **Supersedes** the loose "22×" and "45×" productivity figures scattered through handoffs and doctrine — those are soft (see §2). Cite THIS document for any "how much faster are we" question.
+**Created:** 2026-05-31 (WITA)
+**Method:** 7-agent forensic Workflow `wf_26c10c7a-956` — vault-grounding agent + 5 independent per-axis estimators + 1 adversarial refuter whose only job was to refute inflation. Cost **$0** (Claude subagents on subscription; no metered API).
+
+---
+
+## 1. The bottom line
+
+| Frame (vs a solo human) | Multiplier |
+|---|---|
+| **Machine capacity ceiling** (what the hive *could* produce) | **~30–80×** |
+| **Realised end-to-end throughput** (what *actually ships* through the human loop) | **~5×** (range 3–8×) |
+
+- The 2026 upgrades (CI, Opus 4.8, Gemini 3.5 Flash High, headless CLIs, cross-model verification, Workflow fan-out) **roughly doubled realised throughput** (≈2–3× → ≈5×) — driven almost entirely by the **reliability** axis, not by raw model speed.
+- **The binding constraint is now Adrian, not the stack.** Amdahl's law at a documented 15–20% human serial fraction caps realised speedup at **~5–7×** regardless of any further model/CI upgrade.
+- Naive multiplication of the spec sheets to claim 100×+ is **arithmetically false** — it triple-counts one upgrade and ignores the human bottleneck (§4).
+
+---
+
+## 2. The "22×" baseline is soft — do not cite it as measured
+
+Vault tracing (`2026-05-22-ag-to-claude-COMPLETE-v25-final.md` line 44) shows the **22× was a single Antigravity self-report on one Whisper-transcript integration task** versus a manual-secretary equivalent — **not** a measured hive-vs-solo-Adrian figure, and filed by the same model running ~86% confabulation five days earlier on a different task class.
+
+The genuinely load-bearing number in doctrine is the **45× under-utilisation ratio**: AG burned only **2.2% of its substrate capacity**; 97.8% was wasted (`canonical/concepts/claude-ceo-operating-doctrine.md`, the 2026-05-13 forensic). The "before" state was therefore a machine with a *high ceiling that was being used at one-fortieth of capacity*.
+
+This reframes the entire question: the upgrades attack **two distinct things** — the ceiling, and the fraction of it actually captured. They must be reported separately or the comparison is meaningless.
+
+---
+
+## 3. The five gain axes (independently estimated)
+
+| Axis | Improvement factor | What it really is |
+|---|---|---|
+| Model speed/capability | 2.5–4× | Gemini 3.5 Flash High ~4× faster; Opus 4.8 1M-context single-pass synthesis. Clean, **capacity-side**. SWE-bench delta (76.2→78%) is negligible — the gain is throughput, not output quality. |
+| Parallelism / fan-out | 2.5–5× | 3 headless CLIs (`agy -p`/`grok -p`/`codex exec`) firing in parallel + Workflow fan-out. **16× ceiling is RAM-gated** until the 64GB machine lands; proven safe ceiling ~6–10×. |
+| **Reliability / uptime** | **1.7–2.3×** | **The dominant realised lever.** Took the realised fraction from ~20–25% to ~42–47% of capacity by ending the dead-fleet (17 days) / overnight-idle / keystroke-flood / silent-code-break losses. CI + headless CLIs + repaired LaunchAgent fleet. |
+| Cost per dollar | 3–5× | Flash High 4–8× cheaper tokens — but only binds the **~20–30%** of work that is metered-API. Most sessions run flat-rate subscription (logs show "API spend $0" almost every session). |
+| Quality / rework | 1.4–2.5× | CI + cross-model truth-judge catching code-breaks and confabulation **before** they propagate to canonical (kills the secondary cost: 12-file repointings, multi-hour overnight audits, doctrine-lock sessions). Gated on `cross_verify` reaching production (0 parcels at audit). |
+
+---
+
+## 4. Why it is NOT 100×
+
+Multiply the five low-ends naively: **44.6× improvement × 22 ≈ 981×.** That is the seductive lie. Three things kill it:
+
+1. **Triple-counting one upgrade.** Speed (4×) and cost-efficiency (4–8×) are *the same Gemini 3.5 Flash High event* — AGENTS.md §11.5.a even states them as one combined "16–32× work per dollar/per hour." For any given task either the clock binds or the budget binds, never both. Counting them as independent multipliers bills the same hardware twice.
+2. **Shared credit.** Reliability and parallelism both claim the LaunchAgent-fleet restoration. Reliability and quality both claim the freed confab-remediation bandwidth. The same recovered hour cannot be collected in two columns.
+3. **Amdahl's law — unpriced by every axis.** At audit the stack had **~15 items on Adrian's serial attention** (stock take gating the inventory kernel, Etsy callback URL, Erica label send, Stephan send, Stripe Products, Meta tokens, pricing-anchor call, KGB lore decision, the three-brothers conversation, …). Several are **multi-day external waits** (Erica's reply, Etsy approval, bank exports), not 15-minute decisions. At a 15–20% serial fraction, the realised-speedup ceiling is **~5–7×** no matter how fast the machine gets.
+
+After de-duplication: the genuine *capacity* improvement over the pre-upgrade hive is **~2–4×** (dominated by model speed once double-counts are stripped); the genuine *realised* improvement is **~2×** (reliability being the lever).
+
+---
+
+## 5. The lever — where the next multiple actually is
+
+There is now a **~10× gap between the ceiling (30–80×) and what is realised (~5×). That gap is the human serial bottleneck.**
+
+The next multiple is **not** in a better model, more CLIs, or more CI — those have hit diminishing returns against a ~5–7× Amdahl ceiling. It is in **shrinking Adrian's serial fraction**:
+
+1. **Batch decisions** into one daily pass instead of per-blocker interrupts.
+2. **Pre-authorise** spend bands and approval thresholds so the hive doesn't stall waiting for a "yes."
+3. **Clear external-dependency waits off the critical path** (Etsy approval, bank exports, client/legal replies) by parallelising or pre-staging them.
+
+Squeeze the serial fraction from ~15–20% toward ~5% and the realised ceiling moves from ~5× to **~15–20×** — a bigger jump than the entire 2026 upgrade cycle just delivered.
+
+**Corollary for CI specifically:** the CI rollout (the work in the sibling window) *is* the highest-leverage stack investment, precisely because it lives on the reliability axis — it converts already-paid-for wasted capacity into shipped output. But it is a realised-fraction lever, not a ceiling lever; it cannot break the Amdahl wall.
+
+---
+
+## 6. Sources (vault-grounded)
+
+- `working/handoffs/2026-05-22-ag-to-claude-COMPLETE-v25-final.md` (the 22× self-report)
+- `canonical/concepts/claude-ceo-operating-doctrine.md` (45× under-utilisation, line ~157)
+- `AGENTS.md` §11.5.a (Gemini 3.5 Flash High economics)
+- `canonical/concepts/hive-architecture-v3.md` §4 (16× fan-out RAM-gating)
+- `working/handoffs/2026-05-20-ag-to-claude-BENCHMARK-REPORT-v5.md` (self-invalidated 86.52× benchmark — do not use)
+- `working/handoffs/STATE-OF-STACK.md` (fleet-repair, CI build, confab-strip, keystroke-flood incidents)
+- `episodic/sessions/2026-05-13-ag-accountability-and-token-doctrine-correction.md` (15M-token overnight idle)
+
+## 7. Method / provenance
+
+Estimated by adversarial workflow rather than freehand, specifically to defeat sycophantic inflation of a multiplier (the principal distrusts polite numbers). Five estimators worked in parallel and blind to each other; a sixth adversary saw all five and was instructed to refute. The capacity/realised split and the Amdahl ceiling are the adversary's corrections to the estimators' optimism. Numbers are defensible ranges, not precision claims — confidence is **medium-high** on the *shape* (machine-fast, human-bound), **medium** on the exact figures.
+
+## Revision history
+- 2026-05-31 — created from Workflow `wf_26c10c7a-956`; supersedes loose 22×/45× citations.
