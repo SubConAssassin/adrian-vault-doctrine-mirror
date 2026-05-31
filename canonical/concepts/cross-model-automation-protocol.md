@@ -201,3 +201,20 @@ Two tools retire the fragile keystroke feeder and finally fill the Tier-3 truth-
 - **When:** ≥2 models for anything promoted to canonical or driving a costly decision; solo/Gemini-only for mechanical/low-stakes.
 - **Prompt discipline:** schema + failure-modes up front; "output only the JSON, no prose"; embed a self-critique ("before emitting, list the top 2 ways this is wrong"); temp 0-0.2 for verification.
 - **Posture at $0 marginal cost:** over-verify until residual risk is acceptable — do NOT optimise for speed.
+
+---
+
+## §11. Reliable headless CLI invocations (2026-05-31 — the team-reliability fix)
+
+All three subscription CLIs had distinct headless bugs; all fixed + wrapped in **`tools/cli-ask.sh <codex|grok|agy> [--timeout N] "prompt"|--stdin`** (the canonical reliable interface). Principle (Adrian): *a flaky team member is a bug to FIX, never a thing to route around; confirm real content (not 0–1 bytes) before "done."*
+- **codex** (`codex exec`) blocks on stdin → hangs → alarm-dies at 0 bytes → fix: **`</dev/null`**.
+- **grok** returns EMPTY on long `-p` args → fix: **`grok --prompt-file <PATH>`** (+ `</dev/null`); short `-p` is fine.
+- **agy/Gemini** writes the full answer to a brain-dir artifact + prints only a summary → **`tools/agy-ask.py`** runs it under a PTY + `--dangerously-skip-permissions` AND parses the printed `file://…/brain/….md` path to append the full artifact.
+
+### §11.1 Hardened + acid-tested + the reliability loop (2026-06-01)
+
+`tools/cli-ask.sh` is now hardened and **`tools/cli-ask-selftest.sh` is its adversarial regression suite** (16 probes — empty/whitespace/unknown-model guards · metacharacter-as-data · 200KB prompt · timeout→124 · missing-binary-not-silent · empty/thin→exit 3 · retry-recovers · concurrency · agy PTY wiring · 3 live calls — **16/16 green**).
+
+Guarantees beyond the per-CLI fixes: exit-0-but-empty/thin (<20 non-space bytes) → **exit 3** (never a silent pass) · **one bounded retry** on flake · hard timeout → **124** · missing binary → non-zero (was a silent 0; fixed via `exec … or exit 127`) · prompt passed as **data** (never eval'd) · binaries **env-overridable** (`CLI_ASK_CODEX`/`CLI_ASK_GROK`/`AGY_BIN`). Exit contract: `0` ok · `2` usage · `3` thin-after-retries · `124` timeout · else = the CLI's own code.
+
+**THE RELIABILITY LOOP** (Adrian, 2026-06-01 — applies to the shipped product too, not just the CLIs): adversarial self-test → break it → fix → keep as a **permanent regression gate** → re-run on every change → **add each new field-failure as a new probe**. `bash tools/cli-ask-selftest.sh [--live]`. Recommended: wire it into the periodic `hive-ci` sweep so the harness is re-verified automatically.
