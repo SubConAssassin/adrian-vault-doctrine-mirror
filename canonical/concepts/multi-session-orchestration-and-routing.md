@@ -6,6 +6,8 @@
 Adrian runs many parallel sessions (Cowork desktop, Mac terminal, mobile, headless `claude -p`, + sibling sessions) and each can spawn workflows + CLI burns. With no coordination they **collide**: SOS edit-collisions, CLI/RAM contention, duplicated or competing work, near-miss destructive ops. This file is the coordination contract.
 
 ## 1. Coordinate BEFORE you launch (mandatory pre-flight)
+**One command runs this whole section:** `bash ~/Documents/Adrian-Vault/tools/preflight.sh` — it reports the active sibling state (SOS top entry), running engines + local grinds, RAM/load/free, AG pause state, and prints a **GO / CAUTION / HOLD verdict with the cloud-vs-local routing call**. Run it before any heavy job. Manual checklist if the script is unavailable:
+
 Before any heavy job (workflow, CLI burn, local grind, bulk file op):
 1. **Read the SOS top entries** — what is another session firing *right now*? (e.g. a "CLI-TEAM SWEEP" entry = a sibling owns the CLI team.)
 2. **Check live processes:** `pgrep -f 'agy |grok |codex |whisper|diariz|moondream'` and look for running workflows. Count PIDs with `pgrep -f PATTERN | wc -l` — **never `pgrep -fl … | wc -l`** (it counts newlines in multi-line command-lines; this session it reported "33 agy" for 2 real processes).
