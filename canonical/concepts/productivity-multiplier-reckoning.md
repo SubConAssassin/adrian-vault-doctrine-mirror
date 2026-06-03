@@ -83,5 +83,50 @@ Squeeze the serial fraction from ~15–20% toward ~5% and the realised ceiling m
 
 Estimated by adversarial workflow rather than freehand, specifically to defeat sycophantic inflation of a multiplier (the principal distrusts polite numbers). Five estimators worked in parallel and blind to each other; a sixth adversary saw all five and was instructed to refute. The capacity/realised split and the Amdahl ceiling are the adversary's corrections to the estimators' optimism. Numbers are defensible ranges, not precision claims — confidence is **medium-high** on the *shape* (machine-fast, human-bound), **medium** on the exact figures.
 
+## 8. Addendum — 2026-06-03: post-audit re-measure + the M3→M1Max-64GB worker-swap verdict
+
+**Status of this addendum:** single-read CEO estimate (Claude Opus 4.8), **NOT** the 7-agent adversarial workflow that produced §1–§7. Confidence: medium on *shape*, low–medium on exact figures. The adversarial re-run (5 blind per-axis estimators + 1 refuter) remains the higher-rigour option — **recommended to fire at swap-time** to stress-test these numbers before money moves.
+
+**Frame:** local-compute unit anchored M3-18GB-solo = **100**, M1 Max 64GB = **300** (3×; per `AGENTS.md` §11.6 / the networking paper — the *hardware* axis only, distinct from the whole-stack multiplier in §1).
+
+### 8a. What the upgrades SINCE the 2026-05-31 audit added
+New since §1–§7: **Opus 4.8 + fast-mode** (faster output, same model — used often), the **3-engine headless CLI team matured + proven** (agy/grok/codex, 16/16 selftest, $0, parallel), the **M3 rejoined as an always-on dry-room worker** (213K-chunk corpus index = proof of real utilisation), and a **213K-chunk semantic retrieval index** (grep → semantic search).
+
+| Axis | Last audit (M1 Max + AG2.0/Flash) | Now (post-upgrades) | Δ |
+|---|---|---|---|
+| Local compute units | 300 | 400 (M1 Max 300 + M3 node 100, concurrent) | +33% + always-on utilisation |
+| Reliable parallel engines | ~1–2 | ~4–5 ($0 CLI ×3 + M3 + AG), deterministic | ~3–4× + reliability |
+| Orchestrator | Opus 4.7 | Opus 4.8 + fast-mode | ~1.7–2× output wall-clock |
+| Retrieval | grep | 213K-chunk semantic index | step-change |
+| Marginal grind cost | metered $ | $0 (subscription CLIs) | rationing removed |
+
+Three honest numbers — **do not conflate**: **ceiling** ~50× → ~100–150× (more capacity stranded above the bottleneck); **task-level speedup** ~5× → ~6.5× (Amdahl-capped — only fast-mode + retrieval touch Adrian's critical path); **daily work-units produced** ~2–3× (NEW categories now flow at $0/parallel — the corpus index + 6-venture cross-ref + 250 person-matches in one 2026-06-03 session are the proof; infeasible in the M3-18GB / keystroke-AG era). The §1–§5 conclusion **holds and is more true**: the upgrades bought **ceiling + reliability**, not proportional realised throughput — the binding constraint is still Adrian's serial fraction, and the new capacity sits off his critical path.
+
+### 8b. The M3-18GB → 2nd-M1-Max-64GB worker-swap verdict (workload-specific)
+Question: swap the dry-room M3 worker for a 2nd M1 Max 64GB — gain vs the current (M1 Max + M3-node) config, against Adrian's stated next-30-days workload.
+
+**Local compute:** 400 → **600 units (+50%; worker alone 100 → 300 = 3×).**
+
+**Next-30-days workload, classified by whether the worker touches it:**
+- ❌ **Cloud/CLI/AG — swap does ~nothing:** building all the websites; vault audit *reasoning*; jewelry / X-Max design *generation*; Hero-to-Zero narrative *writing*.
+- ✅ **Worker-bound — swap directly helps:** processing all iCloud/Dropbox photos+videos (batch vision); **close pendant ID + match descriptions + Etsy/site links** (flagship, revenue-gating); Hero-to-Zero photo-understanding + EXIF-travel + transcript/client/timeline correlation; corpus re-embedding.
+
+**Verdict: SWAP IS WORTH IT — but NOT for the +50% nameplate.** Three real reasons:
+1. **3× throughput** on the dominant local job (batch vision over ~64K+ photos + videos).
+2. **Accuracy phase-change, 64GB-gated.** The M3 18GB **cannot hold an accurate 7–13B VLM alongside an image-embedding model** — it forces a tiny model or slow serial model-swapping. Adrian explicitly needs "descriptions match the actual piece" + correct purchase links → that accuracy is a capability the 18GB can't deliver, and bad IDs are a rework loop that eats his serial time. The pendant→description→link DB becomes **usable-for-revenue without hand-correction**.
+3. **Decoupling.** This month runs website builds AND the photo/pendant batch concurrently. With the M3 as worker, heavy-accuracy vision either can't run or gets pushed onto the **primary** M1 Max (contending with the build/design work). A 2nd 64GB worker runs the batch fully parallel, off the primary.
+
+**Realised, month-level:** Amdahl over the worker-bound fraction (~40% of gating work) at ~3× + accuracy-rework removal → **the month compresses ~1.4× (≈ +35–55% total output)**, and the highest-value deliverable (the accurate pendant DB) lands ~3× sooner + correct. **NOT 3× across the board** — websites + audit-reasoning + design-gen are cloud/Adrian-bound and unaffected; if the month *feels* slow, that axis is where it'll be, not the worker.
+
+**M3-18GB capability blockers (concrete):** 27–32B local reasoning = can't load (16–20GB weights alone); accurate 7–13B VLM + embedding model resident together = no; concurrent vision+embedding+reasoning pipelines = needs the 64GB headroom; raw batch-vision throughput = M1 Max 24-core GPU ≈ 3× the M3 Pro's.
+
+**Cost:** ≈ break-even per the resale roadmap (sell M3 + ~$300–400 → 2nd M1 Max; ~1mo interim until the M2 Ultra 192GB; resell ≈ par). Bar trivially cleared — **the decision is *capability*, not the throughput percentage.**
+
+### 8c. Trigger rule (locked)
+**Worker = 64GB before any corpus-scale vision / pendant-ID / 27B-class local run — not before.** If the next stretch is only embeddings + small-model batch (which the M3 already clears overnight with headroom), the swap buys a faster *idle* box (+50% stranded above the bottleneck). Decide on the workload commitment, not the nameplate.
+
+---
+
 ## Revision history
 - 2026-05-31 — created from Workflow `wf_26c10c7a-956`; supersedes loose 22×/45× citations.
+- 2026-06-03 — added §8: post-upgrade re-measure (Opus 4.8 fast-mode + 3-CLI team + M3 node + semantic index) and the workload-specific M3→2nd-M1Max-64GB worker-swap verdict (GO) + locked trigger rule. Single-read CEO estimate (not adversarial-workflow grade — flagged for swap-time re-run).
