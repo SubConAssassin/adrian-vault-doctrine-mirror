@@ -114,6 +114,13 @@ For agy specifically: prepend "WRITING/RESEARCH TASK. Do NOT crawl the vault, do
 
 ## §7 — The Decision Gate (the behavioural trigger that was missing)
 
+**§7.0 — LOCAL PRE-PASS — run FIRST, before "WHO can I give this to?" (zero tokens to the team).** Pressure-tested 2026-06-06 by a codex+grok red-team: the bare reflex fires too early and is the system's #1 flaw. Three local checks come BEFORE the gate below:
+> 1. **FIREWALL PRE-SCAN.** Scan the task + a sample of every referenced source against the firewall list (§7 Chelsea-ex · Yoga-public · Schwartz-on-SS · client PII · legal case numbers / dollar figures · voice-critical markers). ANY hit → **Claude owns it; the team receives only redacted sub-queries, or nothing.** A prescriptive prompt embeds source excerpts, so "delegate by default" can leak firewalled content in plaintext to the $0 team — this scan is the guard.
+> 2. **CONSTRAINTS-IN-PLAY.** Name every hard rule / ledger fact / boundary the task touches. **≥3 from distinct canonical locations → Claude owns the synthesis** (the team can't hold the interacting set; it returns a clean-looking matrix that quietly violates one rule, and a token-thin verify waves it through).
+> 3. **DELEGATION-TAX.** If Claude can finish safely in less time/tokens than prompt+launch+wait+read+verify, **Claude does it directly.** No routing ceremony for small bounded judgment work.
+
+Only after the pre-pass: run the gate.
+
 **Before Claude reads, writes, builds, searches, or mines anything beyond a one-shot judgment, run this gate:**
 
 > *Is this deferrable legwork the team could do with a prescriptive prompt?*
