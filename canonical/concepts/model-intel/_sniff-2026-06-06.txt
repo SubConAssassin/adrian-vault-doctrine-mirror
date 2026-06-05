@@ -1,0 +1,5 @@
+- [100pts] Launch HN: Expanse (YC P26) – Unlock Wasted GPU Capacity  (https://news.ycombinator.com/item?id=48356312)
+- [47pts] Show HN: Formally verified polygon intersection – Opus 4.8 oneshots, prev failed  (https://github.com/schildep/verified-polygon-intersection)
+- [36pts] Company behind GLiNER model released open source model for running LLM guardrail  (https://pioneer.ai/blog/gliguard-16x-faster-safety-moderation-with-a-small-language-model)
+- [22pts] Show HN: Avec – iOS email app that lets you handle your Gmail inbox in seconds  (https://apps.apple.com/us/app/avec-email-app-for-gmail/id6742199038)
+- [174pts] Show HN: Onit – Source-available ChatGPT Desktop with local mode, Claude, Gemini  (https://github.com/synth-inc/onit)
