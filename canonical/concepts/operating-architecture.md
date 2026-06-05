@@ -143,3 +143,9 @@ Reasoning: The binding constraint found tonight is primary Mac load — ~12 conc
 [VERIFY] before full rollout: (1) exact RAM/CPU footprint of a running agy CLI task on M3 vs IDE; (2) whether cli-ask.sh agy (or Gemini agent CLI) can be installed/authenticated and executed on M3 independently (ssh or local) without primary-only vault mounts, auth, or path dependencies; (3) any account-level restrictions on concurrent hosts. Run a single low-stakes 5-10 minute agy task from M3 first.
 
 Fallback if verify fails or CLI proves heavy: maximize M3 local LLM share for all grunt, enforce strict 2-CLI cap on primary (feeder + 1 research max), route even more research to web bridges (0 local clients), and apply more aggressive per-chat TASK-TRIAGE to reduce total primary load.
+
+---
+**CORRECTION 2026-06-06:** the worker ("M3") is actually a 2nd **Apple M1 Max, 64GB RAM** (MacBookPro18,2, macOS 26.5) at 192.168.1.4 — the M3-Pro-18GB was swapped out per the roadmap. ALL "18GB" constraints below are LIFTED: it runs larger local LLMs, the agy CLI, even the AG IDE if wanted. Reachable: `ssh m3worker` / `tools/m3.sh`. Currently bare — needs ollama + models + whisper installed to serve as the grunt node.
+
+---
+**❌ CORRECTION 2026-06-06 ~00:55 (SUPERSEDES the note above):** I mis-identified 192.168.1.4 as "the M3". It is NOT. Adrian confirms: MAIN computer = M1 Max 64GB (this machine, .23); worker = **M3 18GB on Ethernet** = a DIFFERENT host. .4 (M1 Max 64GB, MacBookPro18,2, user adriantaffinder) is almost certainly the MAIN computer via a second interface — I SSHd into myself. The real M3 (18GB) was never reached this session. Disregard the prior "worker is 64GB" note.
