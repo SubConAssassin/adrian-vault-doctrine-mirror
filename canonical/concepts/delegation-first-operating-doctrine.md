@@ -42,7 +42,7 @@ Adrian: *"You should be conversing with your accountant every time, looking at w
 2. **GREEN** → still delegate by default; Claude may do small reads/writes directly.
    **AMBER / RED** → delegate *everything* deferrable; Claude does decision + verify only; replies tight; no bulk reads/writes by Claude.
 3. **✅ Re-calibrated 2026-06-06 13:25 (Adrian-corrected — he said weekly 66% not 55%).** WEEKLY: `CLAUDE_WEEKLY_CAP_TOKENS=3888000000` in `~/.config/com.adrian-vault/.env` → router now reads **66%**, matching the Claude UI (7d effective ÷ cap = 2.566B ÷ 3.888B). The cap is tuned to Adrian's eyeball — **re-tune by `new_cap = (7d effective_tokens in `working/_logs/claude-usage.json`) ÷ (Adrian's real weekly fraction)`**; do NOT reset it to an older value (it's drifted 11.45B→5.12B→4.624B→3.888B as usage grows). 5h: `CLAUDE_5H_CAP_TOKENS=2373919000` → router now reads **4%**, matching the UI (`new_5h_cap = current 5h effective_tokens ÷ Adrian's 5h fraction`). ⚠️ **Caveat:** the 5h numerator sums **every Claude process on the box** (siblings + headless automation + this session) with a cost-proxy formula (output×5) that doesn't equal Anthropic's actual metering — so the 5h cap-tune is an eyeball alignment at the calibration moment, not exact; it tracks Adrian's interactive 5h roughly + conservatively (errs toward over-read when automation is heavy). The weekly (67%) is the binding governor; trust the weekly first, and the Claude UI over the router for the personal 5h. Proper enhancement (flagged, unbuilt — the projects tree has many sub-agent worktree dirs that all aggregate in): exclude non-interactive sessions before the 5h window. If the router and Adrian's lived number ever disagree, **Adrian wins.**
-4. The team (agy/grok/codex) is **$0 and effectively unlimited** — its "burn" is a feature (uses expiring Gemini credits), not a cost to ration. Never ration the team.
+4. The team (agy/grok/codex) is **$0 marginal cost** — never ration it on price. ⚠️ **2026-06-10 correction (verified, see [[ai-stack-june-2026-state]] + `working/_research/2026-06-10-ai-stack-capability-review.md`):** "unlimited" applies to marginal $ only, NOT capacity — **codex is token-METERED since 2026-04-02** (tier multipliers, shared agentic pool, purchasable top-ups) and **AG quota can hard-lock for 5–7 DAYS** when weekly caps trip (4 unannounced quota cuts documented; AI credits removed from base plans May 2026). Budget the team's quota like any other resource; route grind to Flash; checkpoint everything for idempotent resume.
 
 ---
 
@@ -66,8 +66,8 @@ Adrian: *"You should be conversing with your accountant every time, looking at w
 All `$0`, all proven. Fire via the unified interface:
 
 - **`bash tools/cli-ask.sh agy "PROMPT"`** — Gemini (Antigravity CLI). **Default grind engine.** Burns the expiring credits. Reads serials/images reliably. `>100K` input auto-routes to grok; process-group SIGKILL on timeout.
-- **`bash tools/cli-ask.sh grok "PROMPT"`** — Grok-4.3. Reliable bounded workhorse. No live web in CLI (use the web bridge for live web).
-- **`bash tools/cli-ask.sh codex "PROMPT"`** — GPT-5.5. Deep/structured; scope it TIGHT (slow crawler).
+- **`bash tools/cli-ask.sh grok "PROMPT"`** — Grok-4.3. Reliable bounded workhorse. No live web in CLI (use the web bridge for live web). **The installed binary IS Grok Build (0.2.14, in the SuperGrok sub)** — cli-ask deliberately suppresses its agentic mode for writing tasks, but full build mode (plan mode, worktree subagents, headless `grok -p` + `--always-approve`, reads CLAUDE.md/AGENTS.md/skills zero-config per xAI docs) is available = **second overnight build engine + the AG-lockout failover**. New coding model (V9-Medium) expected to auto-swap in ~mid-June.
+- **`bash tools/cli-ask.sh codex "PROMPT"`** — GPT-5.5. Deep/structured; scope it TIGHT. ⚠️ Token-METERED since 2026-04-02 (not unlimited — see §2.4). "Slow crawler" note predates GPT-5.5 (Apr 23, fewer tokens/task) — re-test before treating as a constraint. New: `/goal` mode (self-chains to a verifiable end-state), TOML subagents, `codex exec resume --output-schema` for resumable overnight runs.
 - **`bash tools/agy-retry.sh "PROMPT"`** — bootup-override + retry-until-non-empty (escalating timeout). **Use when agy times out — a timeout is a flake to RETRY, never a shrug** (Adrian-direct: "AG has the single most tokens of anybody; keep trying until you get results").
 - **`python3 tools/agy-ask.py "PROMPT"`** — direct PTY `agy -p --dangerously-skip-permissions` (lowest-level).
 - **Web bridges (heaviest research):** paste prompt into ChatGPT Pro (Deep Research) or SuperGrok (DeeperSearch) → walk away → lands in `working/external-research-in/`. ~10 long threads/day each, more if pushed.
@@ -110,6 +110,8 @@ VERIFY:        "Then print the word count and first 5 lines."
 
 For agy specifically: prepend "WRITING/RESEARCH TASK. Do NOT crawl the vault, do NOT load AGENTS.md, no planning, no subagents." (the bootup-override — the real reliability lever; `agy-retry.sh` does this for you).
 
+**§6a — Engine self-knowledge contract (added 2026-06-10).** The team's own self-reports confirm: codex's cutoff is June 2024, grok can't name its own build, agy tags platform claims [UNSURE]. Therefore: any task touching **post-cutoff facts** (current models, pricing, APIs, product features, news, regulation) MUST either embed the source material in the prompt or route to a live-web surface — never accept a team engine's unsourced claim about anything recent. Every research return carries `as_of_utc` + `grounding_mode: corpus_only|web_assisted|UNVERIFIED` frontmatter; **UNVERIFIED never promotes to canonical** (mechanises the Quarantine Triggers).
+
 ---
 
 ## §7 — The Decision Gate (the behavioural trigger that was missing)
@@ -144,4 +146,5 @@ The team confabulates in the editorial/title layer even when extraction is groun
 ---
 
 revision_history:
+- 2026-06-10 — June-2026 capability review applied (verified, `working/_research/2026-06-10-ai-stack-capability-review.md`): §2.4 "unlimited" corrected (codex metered Apr 2; AG multi-day lockouts); §4 grok bullet = Grok Build unlock + AG-lockout failover, codex bullet = metered + /goal/subagents/resume; §6a engine self-knowledge contract + freshness stamps added.
 - 2026-06-05 — created. Adrian-direct: stop under-using the team; build the overarching system prompt that enforces delegate-by-default + the accountant ritual; conserve Claude tokens for thinking/orchestrating/checking so a second Claude account isn't needed.
