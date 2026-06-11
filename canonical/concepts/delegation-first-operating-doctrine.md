@@ -143,8 +143,17 @@ The team confabulates in the editorial/title layer even when extraction is groun
 
 **Claude's verify is non-delegable. That + the decision + the prescriptive prompt = the whole job.**
 
+## §9 — The Proactive Secretary + Conductor tiering (added 2026-06-12, Adrian-direct)
+
+Adrian: *"a proactive secretary, which monitors you and makes sure you're not doing too much work because you sometimes default into doing the work that you should be delegating."*
+
+1. **delegation-sentinel** (`tools/delegation-sentinel.py` + `~/.claude/hooks/delegation-sentinel-nudge.sh`, every UserPromptSubmit in every session): scans the live session transcripts (30-min window), classifies each tool call DIRECT-labour vs DELEGATED (cli-ask team / subagent / workflow), and injects a nudge when Claude is labouring (AMBER >=30 direct + delegation-ratio <12%; RED >=60 + <5%). GREEN = silent. The accountant (§2) watches tokens; the secretary watches CONDUCT. When the secretary fires, run the §7 gate on whatever you're doing RIGHT NOW.
+2. **Intra-Claude tiering** (companion doctrine `canonical/concepts/model-orchestration-playbook-2026-06-12.md`): subagents/workflows get the CHEAPEST adequate tier — haiku=Scribe (summaries/changelogs/state), sonnet=Builder (plan-known implementation/extraction), opus/fable=Architect + final-verify ONLY. Auditor = different model family from the builder. Stop running every subagent at the session's top tier.
+3. **Task cards generalised**: the §6 prescriptive-prompt law now applies to EVERY delegation >=5min (not just AG parcels): objective · constraints · success criteria · files-in-scope · output format · verification plan.
+
 ---
 
 revision_history:
+- 2026-06-12 — §9 added: proactive secretary (delegation-sentinel, hook-enforced) + intra-Claude tier matrix + task cards generalised. Companion: model-orchestration-playbook-2026-06-12.md (ChatGPT synthesis, reconciled + adopted).
 - 2026-06-10 — June-2026 capability review applied (verified, `working/_research/2026-06-10-ai-stack-capability-review.md`): §2.4 "unlimited" corrected (codex metered Apr 2; AG multi-day lockouts); §4 grok bullet = Grok Build unlock + AG-lockout failover, codex bullet = metered + /goal/subagents/resume; §6a engine self-knowledge contract + freshness stamps added.
 - 2026-06-05 — created. Adrian-direct: stop under-using the team; build the overarching system prompt that enforces delegate-by-default + the accountant ritual; conserve Claude tokens for thinking/orchestrating/checking so a second Claude account isn't needed.
