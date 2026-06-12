@@ -34,6 +34,22 @@ Synthesised with the full team (codex + grok + agy) 2026-06-06. Full architectur
 > **HARD CAP: 2–4 concurrent cli-ask clients on the primary Mac** (shared with the IDE; AG-feeder = 1 slot). 12 clients = load 577, box dead, ~0 throughput. Offload to M3 + web bridges.
 > **24/7:** by **22:00 WITA** the overnight plan is built and all nodes loaded (M3 queue, AG-feeder, headroom-only M1 Max); the team works while Adrian sleeps; on wake, review outputs first. Every allocation must return **real venture progress — invest, don't burn**. M3 must never idle.
 
+## §1b — THE MODEL-ROUTING LAW (Adrian-direct 2026-06-12 — deny-by-default; this overrides momentum)
+
+Adrian: *"Fable 5 does primarily the thinking, then delegates to different models and CLIs to most efficiently utilize our token pool… you should be at an absolute minimum thinking about what to do and telling who to do it."* Context that triggered this: account burned to **79% weekly in ~1.5 days** (target: ~3.5 days per account, two 20x accounts = the week), including 1.4M premium subagent tokens spent transcribing receipt photos that agy reads for $0.
+
+**1. The premium-engine ALLOWLIST.** Fable/Opus session tokens (incl. subagents at session tier) may ONLY be spent on: correctness/strategy decisions · architecture & system design · writing prescriptive delegation prompts/task cards · verifying returns (grounding/firewall/voice/legal) · voice-critical or legal wording · direct operator comms · final synthesis of multi-source results. **Everything else is DENIED by default** — if a task isn't on the list, route it (§3 table, §4 roster) or pin it to a cheaper Claude tier.
+
+**2. NEVER on the premium engine** (the recurring sins, named): vision/image transcription · OCR-adjacent extraction · bulk file reads/summaries · batch content generation · corpus mining · web research legwork · mechanical code edits after the plan is decided · changelogs/state compression (haiku's job). A premium subagent doing ANY of these is a routing failure even if it "works".
+
+**3. Subagent tier-pinning is MANDATORY** (playbook matrix, now law): Scribe→haiku · Builder/extractor→sonnet (or team CLI) · Architect/final-verify→opus/fable. Launching a subagent without an explicit cheaper-tier decision = it silently inherits the session's top tier = burn. Say the tier in the Agent call or justify why top-tier.
+
+**4. Session-start model check (tell Adrian, don't absorb).** At session start, judge the session's likely work against the allowlist: if it's routine (state queries, file ops, known-pattern builds), SAY in the first reply that this session doesn't need the top model and recommend he run it in a cheaper-model window / second account. He decides; the assistant must surface it.
+
+**5. Two-account discipline:** the weekly pool is the binding constraint; the accountant's % + Adrian's lived number govern. On AMBER/RED: allowlist-only, everything else deferred or delegated — no exceptions for "it's quicker if I just do it" (it never is, at pool scale).
+
+revision_history: 2026-06-12 — §1b added (Adrian-direct, after the housekeeping-batch graft + 79%/1.5-day burn). Forensic team review of the whole orchestration architecture commissioned same session → `working/_research/2026-06-12-orchestration-forensic-*.md`.
+
 ## §2 — The Accountant Ritual (do this, don't skip it)
 
 Adrian: *"You should be conversing with your accountant every time, looking at what resources you have available — your own tokens, the AG tokens, etc."*
