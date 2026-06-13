@@ -167,9 +167,31 @@ Adrian: *"a proactive secretary, which monitors you and makes sure you're not do
 2. **Intra-Claude tiering** (companion doctrine `canonical/concepts/model-orchestration-playbook-2026-06-12.md`): subagents/workflows get the CHEAPEST adequate tier — haiku=Scribe (summaries/changelogs/state), sonnet=Builder (plan-known implementation/extraction), opus/fable=Architect + final-verify ONLY. Auditor = different model family from the builder. Stop running every subagent at the session's top tier.
 3. **Task cards generalised**: the §6 prescriptive-prompt law now applies to EVERY delegation >=5min (not just AG parcels): objective · constraints · success criteria · files-in-scope · output format · verification plan.
 
+## §10 — Corrected engine economics + the multi-pod fleet + the Council-Rotation research filter (added 2026-06-13, Adrian-direct)
+
+**§10.1 — Economics corrected (supersedes the scarcity framing where they conflict).** With Adrian's **two Claude accounts** + Anthropic's generous weekly allowance + observed glitch-resets, **Claude is an ABUNDANT engine** (2026-06-13 lived reading: weekly all-models **~17%**, 4 days to reset = GREEN; the resource-router's AMBER was a **stale-cap mis-read** — **Adrian's lived number always wins; recalibrate the cap, never trust the alarm over him**). **Gemini/Antigravity is also abundant** (large weekly quota + the perishable IDE credits). The **EXPENSIVE + more-limited engines are ChatGPT (codex) and Grok**, especially metered. **Routing consequence:** push VOLUME onto the abundant engines (Claude · Gemini/agy · local-LLM); reserve ChatGPT/Grok for **sparing, high-value one-shot cross-checks**, never bulk.
+
+**§10.2 — Why delegate-first still holds (re-justified).** Delegation is NOT because Claude is expensive (it's abundant). It is for **(1) PARALLELISM** — the team works while Claude thinks — and **(2) COMPARATIVE ADVANTAGE** — Claude's judgment/orchestration is worth more than Claude's typing. The Prime Directive (§1) stands; only its rationale is corrected. **The binding constraint is now Adrian's orchestration ATTENTION, not Claude tokens.**
+
+**§10.3 — The multi-pod fleet** (M1 Ultra 64GB ~16 Jun; a 3rd 64GB node planned):
+- Each **64GB Apple-Silicon node** holds ONE fluid loadout: *orchestration* (2–3 Claude windows + 4 CLIs + 1 AG IDE) · *execution* (~3 AG IDEs + CLIs) · *inference* (1 local LLM 30–70B + CLIs + 1 Claude). **Claude windows are light on RAM** (cloud client); the RAM hogs are AG IDEs + local-LLMs.
+- **Two Claude accounts × N nodes** → ~6 Claude windows fleet-wide. ONE canonical Obsidian vault, **partitioned by venture**, reachable via **Tailscale** (NAT-agnostic; survives the gazebo↔dry-room split). **NEVER auto-sync the state kernel** (events.jsonl / STATE-OF-STACK) across machines via iCloud/Dropbox — the documented drift bomb. Hit ONE canonical kernel (network mount over Tailscale, OR promote events.jsonl → a shared Postgres both machines write to). **This shared-state concurrency layer is the PREREQUISITE BUILD before two Claudes run on one vault.**
+- Headless nodes (Mac Studio Ultra, dry room) controlled from the MacBook via **SSH** (Claude windows, light) + **Screen Sharing/VNC** (AG IDE GUI), all over Tailscale.
+- AG-IDE lanes MUST use the **proven feeder** (`working/_feeder/tasks/` + `tools/ag-feeder.py --until`), never a one-shot bounce.
+- **Binding limits = (1) the two accounts** (token; a 3rd Claude sub is the release valve when both cap) **+ (2) Adrian's attention** (orchestration). **NOT RAM.**
+
+**§10.4 — The Council-Rotation research filter (the standing research method).** For any research / factual job:
+1. **FRAME (Claude):** the exact question + sub-queries + success criteria (§6 prescriptive-prompt law).
+2. **FAN OUT:** the same question, full-depth, to multiple engines in parallel — VOLUME to the abundant ones (Gemini/agy + local-LLM + Claude subagents); ChatGPT/Grok sparingly.
+3. **ROTATE THE CROSS-CHECK (the filter):** feed each engine's output to a DIFFERENT model family to refute/verify (Gemini→checks ChatGPT, ChatGPT→checks Grok, Grok→checks Gemini). Each is clever but blind-spotted; cross-examination surfaces errors + the high-confidence commonalities.
+4. **CONDENSE:** post-cross-check agreement = high-confidence core; divergences = flagged for Claude.
+5. **SYNTHESISE (Claude, second thinking):** final judgment on the filtered, condensed material.
+High-stakes → **≥2 independent-family confirmations before promotion** (§8). Two local-LLM nodes let two fan-out/cross-check engines run **$0 on-silicon**, growing as the hardware upgrades.
+
 ---
 
 revision_history:
+- 2026-06-13 — §10 added (Adrian-direct, fleet-economics session): engine economics corrected (Claude + Gemini abundant; ChatGPT/Grok expensive-limited; router AMBER was a stale-cap mis-read — recalibrate, Adrian's lived ~17% weekly wins); delegate-first re-justified (parallelism + comparative advantage, NOT token scarcity); the 2-account multi-pod 64GB fleet + Tailscale + the shared-kernel concurrency PREREQUISITE; the Council-Rotation cross-model research filter codified.
 - 2026-06-12 — §9 added: proactive secretary (delegation-sentinel, hook-enforced) + intra-Claude tier matrix + task cards generalised. Companion: model-orchestration-playbook-2026-06-12.md (ChatGPT synthesis, reconciled + adopted).
 - 2026-06-10 — June-2026 capability review applied (verified, `working/_research/2026-06-10-ai-stack-capability-review.md`): §2.4 "unlimited" corrected (codex metered Apr 2; AG multi-day lockouts); §4 grok bullet = Grok Build unlock + AG-lockout failover, codex bullet = metered + /goal/subagents/resume; §6a engine self-knowledge contract + freshness stamps added.
 - 2026-06-05 — created. Adrian-direct: stop under-using the team; build the overarching system prompt that enforces delegate-by-default + the accountant ritual; conserve Claude tokens for thinking/orchestrating/checking so a second Claude account isn't needed.
