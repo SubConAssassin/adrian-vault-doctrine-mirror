@@ -56,7 +56,7 @@ This pack is the concrete migration plan. Output of Phase F.5 in the post-vault-
 - **launchd EX_CONFIG failures** — macOS managed-LWCR rejection from 2026-05-08 is OS-level, not RAM. **Skip LaunchAgents entirely** on new Mac.
 - **Network bandwidth** — Bali residential connection caps GitHub pushes, MCP latency, AG cycle bursts. Unchanged.
 - **AG sandbox restrictions** — AG still can't exec Python/CLIs directly. Claude-direct execution still required for `os`/`subprocess` work.
-- **The 84M-word corpus is still 84M words** — speaker attribution, §7 firewall discipline, anti-confab contract still apply at the same forensic cost.
+- **The corpus is large regardless of RAM** (measured 2026-06-14: **~59.5M words** of ingested source [raw + transcripts + intelligence]; **~147.8M words** across the whole vault incl. derived synthesis / research scratch / archive mirrors; the earlier "84M" was an unscoped round number, never a measured `wc`) — speaker attribution, §7 firewall discipline, anti-confab contract still apply at the same forensic cost.
 - **Obsidian indexing 24GB vault** — even with 64GB, indexing is I/O-bound during cold load. The 2026-05-20 `userIgnoreFilters` patch (`.claude/`, `.git/`, `raw/`, `working/_logs/`, `node_modules/`) cut 13k redundant files; that win persists.
 
 ## 3. Pre-arrival actions (DO BEFORE PICKUP)

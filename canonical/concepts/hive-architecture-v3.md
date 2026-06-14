@@ -162,7 +162,7 @@ The hive is no longer "Claude + AG + advisors." It's now a four-layer stack.
 
 **Honest caveat (per subagent C):** The biggest unlock is **Tier-0 acoustic** + **subagent fan-out at scale**, NOT local LLM hosting. Gemma 27B-Q4 is useful but doesn't compete with Claude/Gemini/ChatGPT for serious reasoning. 64GB **complements** the API/subscription layer; doesn't replace it.
 
-**Things that do NOT change at 64GB:** AG rate limits (API-side), API quotas, GUI keystroke bugs (if not migrated to CLI/SDK), launchd EX_CONFIG failures, network bandwidth, AG sandbox restrictions, the 84M-word corpus still needs same forensic discipline.
+**Things that do NOT change at 64GB:** AG rate limits (API-side), API quotas, GUI keystroke bugs (if not migrated to CLI/SDK), launchd EX_CONFIG failures, network bandwidth, AG sandbox restrictions, the corpus (measured 2026-06-14: **~59.5M words** ingested source / **~147.8M** whole-vault text incl. derived synthesis — the earlier "84M" was an unscoped round number, never a measured `wc`) still needs same forensic discipline.
 
 ## 3. The Six Capability Clusters
 
