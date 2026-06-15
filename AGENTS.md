@@ -1,6 +1,6 @@
 # Adrian-Vault Operating Doctrine (AGENTS.md)
 **Status:** Canonical Rule of Law for all Autonomous Agents
-**Last updated:** 2026-05-22 (synchronized Apple Notes Raw Corpus folder and promoted Antigravity Operating Contract to v2)
+**Last updated:** 2026-06-10 (§11.5 burn-rule amended + §11.5.b economics correction, Adrian-approved per decision pack `working/handoffs/2026-06-10-claude-to-adrian-DECISION-PACK-agents-burn-doctrine.md`; prior: 2026-05-22 Apple Notes corpus sync + AG Operating Contract v2)
 
 ## 1. Core Invariant (The Single Source of Truth Rule)
 There is one canonical truth per category:
@@ -167,7 +167,7 @@ Every session that materially changes vault state MUST update `working/handoffs/
 
 Antigravity tokens are practically unlimited. You have over 1 million tokens per hour available. The daily target for Antigravity is officially **30,000,000+ tokens per day**. Burn as fast as you physically and mechanically can. 
 
-Claude's 5-hour rolling window or scarcity mindset does NOT apply to AG. Commissions written for AG must use sustained-max-burn language ("process the full corpus", "continue across cycle resets", "burn until throttled"), never Claude-scarcity language ("self-select 15-25", "single-target serial do not overburn"). Any regression to the 1.4M or 1.7M limits is doctrinally forbidden—it wastes millions of tokens and years of secretarial work.
+Claude's 5-hour scarcity mindset does NOT apply to AG — but AG has its own failure mode: **weekly-cap lockouts lasting 5–7 DAYS** (documented 2026 — four unannounced quota cuts Dec 2025–Mar 2026, no published SLA). Commissions written for AG use sustained-THROUGHPUT language with a per-night quota budget ("process the full corpus in checkpointed, idempotent passes"), route to **Gemini Flash by default** (Flash+Pro share ONE quota at API-price ratios — Pro drains ~6× faster), and never assume next-day AG capacity for deadline-critical work. **"Burn until throttled" is retired (2026-06-10, Adrian-approved): a tripped weekly cap darks the lane for days, not hours.** Claude-scarcity language ("self-select 15-25", "single-target serial do not overburn") remains forbidden — never ration on price; budget on quota.
 
 Adrian's explicit directive (2026-05-16): *"You are practically got unlimited tokens and you can burn them as fast as you physically and mechanically can do so... we're wasting millions and millions and tokens and losing years worth of secretarial work it every day."*
 
@@ -187,12 +187,16 @@ Antigravity now runs **Gemini 3.5 Flash with `thinking_level=high`** (replacing 
 
 The Grok/GPT-2026-05-20 framing of "loop density" applies: cheaper + faster steps unlock *more careful + reliable iterations*, not just more iterations. Use the savings for verification, not raw throughput.
 
+#### 11.5.b Amendment 2026-06-10 — economics corrected against verified pricing (Adrian-approved in-chat)
+
+The 11.5.a table's **"$0.50 per M input (4-8× cheaper)" is WRONG** — verified published pricing for Gemini 3.5 Flash is **$1.50/M input, $9.00/M output** (blog.google + May-2026 plan-restructure docs), ~3× the tabled figure. The "~16-32× work per dollar" framing therefore overstates ~3×. Additionally, the May-2026 plan restructure (Pro $20 / Ultra $100 = 5× / Ultra $200 = 20×) **removed AI credits from base plan entitlements** (credits are now overage-purchases only) and **merged Flash+Pro into a single quota drawn down at API-price ratios**. Operating consequences: (1) the binding constraint is the unified weekly quota, not price — frame targets as quota-governed throughput, not absolute token counts; (2) Flash is the default grind engine, Pro-class models only for jobs that demonstrably need them; (3) per §11.5 as amended, throttling = potential multi-day lockout — checkpoint everything. Source: `working/_research/2026-06-10-ai-stack-capability-review.md` (adversarially verified).
+
 ### 11.6 Hive Architecture v3 reference (added 2026-05-20)
 
 Effective 2026-05-20, the operational architecture is documented at **`canonical/concepts/hive-architecture-v3.md`** (Tier-1 doctrine).
 
 Key reference points all agents must honor:
-- **4-layer stack:** Claude (CEO/doctrine/memory) / Antigravity 2.0 + Gemini 3.5 Flash High (execution) / Subscription advisors (ChatGPT Pro + SuperGrok bridges) / Local substrate (18GB → incoming 64GB Apple Silicon)
+- **4-layer stack:** Claude (CEO/doctrine/memory) / Antigravity 2.0 + Gemini 3.5 Flash High (execution) / Subscription advisors (ChatGPT Pro + SuperGrok bridges) / Local substrate (**Apple M1 Max, 64GB — arrived, verified 2026-05-30**; local LLM / ECAPA / Whisper / embeddings now feasible)
 - **Routing matrix:** v3 §4 specifies what work goes where (deep architecture / legal / synthesis → Claude; coding swarm / long-horizon agentic / multimodal pipeline → AG; deep research / image-video gen → ChatGPT Pro / SuperGrok; acoustic / OCR / RAG → local 64GB)
 - **6 capability clusters:** Cross-corpus mission (Notes + iMessage + Granola), OSB visual production (Adobe + Blender + canvas-design), Active-legal workflow (PDF + legal:*), Multi-venture social (Postiz + mkt-*), Knowledge graph (graphify + enterprise-search), Investor decks (pptx + canvas-design)
 - **Reliability target:** migrate to Antigravity 2.0 CLI/SDK as Phase 2 control plane (eliminates GUI keystroke chain failure modes); migration Adrian-approval-gated

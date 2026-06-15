@@ -9,6 +9,9 @@ Primary doctrine lives in:
 CEO operating doctrine (Claude's role as orchestrator of the agent stack) lives in:
 @canonical/concepts/claude-ceo-operating-doctrine.md
 
+**Delegation-first operating doctrine — HOW Claude spends its scarce tokens (delegate-by-default; team does ALL legwork; Claude thinks/orchestrates/verifies). This is a standing system prompt, loaded every session:**
+@canonical/concepts/delegation-first-operating-doctrine.md
+
 Current operational state (what's firing right now across the stack) lives in:
 @working/handoffs/STATE-OF-STACK.md
 
@@ -26,9 +29,11 @@ External research bridge (ChatGPT Pro + SuperGrok subscription content):
 - **Bootup read order:**
   1. `CLAUDE.md` (this file)
   2. `AGENTS.md`
-  3. `canonical/concepts/claude-ceo-operating-doctrine.md`
-  4. `working/handoffs/STATE-OF-STACK.md`
-  5. The relevant `companies/{venture}/ledger.md` for whatever the user is engaging on
+  3. `canonical/concepts/delegation-first-operating-doctrine.md` — **the token-spend constitution: delegate-by-default, run the accountant ritual, team does all legwork. §1b MODEL-ROUTING LAW (Adrian-direct 2026-06-12): Fable/Opus = think/prescribe/verify/operator-comms ONLY (deny-by-default allowlist); vision/transcription/extraction/batch/research-legwork NEVER on premium tokens; subagents tier-pinned (haiku scribe / sonnet builder / opus-fable architect+verify); if a session's work is routine, SAY at the start that a cheaper-model window would do.**
+  4. `canonical/concepts/claude-ceo-operating-doctrine.md`
+  5. `working/handoffs/STATE-OF-STACK.md`
+  6. The relevant `companies/{venture}/ledger.md` for whatever the user is engaging on
+- **Every-turn delegation gate (the behaviour that kept not firing):** before Claude reads/writes/builds/searches/mines anything beyond a one-shot judgment, run the §7 Decision Gate. Deferrable legwork (research, web research, content, code, extraction, batch, mining) → delegate to the CLI team with a prescriptive prompt (`bash tools/cli-ask.sh agy|grok|codex`). Claude keeps only the decision, the orchestration, and the verify.
 - **Loud Failure:** You MUST halt and report a loud failure if any of the following occur:
   - `AGENTS.md` fails to load.
   - `ledger.md` is missing for the active venture.
@@ -51,7 +56,7 @@ You have terminal execution rights. Use the following scripts to query ChatGPT o
 python3 ~/Documents/Adrian-Vault/tools/ask-chatgpt.py "your prompt"
 python3 ~/Documents/Adrian-Vault/tools/ask-chatgpt.py --model gpt-5.4 "your prompt"
 
-# Grok (grok-4)
+# Grok (grok-4.3 — pin explicitly; legacy slugs redirect to 4.3 at LOW effort since 2026-05-15)
 python3 ~/Documents/Adrian-Vault/tools/ask-grok.py "your prompt"
 ```
 
@@ -69,7 +74,7 @@ A previous session made 1,053 API calls (~2.7M tokens, ~$8) on a single task. Th
 API keys live at: `~/.config/com.adrian-vault/.env`
 
 ## 5. Hardware & Remote Control
-- **Hardware:** MacBook Pro M3 Pro, 18GB RAM. Always ARM64/Apple Silicon builds. Never Intel.
+- **Hardware:** MacBook Pro **Apple M1 Max, 64GB RAM** (10-core 8P+2E; verified 2026-05-30 — the "incoming 64GB" upgrade has landed, replaces the old M3 Pro 18GB). Always ARM64/Apple Silicon builds. Never Intel. 64GB unlocks local LLM inference, ECAPA/Whisper-large, vault embeddings, and Docker locally without memory pressure.
 - **Remote Control (iPhone):** If Adrian connects from iPhone, the session is registered via `claude remote-control` in this vault directory. Fallback URL: `https://claude.ai/code?environment=ENV_ID`.
 
 ## Legacy Reference Compatibility
