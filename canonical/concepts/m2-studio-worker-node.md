@@ -46,6 +46,13 @@ Adrian is in Sayan/Ubud (and the Studio sits in the spare/dry room). Hot ambient
 3. **Doctrine correction needed:** `delegation-first §10.3` / `hive-architecture-v3` still reference an "M1 Ultra incoming" — that purchase was **CANCELLED**; the M2 Studio (this node) is the real second node now. Update those references.
 4. **Studio corpus-grind at scale:** the full Dropbox image corpus (14k images) needs OCR-first (qwen is text-only) — a next-phase pipeline; the 876 already-extracted notes were classified this session (`working/deep-extraction/dropbox-classified-2026/`, 682 OSB / 172 Ashta / 2 SS / 1 AGA).
 
+## 6b. Transcription (Whisper) — the Studio's OTHER workhorse (added 2026-06-17 ~03:00)
+- Whisper is installed on the Studio: `whisper-cli` (Homebrew) + `ffmpeg` + model `~/whisper-models/ggml-medium.en.bin` (1.4GB).
+- **The proven streaming queue is repointed to the Studio:** `tools/studio-transcribe-queue.py` (a copy of the M3's `m3-transcribe-queue.py`, M3 original untouched). The M1 ffmpeg-demuxes Dropbox media → ships a small wav → Studio runs whisper-cli → `.md` transcript back to `working/deep-extraction/ss-media-transcripts/` (`node: m2-studio`). Idempotent (shares the ~1,774-done dedup), load-guarded.
+- **⚠️ LIVE as of 2026-06-17 ~02:25:** a full backlog run is GRINDING (`python3 tools/studio-transcribe-queue.py 1440`, detached nohup, 24h deadline, ~551 pending). **Check it:** `tail -f working/_logs/studio-transcribe-queue.log` · **Stop:** `touch working/_locks/studio-transcribe-queue.stop`. If it's still running when you read this, leave it; if done, the transcripts are in `ss-media-transcripts/`.
+- **Speed (measured, clean, same file+model):** M2 Studio ~1.7× the M1 Max and ~5.5× the (offline) M3 at Whisper; ~26× realtime. Detail: `working/handoffs/2026-06-17-m2-vs-m3-whisper-benchmark.md`.
+- ⚠️ The Dropbox CloudStorage mount was re-linked (`Dropbox-Adriantaffinder/Adrian Taffinder` → `Dropbox/`); the studio queue remaps paths transparently. 83 list entries point at the old structure (unreachable, flagged, not blocking).
+
 ## 7. Hard-won lessons (don't relearn these)
 - Verify-before-trust pays: caught agy doctrine-bleed, an overclaimed 2.6×, a port-conflict 500, and a q8-KV slowdown — all by measuring/checking, not assuming.
 - `find ~` on the Studio stalls (iCloud dataless traversal) — use targeted paths over SSH, never `find ~`.
