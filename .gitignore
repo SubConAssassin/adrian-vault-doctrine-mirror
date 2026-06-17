@@ -60,3 +60,4 @@ Thumbs.db
 .env.symlink
 .env
 infrastructure/n8n/.env
+working/house-design/blends/*.blend
