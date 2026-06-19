@@ -1,0 +1,5 @@
+- [205pts] Show HN: Trace – Offline Mac meeting transcripts you can flag mid-call  (https://traceapp.info)
+- [93pts] Show HN: Formally verified polygon intersection – Opus 4.8 oneshots, prev failed  (https://github.com/schildep/verified-polygon-intersection)
+- [36pts] Company behind GLiNER model released open source model for running LLM guardrail  (https://pioneer.ai/blog/gliguard-16x-faster-safety-moderation-with-a-small-language-model)
+- [31pts] Show HN: Codiff, a local diff review tool  (https://github.com/nkzw-tech/codiff/releases)
+- [174pts] Show HN: Onit – Source-available ChatGPT Desktop with local mode, Claude, Gemini  (https://github.com/synth-inc/onit)
