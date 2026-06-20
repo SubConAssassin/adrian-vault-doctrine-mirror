@@ -19,11 +19,16 @@ Adrian is in Sayan/Ubud (and the Studio sits in the spare/dry room). Hot ambient
 - **Terminal:** `ssh studio` (alias in `~/.ssh/config` on the MacBook → `subconm2@192.168.1.65`, key `~/.ssh/id_ed25519`). Also reachable on **.53** (dual-homed Wi-Fi+Ethernet). Passwordless.
 - **GUI / full desktop:** double-click **`~/Desktop/Mac Studio Screen.inetloc`** (or Finder → Connect to Server → `vnc://192.168.1.65`). Screen Sharing is enabled + authorized for all users.
 - **Credentials (if ever needed):** macOS user `subconm2`, password `Kian2000`. ⚠️ username is **lowercase** `subconm2`; the *computer name* is `SubConm2` — do not confuse them (cost an hour this session).
-- **IPs are DHCP** (.65 / .53) — if they change, re-find via `nc -z` port-22 scan + `ssh subconm2@<ip>`. **TODO (needs Adrian):** Tailscale login on the Studio for a stable name.
+- **IPs are DHCP** (.65 / .53) — if they change, re-find via `nc -z` port-22 scan + `ssh subconm2@<ip>`. **Tailscale is now LIVE (2026-06-19):** stable mesh IPs **M2 `100.67.6.112` / M1 `100.103.106.14`** — M2 mounts M1's vault over Tailscale SMB. Prefer the Tailscale IPs over DHCP.
 
 ## 3. Local LLM — the grind engine (LIVE + TUNED)
 - **Ollama runs as a persistent 24/7 LaunchAgent** `com.adrianvault.ollama` (survives reboot: RunAtLoad + KeepAlive). Config: **`OLLAMA_FLASH_ATTENTION=1` + `OLLAMA_NUM_PARALLEL=4`** + `OLLAMA_HOST=0.0.0.0:11434` (LAN-reachable, OpenAI-compatible API).
-- **Models pulled:** `qwen2.5:14b` (primary, ~9GB) + `nomic-embed-text` (embeddings). Secondary `qwen2.5:32b` recommended for quality passes (not pulled yet). For *heavy/fast* corpora consider `qwen2.5:7b` (~2× faster, slight quality trade).
+- **Models (updated 2026-06-20 — M2-Claude researched, Grok-verified):**
+  - **PRIMARY: `qwen3.5:9b`** (6.6GB, ~35–50 tok/s, native vision, 201 langs, tool-calling) — replaces `qwen2.5:14b`. Direct upgrade: smaller footprint, better quality, faster. Use `/no_think` prefix in prompts for batch/extraction work (disables reasoning mode, saves tokens).
+  - **EMBEDDINGS: `bge-m3`** (1.2GB, 8K ctx, 100+ langs) — already pulled; replaces `nomic-embed-text` for multilingual/long-transcript corpus. Query prefix: `Represent this sentence for searching relevant passages: `
+  - **VISION sidecar: `moondream`** (1.7GB) — still present; for photo captioning pipeline.
+  - **KEPT for now: `qwen2.5:14b`** (9GB) — can remove once `qwen3.5:9b` validated at scale (saves 9GB disk). Runner-up: `qwen3.5:35b` (MoE, 24GB) for overnight-only quality passes when Blender/Whisper not loaded.
+  - **Speed boost (pending):** `export OLLAMA_MLX=1` before `ollama serve` restart unlocks Apple MLX acceleration — requires restarting the LaunchAgent; defer until a maintenance window.
 - **Endpoint test:** `curl -s http://192.168.1.65:11434/api/tags`. Only **ONE** `ollama serve` should run — if you ever see `bind: address already in use`, kill all (`pkill -9 -f ollama`) and `launchctl load ~/Library/LaunchAgents/com.adrianvault.ollama.plist`.
 - **Grind harness:** `tools/studio-grind.py [LIMIT]` — MacBook reads corpus text files, pushes to the Studio endpoint (4-wide concurrent), saves JSON. **Data stays on the MacBook; only inference runs on the Studio (no copy).** Idempotent. Reusable on any corpus (edit SRC_DIR/SYS prompt).
 
@@ -41,7 +46,7 @@ Adrian is in Sayan/Ubud (and the Studio sits in the spare/dry room). Hot ambient
 - **Antigravity:** sustained build/extraction via the PROVEN FEEDER (`working/_feeder/tasks/` + `ag-feeder.py --until`), never a one-shot bounce.
 
 ## 6. What's pending (hand to Adrian / next session)
-1. **Adrian, ~30s each:** `claude /login` on the Studio (unlocks headless 2nd pool) · Tailscale login on the Studio · review/approve the 8 drafts.
+1. **Adrian, ~30s each:** `claude /login` on the Studio (unlocks headless 2nd pool) · review/approve the 8 drafts. *(Tailscale login — DONE 2026-06-19.)*
 2. **8 SS/Mastermind/Ashta drafts** in `working/drafts-pending/2026-06-16-*.md` (verified clean) — each is a draft + apply-ready patch; the code ones need applying via AG-IDE or Claude-direct after Adrian approves.
 3. **Doctrine correction needed:** `delegation-first §10.3` / `hive-architecture-v3` still reference an "M1 Ultra incoming" — that purchase was **CANCELLED**; the M2 Studio (this node) is the real second node now. Update those references.
 4. **Studio corpus-grind at scale:** the full Dropbox image corpus (14k images) needs OCR-first (qwen is text-only) — a next-phase pipeline; the 876 already-extracted notes were classified this session (`working/deep-extraction/dropbox-classified-2026/`, 682 OSB / 172 Ashta / 2 SS / 1 AGA).
