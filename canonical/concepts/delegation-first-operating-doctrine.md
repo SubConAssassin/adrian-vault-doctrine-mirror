@@ -211,11 +211,23 @@ High-stakes → **≥2 independent-family confirmations before promotion** (§8)
 
 **Adrian:** *"There's no reason why we can't put all the same stuff to all of the CLIs for responses equally and then rotate their answers between them so they can audit each other to improve the quality of the information. That's the filtering system for you to get all the best quality information so it reduces your amount of thinking and homework."*
 
-### §12.1 — The equal-weight rule
+### §12.1 — The proportional-weight rule (Adrian-direct 2026-06-24)
 
-**All three flat-rate CLIs (agy · grok · codex) are equal-weight research engines.** The implicit "agy first, grok second, codex rarely" routing hierarchy is retired. Codex (ChatGPT Plus/Pro CLI) has been chronically under-utilised — zero watchdog kills in the June audit vs 18 (grok) and 7 (agy). It is a full flat-rate subscription, never throttled once, carrying available capacity we are not burning.
+**All three flat-rate CLIs serve every research task, but batch distribution is proportional to each engine's token pool** — not equal. Confirmed subscription tiers and relative capacities:
 
-**The default research invocation is now `council-ask.sh`**, not `cli-ask.sh agy`. When a research task clears the §7.0 local pre-pass (no firewall hit, not faster direct, not ≥3 constraint interplay), `council-ask.sh` is the standard call.
+| Engine | Subscription | Relative capacity | Batch share | Council-ask share |
+|--------|-------------|-------------------|-------------|-------------------|
+| agy | Gemini Ultra $200 = 20× | Largest (~30M+ tokens/day) | **~60%** | 1/3 (equal — triangulation) |
+| grok | SuperGrok Standard | Medium | **~30%** | 1/3 |
+| codex | ChatGPT Plus $20 = 1× base | Smallest (base tier) | **~10%** | 1/3 |
+
+**Two modes — different distribution rules:**
+- **council-ask (triangulation):** 1:1:1 — always send the same question to all three. The value is independent perspectives; pool size is irrelevant.
+- **council-saturate (batch distribution):** 6:3:1 — agy gets the most chunks, codex the fewest. Route proportionally so each engine approaches its pool ceiling at roughly the same time.
+
+**Upgrade trigger:** the first time codex throttles on Plus, upgrade to Pro $100 (5×). Do not upgrade before that — we haven't saturated the base tier yet. June audit: 0.05% of agy capacity used; zero throttles on any engine across 19 days.
+
+**The default research invocation is `council-ask.sh`**, not `cli-ask.sh agy`. When a research task clears the §7.0 local pre-pass (no firewall hit, not faster direct, not ≥3 constraint interplay), `council-ask.sh` is the standard call.
 
 ### §12.2 — What council-ask.sh does
 
