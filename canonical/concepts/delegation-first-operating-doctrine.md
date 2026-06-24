@@ -207,7 +207,63 @@ High-stakes → **≥2 independent-family confirmations before promotion** (§8)
 
 ---
 
+## §12 — THE COUNCIL-ASK DEFAULT (Adrian-direct 2026-06-24)
+
+**Adrian:** *"There's no reason why we can't put all the same stuff to all of the CLIs for responses equally and then rotate their answers between them so they can audit each other to improve the quality of the information. That's the filtering system for you to get all the best quality information so it reduces your amount of thinking and homework."*
+
+### §12.1 — The equal-weight rule
+
+**All three flat-rate CLIs (agy · grok · codex) are equal-weight research engines.** The implicit "agy first, grok second, codex rarely" routing hierarchy is retired. Codex (ChatGPT Plus/Pro CLI) has been chronically under-utilised — zero watchdog kills in the June audit vs 18 (grok) and 7 (agy). It is a full flat-rate subscription, never throttled once, carrying available capacity we are not burning.
+
+**The default research invocation is now `council-ask.sh`**, not `cli-ask.sh agy`. When a research task clears the §7.0 local pre-pass (no firewall hit, not faster direct, not ≥3 constraint interplay), `council-ask.sh` is the standard call.
+
+### §12.2 — What council-ask.sh does
+
+Three phases, all standard `cli-ask.sh` infrastructure:
+
+**Phase 1 — Fan out (parallel):** identical prompt → agy + grok + codex simultaneously.
+
+**Phase 2 — Cross-audit (parallel, rotated):** each engine audits a *different* engine's output:
+- agy audits codex
+- grok audits agy
+- codex audits grok
+
+Each auditor marks claims [CONFIRMED], [UNCERTAIN], or [REFUTED] with citations. Cross-examination surfaces errors blind-spotted in any single engine.
+
+**Phase 3 — Synthesis manifest:** writes `council-synthesis.md` to a timestamped outdir:
+- **Consensus** = items ≥2 engines agreed on AND no auditor [REFUTED] → high-confidence, promote directly
+- **Divergences** = disagreements or auditor flags → Claude reviews only these
+- Raw output paths for any deep-read
+
+`council-ask.sh` returns the path to the synthesis file. **Claude reads the synthesis, not all six raw files.** That is how this reduces Claude's research burden.
+
+### §12.3 — When to use council-ask vs single-engine
+
+| Use `council-ask.sh` | Use `cli-ask.sh` (single-engine) |
+|---|---|
+| Any research question where quality > raw speed | Quick bounded lookups (one fact, one file path) |
+| Multi-source factual synthesis | Fire-and-forget extraction jobs (no audit needed) |
+| Anything Claude would previously search + think about | Time-critical with <2min tolerance |
+| Tasks where engine disagreement is informative | Tasks with a known-correct deterministic answer |
+
+### §12.4 — Throttle as success metric
+
+Council-ask triples throughput on each flat-rate subscription vs the current single-engine default. Reaching the hourly cooldown on any engine is the goal — it means maximum value extracted before the reset. Report when any engine throttles; that is a milestone, not a failure.
+
+### §12.5 — Claude's new research posture
+
+1. Frame the question + write the prescriptive prompt (§6)
+2. Fire `council-ask.sh "PROMPT"` — one Bash call
+3. Read `council-synthesis.md` (~20% of raw output volume)
+4. Apply firewall + judgment to the consensus
+5. Report to Adrian
+
+Steps 2–3 replace everything Claude used to do manually (search, read multiple sources, cross-check, synthesise). **Claude is a question-framer and verdict-giver, not a researcher.**
+
+---
+
 revision_history:
+- 2026-06-24 — §12 added (Adrian-direct): Council-Ask becomes the default research invocation; all three flat-rate CLIs equal-weight; `council-ask.sh` (fan-out → cross-audit rotation → synthesis manifest) is the standard call replacing ad-hoc single-engine dispatch. Forensic audit confirmed codex had zero kills vs 18 grok/7 agy — chronic under-use resolved by doctrine.
 - 2026-06-16 — §11.1 / §4 / §2.4 CORRECTED (Adrian-direct): the `cli-ask codex` CLI is FLAT-RATE on Adrian's ChatGPT Plus/Pro SUBSCRIPTION, NOT metered — the prior "codex token-METERED since 2026-04-02" claim was wrong and is scratched. ALL THREE `cli-ask` CLIs (agy/grok/codex) are subscription/flat-rate → hit them with all the work, to the throttle ceiling. ONLY the `ask-chatgpt.py` / `ask-grok.py` API scripts cost real money. Acted on it same session: ran grok + codex in parallel (strided) on `tools/manifest-classify-grind.py`.
 - 2026-06-14 — §11 added (Adrian-direct, infrastructure-for-scale session): the THROTTLE-CEILING LAW — flat-rate subs (agy · grok CLI · ChatGPT Pro web · SuperGrok web) pushed to their natural hourly cooldown, redundantly, as a leverage/success metric; metered surfaces (ask-*.py APIs + codex CLI) stay one-shot; reconciles §10.1's "ChatGPT/Grok sparing" to the METERED path only. Redundant multi-engine triangulation for statistical efficacy (`tools/council-saturate.sh`). Multi-node throughput target; today bounded by ~10–12 concurrent on the one M1 Max + 2 web bridges, ramping with the fleet.
 - 2026-06-13 — §10 added (Adrian-direct, fleet-economics session): engine economics corrected (Claude + Gemini abundant; ChatGPT/Grok expensive-limited; router AMBER was a stale-cap mis-read — recalibrate, Adrian's lived ~17% weekly wins); delegate-first re-justified (parallelism + comparative advantage, NOT token scarcity); the 2-account multi-pod 64GB fleet + Tailscale + the shared-kernel concurrency PREREQUISITE; the Council-Rotation cross-model research filter codified.
