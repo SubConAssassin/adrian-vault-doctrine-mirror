@@ -37,7 +37,7 @@ Grounded counts, 2026-07-03. "Copies" = physical file rows (duplication is real 
 | 6 | **iCloud Photos — videos** | Apple | 🟢 cloud (metadata) | 9,645 | metadata-only | **L3/L4** (geo + scene) |
 | 7 | **iCloud Photos — stills** | Apple | ⚠️ **uncatalogued** | unknown | unknown | **gap** |
 | 8 | **Seagate "AdriansDrive"** | i7 (external) | 🔴 **OFFLINE** (May snapshot) | 825,757 | 3.0 TB | L0 · **not hashed** |
-| 9 | **M2 "ADRIANS DRI" + "M2-Storage"** | M2 Studio | 🟡 online, **full count pending** | video ~322 catalogued | TBD | partial |
+| 9 | **M2 "ADRIANS DRI" + "M2-Storage"** | M2 Studio | 🟡 online, **counted — ingest pending** | 181,591 + 57,463 | ~4.8 TB | not yet in SSOT DB |
 | 10 | **Facebook** (text posts) | export | n/a | 6,521 posts | text | corpus (separate track) |
 
 **Headline (unified DB, verified):** **1,241,290 catalogued file-copies**, **10.2 TB** of media before dedup. Folding the offline Seagate in raised the real media counts far above what `master-file-index` alone showed — **video 61,966 · audio 12,180 · image 294,161** (vs 23k/8k/164k in the base index). Three honesty flags: (a) the 825k-file Seagate is **only a May snapshot — the drive is not currently mounted**, so it is inventoried but not re-verifiable right now; (b) the **iCloud stills library is not catalogued at all** — only the videos were pulled; (c) **nothing is content-hashed** in the unified view (the only hashes we have are the Dropbox rows inside the May inventory), so cross-drive dedup has not run. All three must be closed before "single source of truth" is literally true.
@@ -100,7 +100,7 @@ The point of the whole ladder: **"give me 10 clips about X"** returns real, safe
 
 **Done / solid:** unified L0 catalogue exists (1,241,290 copies across 8 sources in one DB); L1 at 11.5% of A/V; a real geo+scene seed for 10,468 assets across 612 places; the Librarian dedup/transcribe/verify architecture is fully designed.
 
-**The gaps (in priority order):** (1) close the L0 holes — re-mount + re-verify the offline Seagate, catalogue the iCloud stills, finish the M2 volume walk, and content-hash for dedup (currently 0 hashed); (2) L2/L3/L4 are ~0 for the bulk — this is the multi-week, multi-node grind (~66k unprocessed A/V through speech+soundscape, 294k photos through vision+geo); (3) L5 story layer and the journey map are downstream of that.
+**The gaps (in priority order):** (1) close the L0 holes — re-mount + re-verify the offline Seagate, catalogue the iCloud stills, **ingest the now-counted M2 volumes (ADRIANS DRI 4.0 TB/181,591 files incl. FCP-bundle internals + recycle-bin; M2-Storage 780 GB/57,463 — ~239k files/4.8 TB online, walked but not yet merged; note its name near-matches the offline Seagate — possible backup, hashing will confirm)**, and content-hash for dedup (currently 0 hashed); (2) L2/L3/L4 are ~0 for the bulk — this is the multi-week, multi-node grind (~66k unprocessed A/V through speech+soundscape, 294k photos through vision+geo); (3) L5 story layer and the journey map are downstream of that.
 
 **This is a grind, stated plainly:** transcribing ~66k unprocessed A/V + vision-captioning 294k photos + geo-investigating them is weeks of fleet compute (M2 GPU Whisper + local vision models + CLI enrichment), not a one-session job. What is delivered now is the **map, the unified SSOT DB, and the ladder** — the foundation that makes the grind measurable and resumable. The compute plan is the Librarian architecture extended with the L2–L5 workers.
 
