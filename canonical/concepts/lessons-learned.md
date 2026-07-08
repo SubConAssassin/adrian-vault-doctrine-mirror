@@ -423,3 +423,34 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Tags:** `process-change`, `discovery`, `infrastructure`
 
 ---
+
+**Session:** f899 (m2-ingestion-fleet-aura-clientfile) · **Handoff:** `working/handoffs/2026-07-08-2015-f899-session-ingestion-fleet-aura.md`
+**Date:** 2026-07-08
+**Context:** Found 3 concurrent `node-cloud-pipeline.py` processes on the i7 node and killed 2 as "orphaned duplicates," pattern-matching to a real GPU-contention bug already fixed on M1 earlier the same night.
+**What happened:** The i7 processes weren't accidental duplicates — they were `lane 0`/`lane 2` from a deliberate wrapper script (`run-shard.sh`) running CPU-based `faster-whisper`, not the Metal/`mlx` engine the one-instance-per-node rule was built for. Killed real, working, days-old coverage for no benefit; the wrapper respawned both lanes within the hour.
+**Root cause:** GPU contention (Apple Silicon, `mlx`, unified memory) and CPU parallelism (Intel, multi-core, `faster-whisper`) are different failure classes with opposite correct behavior — one process per node is right for the former, wrong for the latter. Pattern-matched on process count alone instead of checking the actual engine/architecture first.
+**Mitigation / pattern:** Before killing "duplicate" processes on any node, `grep TX_ENGINE`/check `ps` args to confirm what's actually running and on what hardware. Never apply a GPU-contention safety rule to a CPU-based setup without verifying the engine first.
+**Promoted to:** This entry. Standing check before any process-count-based "cleanup" on i7 or any other Intel/CPU-engine node.
+**Tags:** `mistake`, `tool-gotcha`, `infrastructure`
+
+---
+
+**Session:** f899 (m2-ingestion-fleet-aura-clientfile) · **Handoff:** `working/handoffs/2026-07-08-2015-f899-session-ingestion-fleet-aura.md`
+**Date:** 2026-07-08
+**Context:** Writing and running a one-off `mlx_whisper` transcription script on M1 via non-interactive SSH.
+**What happened:** Two chained gotchas. (1) An f-string with a backslash inside the `{}` expression part (`f"...{x.get(\"key\")}"`) is a hard `SyntaxError` on Python <3.12 — crashed the script before it ran at all. (2) After fixing that, `mlx_whisper`'s internal `ffmpeg` subprocess call failed with `FileNotFoundError` — non-interactive SSH's default PATH (`/usr/bin:/bin:/usr/sbin:/sbin`) doesn't include Homebrew's `/opt/homebrew/bin`. The first attempted fix, `export PATH="/opt/homebrew/bin:$PATH"` (prepend), broke the *already-working* `mlx_whisper` import — it changed which `python3` resolved first, and the package was only installed in the other one's site-packages.
+**Root cause:** (1) Basic f-string syntax limit. (2) Prepending to PATH to fix a missing binary can silently shadow a *different* binary (here, `python3`) that was already resolving correctly by PATH-order accident.
+**Mitigation / pattern:** Never nest escaped quotes inside an f-string `{}` — assign to a plain variable first. When a remote non-interactive shell is missing one specific tool but everything else already works, **append** the fix directory to PATH (`$PATH:/new/dir`), never prepend — prepending risks breaking a working interpreter/tool resolution that depends on the existing order.
+**Promoted to:** This entry. Standing pattern for any one-off script deployed to M1/M2/i7 over non-interactive SSH.
+**Tags:** `mistake`, `tool-gotcha`, `infrastructure`
+
+---
+
+**Session:** f899 (m2-ingestion-fleet-aura-clientfile) · **Handoff:** `working/handoffs/2026-07-08-2015-f899-session-ingestion-fleet-aura.md`
+**Date:** 2026-07-08
+**Context:** Shutdown-protocol Step 1 process audit on a resumable batch job (fork-1 speaker diarization, 1,744-file worklist) that had reached the end of its input list.
+**What happened:** The job technically completed (1,744/1,744 lines written) but 350 of those (20%) were `error` entries from a mid-run Dropbox API network outage, not real diarization verdicts — 338 of them consecutive at the tail end, meaning connectivity likely failed partway through and never recovered for the rest of the run. The script's own resumability logic (`done.add(json.loads(l)["audio"])` for every line regardless of verdict) treats error entries as done — a naive re-run would silently skip all 350 forever.
+**Root cause:** "Reached the end of the input list" and "produced real results for every item" are different claims for any resumable job whose done-tracking doesn't distinguish success from failure. Nobody checked the tail of the results for a run of identical failures before this shutdown's process audit.
+**Mitigation / pattern:** For any resumable batch job, before reporting it complete, check the terminal fraction of results for a run of identical failures (not just whether the process reached the end of its input). If the done-tracking logic doesn't distinguish error from success, build a fresh retry-list filtered to error verdicts rather than re-running the whole job (which would just skip them again).
+**Promoted to:** This entry. Standing check for any long-running resumable pipeline job (diarization, transcription, enrichment) before declaring it complete.
+**Tags:** `mistake`, `discovery`, `process-change`, `infrastructure`
