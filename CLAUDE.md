@@ -32,7 +32,8 @@ External research bridge (ChatGPT Pro + SuperGrok subscription content):
   3. `canonical/concepts/delegation-first-operating-doctrine.md` — **the token-spend constitution: delegate-by-default, run the accountant ritual, team does all legwork. §1b MODEL-ROUTING LAW (Adrian-direct 2026-06-12): Fable/Opus = think/prescribe/verify/operator-comms ONLY (deny-by-default allowlist); vision/transcription/extraction/batch/research-legwork NEVER on premium tokens; subagents tier-pinned (haiku scribe / sonnet builder / opus-fable architect+verify); if a session's work is routine, SAY at the start that a cheaper-model window would do.**
   4. `canonical/concepts/claude-ceo-operating-doctrine.md`
   5. `working/handoffs/STATE-OF-STACK.md`
-  6. The relevant `companies/{venture}/ledger.md` for whatever the user is engaging on
+  6. **`working/claude-coordination/`** — inter-Claude channel (2026-06-21). If M2 Claude is active, read `m2-state.md` + `INTENT.md` before dispatching any model-heavy work. Check for M2 findings in `m2-forensic-report.md`. Never stack model loads without checking INTENT.md first.
+  7. The relevant `companies/{venture}/ledger.md` for whatever the user is engaging on
 - **Every-turn delegation gate (the behaviour that kept not firing):** before Claude reads/writes/builds/searches/mines anything beyond a one-shot judgment, run the §7 Decision Gate. Deferrable legwork (research, web research, content, code, extraction, batch, mining) → delegate to the CLI team with a prescriptive prompt (`bash tools/cli-ask.sh agy|grok|codex`). Claude keeps only the decision, the orchestration, and the verify.
 - **Loud Failure:** You MUST halt and report a loud failure if any of the following occur:
   - `AGENTS.md` fails to load.
