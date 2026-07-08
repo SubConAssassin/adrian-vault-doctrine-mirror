@@ -454,3 +454,80 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Mitigation / pattern:** For any resumable batch job, before reporting it complete, check the terminal fraction of results for a run of identical failures (not just whether the process reached the end of its input). If the done-tracking logic doesn't distinguish error from success, build a fresh retry-list filtered to error verdicts rather than re-running the whole job (which would just skip them again).
 **Promoted to:** This entry. Standing check for any long-running resumable pipeline job (diarization, transcription, enrichment) before declaring it complete.
 **Tags:** `mistake`, `discovery`, `process-change`, `infrastructure`
+
+---
+
+**Session:** m2fc (fleet-memory-crisis-and-m1-fix) · **Handoff:** `working/handoffs/2026-07-08-2304-m2fc-session-fleet-memory-crisis-and-m1-fix.md`
+**Date:** 2026-07-06 to 2026-07-08
+**Context:** Overnight fleet-management request from Adrian while a severe M2 memory emergency was already in progress; process audit for what was consuming memory on the Studio.
+**What happened:** Grepped `ps aux` for the literal string "whisper" while auditing for transcription processes and missed `audio-tx-mlx.py` (the real `com.adrianvault.m2-audio` daemon), leading to an incorrectly reported "zero overnight output" for the Studio — corrected once found by cross-referencing `launchctl list | grep adrianvault` against running processes.
+**Root cause:** Assumed a technology name (whisper) would appear in the process name/args rather than checking the actual launchd label/script name first.
+**Mitigation / pattern:** When auditing for a category of process, get the canonical process/script names from `launchctl list | grep <namespace>` (or the plist) FIRST, then grep `ps aux` for those exact names — don't guess keywords from the technology involved.
+**Promoted to:** This entry.
+**Tags:** `mistake`, `tool-gotcha`, `infrastructure`
+
+---
+
+**Session:** m2fc (fleet-memory-crisis-and-m1-fix) · **Handoff:** `working/handoffs/2026-07-08-2304-m2fc-session-fleet-memory-crisis-and-m1-fix.md`
+**Date:** 2026-07-06 to 2026-07-08
+**Context:** Chasing the root cause of the Mac Studio's recurring severe memory emergencies (swap exhaustion, mem-guardian stuck in EMERGENCY for hours at a time).
+**What happened:** Measured the two obvious suspects directly instead of assuming: Claude Desktop renderer windows (~1.5-2GB combined) and Ollama (server up but zero models loaded, ~20MB) — neither accounted for the scale of the pressure. A later session confirmed the real cause: the `com.adrianvault.m2-audio` mlx-whisper daemon itself, after long continuous runtime — stopping it dropped swap from 12.48G used to 5.58G in one action.
+**Root cause:** A long-running mlx-based transcription daemon's own memory footprint grows over very long uninterrupted runtimes (this instance ran continuously since Friday) and had not been considered as a candidate because it was seen as "doing real, wanted work" rather than as a resource-audit target.
+**Mitigation / pattern:** On this fleet, a long-running mlx-whisper daemon is a higher-probability memory-pressure cause than the interactive apps (Desktop, browser). Include it explicitly in any memory-pressure triage on Studio or M1, even when it's producing good output — "productive" and "resource-safe" are separate questions.
+**Promoted to:** This entry.
+**Tags:** `discovery`, `infrastructure`
+
+---
+
+**Session:** m2fc (fleet-memory-crisis-and-m1-fix) · **Handoff:** `working/handoffs/2026-07-08-2304-m2fc-session-fleet-memory-crisis-and-m1-fix.md`
+**Date:** 2026-07-06 to 2026-07-08
+**Context:** M1 boot-storm investigation after Adrian asked why M1 was thrashing independently of the Studio's issue.
+**What happened:** M1 had accumulated 3 concurrent `node-cloud-pipeline.py` shards plus its own `audio-tx-mlx.py` all running at once — the identical GPU-contention thrashing bug that was found and fixed on M2 weeks earlier (single-whisper-only rule). The fix was never propagated to M1, which independently re-developed the same failure.
+**Root cause:** A node-class infrastructure bug was treated as fixed once patched on the node where it was first found, without checking whether the same daemon configuration existed on sibling nodes.
+**Mitigation / pattern:** When a node-class bug is fixed on one fleet member, explicitly check and apply the same fix to every other node running the same daemon/pipeline, rather than assuming the bug (or the fix) is specific to the node where it surfaced.
+**Promoted to:** This entry; candidate for a dedicated `canonical/concepts/fleet-operations.md` if one doesn't already exist.
+**Tags:** `discovery`, `process-change`, `infrastructure`
+
+---
+
+**Session:** m2fc (fleet-memory-crisis-and-m1-fix) · **Handoff:** `working/handoffs/2026-07-08-2304-m2fc-session-fleet-memory-crisis-and-m1-fix.md`
+**Date:** 2026-07-06 to 2026-07-08
+**Context:** Investigating M1's severe swap exhaustion and Adrian's separate complaint about a limited M1 token budget.
+**What happened:** Found 126 concurrent Claude Code CLI processes open on M1, accumulated silently over a single day (oldest from before 11am, newest 23 minutes old at time of check) — verified as a real unique-PID count via `pgrep`, not a grep artifact. This was almost certainly the dominant driver of both the memory exhaustion and the token-budget complaint. By the next check, all had been closed and the machine fully recovered (swap ~10GB used → 1.2GB used, load average 76-106 boot-storm range → 5.5).
+**Root cause:** Nothing was periodically auditing concurrent session count on M1; sessions left open silently compound both memory and token cost with no visible warning until the machine is already in distress.
+**Mitigation / pattern:** Periodically check `pgrep -f "claude --output-format" | wc -l` per node, especially on any node reporting unexplained memory pressure or unexpectedly fast token/budget consumption.
+**Promoted to:** This entry.
+**Tags:** `discovery`, `process-change`, `infrastructure`
+
+---
+
+**Session:** m2fc (fleet-memory-crisis-and-m1-fix) · **Handoff:** `working/handoffs/2026-07-08-2304-m2fc-session-fleet-memory-crisis-and-m1-fix.md`
+**Date:** 2026-07-06 to 2026-07-08
+**Context:** Cross-referencing session-count findings between a loose `ps aux | grep -c` pass and a follow-up verification pass on M1.
+**What happened:** An initial loose count (`ps aux | grep -c "claude --output-format"`) returned 128; a precise unique-PID count (`pgrep -f "claude --output-format" | wc -l`) returned 126 — close in this case, but the two methods are not reliably equivalent (grep -c counts matching lines, which can include wrapped/duplicated output; pgrep counts actual distinct processes).
+**Root cause:** `ps aux` output lines are not a 1:1 guarantee with process count under all formatting/terminal-width conditions.
+**Mitigation / pattern:** Use `pgrep -f <pattern> | wc -l` (not `ps aux | grep -c <pattern>`) whenever a process count will be reported as fact to Adrian or logged as a metric.
+**Promoted to:** This entry.
+**Tags:** `tool-gotcha`
+
+---
+
+**Session:** m2fc (fleet-memory-crisis-and-m1-fix) · **Handoff:** `working/handoffs/2026-07-08-2304-m2fc-session-fleet-memory-crisis-and-m1-fix.md`
+**Date:** 2026-07-06 to 2026-07-08
+**Context:** Considering a remote restart of the Mac Studio, which Adrian described as headless, to clear an unresolved memory emergency.
+**What happened:** Checked `fdesetup status` before proposing or executing any remote restart. Found FileVault off on the Studio, meaning a remote restart would boot straight through without stopping at a pre-boot disk-unlock screen. Had it been on, the machine would have been unreachable by both SSH and M1's screen-sharing until someone was physically present with a keyboard.
+**Root cause:** N/A (preventive check, not a mistake this time — logged because the risk is severe and easy to skip under pressure).
+**Mitigation / pattern:** Before any remote restart of a headless or remotely-administered Mac, always check `fdesetup status` first. If FileVault is on, do not restart remotely without confirming an alternative unlock path (remote unlock via MDM, or physical access) exists.
+**Promoted to:** This entry; candidate for a dedicated `canonical/concepts/fleet-operations.md` if one doesn't already exist.
+**Tags:** `process-change`, `infrastructure`
+
+---
+
+**Session:** m2fc (fleet-memory-crisis-and-m1-fix) · **Handoff:** `working/handoffs/2026-07-08-2304-m2fc-session-fleet-memory-crisis-and-m1-fix.md`
+**Date:** 2026-07-06
+**Context:** Searching the vault for the canonical shutdown protocol document as part of this session's own shutdown.
+**What happened:** A `find` for `*shutdown-protocol*` under the vault root returned ~150 matches, the overwhelming majority under `.claude/worktrees/<adjective-scientist-hash>/` — roughly 75-85 distinct worktree directories, each holding what looks like a substantial partial or full checkout of the vault repo (including `canonical/concepts/`).
+**Root cause:** Unknown — not investigated further this session (out of scope for a shutdown). Consistent with accumulated agent-isolation worktrees (e.g. from `isolation: "worktree"` agent/workflow runs) never being cleaned up after use.
+**Mitigation / pattern:** Not yet established. Flagging only — deleting any of these without checking each for uncommitted work first would be destructive and should not be done without Adrian's review.
+**Promoted to:** This entry; action item `vault-worktree-sprawl-audit` opened in the action register.
+**Tags:** `discovery`, `infrastructure`
