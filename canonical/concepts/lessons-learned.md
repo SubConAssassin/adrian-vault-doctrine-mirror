@@ -5,8 +5,8 @@ status: canonical
 tier: 2
 firewall_class: working-internal
 created: 2026-05-04
-updated: 2026-05-04
-last_updated: 2026-05-04
+updated: 2026-07-08
+last_updated: 2026-07-08
 tags: [adrian-os, learning, mitigations, infrastructure]
 related:
   - canonical/concepts/shutdown-protocol.md
@@ -388,5 +388,38 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 5. Review anomaly register with Adrian before running any P&L summary.
 **Promoted to:** This entry. When `canonical/projects/accounting/` workspace is created (by Code), copy this rule into its README as a standing operating principle.
 **Tags:** `process-change`, `discovery`
+
+---
+
+**Session:** m2-ss-launch-window (segment 2) · **Handoff:** `working/handoffs/_claude-bridge/m2-to-m1-2026-07-08-security-and-mastermind-page.md`
+**Date:** 2026-07-08
+**Context:** Fixing a real Supabase RLS-disabled security alert on the SS member-portal DB (`xilyaavgtkgkmcurycai`) from an M2 CLI session (no browser, no Supabase dashboard access).
+**What happened:** The Supabase Management API allowed reads (`relrowsecurity=false` on all 15 tables, confirmed) but the `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` write call hit Cloudflare error 1010 (bot-blocked). Reads then also started 403ing shortly after — the block appeared to widen once flagged as automated traffic.
+**Root cause:** Supabase's Management API sits behind Cloudflare bot-protection that treats scripted/CLI request patterns as suspicious, especially for DDL writes.
+**Mitigation / pattern:** For any Supabase DDL/admin work from a CLI session, skip the Management API entirely and connect directly via Postgres wire protocol (pooler host + project DB password + a pure-Python driver, e.g. `pg8000`, in a throwaway venv). This is both more reliable and the authoritative path for DDL anyway — reserve the Management API for simple reads. Before enabling RLS blind, confirm whether the app connects via an anon/publishable key (if yes, matching policies must exist first or the live app breaks; if the app is owner/service-role-only, RLS can be enabled broadly since that role bypasses it).
+**Promoted to:** This entry. Cite before any future Supabase admin/security work from a CLI session on any venture (SS, Ashta, etc.).
+**Tags:** `process-change`, `infrastructure`, `security`
+
+---
+
+**Session:** m2-ss-launch-window (segment 2) · **Handoff:** `working/handoffs/_claude-bridge/m2-to-m1-2026-07-08-security-and-mastermind-page.md`
+**Date:** 2026-07-08
+**Context:** Needed `pg8000` (pure-Python Postgres driver) to fix the Supabase RLS incident above; system Python on the Mac Studio refused `pip install`.
+**What happened:** `pip install pg8000` failed with PEP 668 "externally-managed-environment"; `psycopg`/`psycopg2` (C-extension drivers) weren't available either.
+**Root cause:** macOS system Python (and Homebrew Python) are externally managed per PEP 668 — direct `pip install` is blocked by design to protect the system interpreter.
+**Mitigation / pattern:** Always spin a throwaway venv (`python3 -m venv <path> && <path>/bin/pip install ...`) for any one-off Python dependency on this machine, rather than fighting it with `--break-system-packages`. Cheap, fully isolated, safe to delete after.
+**Promoted to:** This entry. Standing rule for any ad-hoc Python tooling on the M2 Studio (and likely M1, same macOS constraint).
+**Tags:** `process-change`, `infrastructure`
+
+---
+
+**Session:** m2-ss-launch-window (segment 2) · **Handoff:** `working/handoffs/_claude-bridge/m2-to-m1-2026-07-08-security-and-mastermind-page.md`
+**Date:** 2026-07-08
+**Context:** About to drop a newly-built static Mastermind sales page onto the M1 Next.js repo (`~/Documents/localhost/subconscious-surgery-next`) as "just add a static file."
+**What happened:** Checked branch/status first (habit, not asked) — found `feat/kajabi-enrollment-webhook` with 13 uncommitted modified files across critical routes (dashboard, root layout, both legal pages, the mastermind layout itself, packages, sitemap, middleware, etc.) plus a modified `prisma/dev.db`/`seed.ts`. Deploying into that state risked entangling or clobbering real in-progress work nobody was watching.
+**Root cause:** No pre-deploy check was actually required by tooling — this was caught only because branch/status was checked on habit before writing.
+**Mitigation / pattern:** Always check `git status` and current branch on a deploy target before writing to it or pushing — even for "just a static file" or a change that feels self-contained. Treat this as a hard gate before ANY push/deploy action, not only destructive ones. When the target is dirty, stage the new work elsewhere (as was done here — vault staging + a Claude Artifact for a live preview) and defer the actual on-domain deploy to a clean session.
+**Promoted to:** This entry. Standing pre-deploy gate for all ventures' web repos (SS, Ashta, XMAXED).
+**Tags:** `process-change`, `discovery`, `infrastructure`
 
 ---
