@@ -5,8 +5,8 @@ status: canonical
 tier: 2
 firewall_class: working-internal
 created: 2026-05-04
-updated: 2026-07-08
-last_updated: 2026-07-08
+updated: 2026-07-09
+last_updated: 2026-07-09
 tags: [adrian-os, learning, mitigations, infrastructure]
 related:
   - canonical/concepts/shutdown-protocol.md
@@ -531,3 +531,47 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Mitigation / pattern:** Not yet established. Flagging only — deleting any of these without checking each for uncommitted work first would be destructive and should not be done without Adrian's review.
 **Promoted to:** This entry; action item `vault-worktree-sprawl-audit` opened in the action register.
 **Tags:** `discovery`, `infrastructure`
+
+---
+
+**Session:** 9441 (xmaxed-forensic-panel-fixes) · **Handoff:** `working/handoffs/2026-07-09-2235-9441-session-xmaxed-forensic-panel-fixes.md`
+**Date:** 2026-07-09
+**Context:** Re-investigating an XMAXED 3D configurator's bodywork after a prior automated "completeness audit" wrongly reported the model fully fine, when Adrian was in fact seeing severe visible defects (floating bike, debris, broken headlight, missing panel).
+**What happened:** Chrome pauses `requestAnimationFrame` on hidden/unfocused tabs. A prior sweep agent called a camera-repositioning JS function on a non-frontmost scratch tab, then screenshotted it — the frame was stale because the render loop never ran. The agent had no way to detect this internally and reported full confidence anyway.
+**Root cause:** Browser-level rAF throttling on backgrounded tabs, invisible to a screenshot-based verification step unless specifically guarded against.
+**Mitigation / pattern:** For any visual verification of a just-changed camera/scene state on a tab that might not be frontmost, bypass the app's own rAF loop entirely — build a manual `THREE.WebGLRenderer` on a manually-appended canvas with a manually-positioned camera and call `renderer.render(root, camera)` synchronously on demand. Applies to any Three.js (or similar rAF-driven) app being verified via browser automation.
+**Promoted to:** This entry.
+**Tags:** `tool-gotcha`
+
+---
+
+**Session:** 9441 (xmaxed-forensic-panel-fixes) · **Handoff:** `working/handoffs/2026-07-09-2235-9441-session-xmaxed-forensic-panel-fixes.md`
+**Date:** 2026-07-09
+**Context:** Re-examining a Blender object (`Plane.015`, an XMAXED rear number plate) that had been deleted as presumed debris in the immediately-prior session, after Adrian reported "the rear number plate has been removed for some reason."
+**What happened:** The object had 48 verts fragmented into 11 disconnected loose-part islands and a plain gray material — the same surface signature commonly used to flag debris. But the islands all shared nearly the same X-Y footprint at slightly different Z offsets (a layered flat plate with a raised border), not scattered debris. It was a real, legitimate part; the deletion was wrong.
+**Root cause:** Judging "is this debris?" from vertex-fragmentation/island count alone, without checking whether the islands share a spatial footprint (legitimate layered part) or are scattered at genuinely different locations (real debris).
+**Mitigation / pattern:** Before deleting any Blender object flagged by high island-count, compare each island's world-space X-Y footprint. Same footprint at different Z = legitimate layered/beveled part (keep). Genuinely different locations = real debris (safe to remove). Also cross-check plausible real-world part identity (e.g., a small flat plate near the tail = plausible number plate) before deleting anything.
+**Promoted to:** This entry.
+**Tags:** `mistake`
+
+---
+
+**Session:** 9441 (xmaxed-forensic-panel-fixes) · **Handoff:** `working/handoffs/2026-07-09-2235-9441-session-xmaxed-forensic-panel-fixes.md`
+**Date:** 2026-07-09
+**Context:** Deleting confirmed-debris/wrong-material Blender objects (`HEAD LAMP 1`) from the XMAXED bike model.
+**What happened:** Before deleting `HEAD LAMP 1`, checked for children and found `Cylinder.006` parented to it. Co-deleted both together (after confirming `Cylinder.006` had no grandchildren of its own) rather than deleting the parent alone.
+**Root cause:** A child object's local coordinates are often authored assuming the parent's transform will compensate. Deleting a parent without reparenting or co-deleting its children leaves them with wildly wrong effective positions — and since this app auto-grounds/scales off a whole-scene bounding box, an orphaned child can silently distort the entire rendered model.
+**Mitigation / pattern:** Before deleting any Blender object, check for children (`[c.name for c in bpy.data.objects if c.parent == obj]`). Either reparent with a properly compensated local transform, or delete parent+child together after confirming the subtree is fully accounted for.
+**Promoted to:** This entry.
+**Tags:** `discovery`, `process-change`
+
+---
+
+**Session:** 9441 (xmaxed-forensic-panel-fixes) · **Handoff:** `working/handoffs/2026-07-09-2235-9441-session-xmaxed-forensic-panel-fixes.md`
+**Date:** 2026-07-09
+**Context:** Root-causing the XMAXED bike "floating in mid-air" bug via a 10-agent forensic parts census.
+**What happened:** `app.js` grounded the model by subtracting the whole-scene bounding box's minimum Y from every vertex ("feet on ground"). A single stray fragment anywhere in the hierarchy — in this case, small loose islands left inside `BATOK_UPPER`/`BATOK_LOWER` from an earlier mesh-separate pass, plus an invisible root control plane — silently dragged that minimum ~0.5m below the actual wheels, floating the whole bike.
+**Root cause:** Whole-scene bounding-box grounding has no resilience to stray/leftover geometry anywhere in a large hierarchy; a single small mistake in modeling history becomes a whole-model visual bug.
+**Mitigation / pattern:** Ground rigid-body/vehicle-like models on a purpose-specific sub-box (e.g. wheel/tyre meshes matched by name pattern) rather than the whole-scene bounding box, so the visual result stays correct even if stray geometry is never fully cleaned from the source file. Fixed in both layers here: the app-side grounding logic (robust, permanent) and the source-file cleanup (removes the actual pollution).
+**Promoted to:** This entry.
+**Tags:** `discovery`, `process-change`
