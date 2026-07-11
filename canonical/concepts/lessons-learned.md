@@ -575,3 +575,91 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Mitigation / pattern:** Ground rigid-body/vehicle-like models on a purpose-specific sub-box (e.g. wheel/tyre meshes matched by name pattern) rather than the whole-scene bounding box, so the visual result stays correct even if stray geometry is never fully cleaned from the source file. Fixed in both layers here: the app-side grounding logic (robust, permanent) and the source-file cleanup (removes the actual pollution).
 **Promoted to:** This entry.
 **Tags:** `discovery`, `process-change`
+
+---
+
+**Session:** e65c (xmaxed-racing-game v86–v101) · **Handoff:** `working/handoffs/2026-07-11-0235-e65c-session-xmaxed-racing-game-v101.md`
+**Date:** 2026-07-11
+**Context:** Placing horizon/backdrop geometry (volcanoes) around a 3D race track.
+**What happened:** Gunung Agung's cone was placed by how it looked from the cameras rendered that day; its base radius quietly crossed the track's shutdown area, so past the finish line the bikes rode INSIDE the mountain slope ("glitches with the person inside the hill").
+**Root cause:** Set-dressing was validated against camera views, not against the full play corridor the actors traverse.
+**Mitigation / pattern:** Any large ground-standing backdrop mesh gets a clearance check of its base footprint against the ENTIRE playable corridor (start → shutdown end, full width), not the frames you happened to render. One distance-vs-base-radius comparison per object.
+**Promoted to:** This entry.
+**Tags:** `mistake`
+
+---
+
+**Session:** e65c (xmaxed-racing-game v86–v101)
+**Date:** 2026-07-11
+**Context:** Runtime suspension animation on a GLB whose root carries a diagonal CAD orientation.
+**What happened:** Suspension pitch was applied as `rotation.x` on a group whose LOCAL frame was still the raw CAD diagonal (~150° yaw off) — the state values (mm of squat) read perfectly while the RENDER showed ~87% inverted pitch plus parasitic roll. Caught by an adversarial review agent, not by the state-number verification.
+**Root cause:** Verifying the simulation state without probing the rendered world-space attitude; local-frame rotations on CAD-oriented nodes don't mean what the variable names suggest.
+**Mitigation / pattern:** When animating orientation on imported-CAD subtrees: carry the corrective yaw on the SAME node with rotation order 'YXZ' so pitch is about the true lateral axis — and always add a world-space attitude probe (quaternion → world euler) to the debug surface; assert pitch/roll in WORLD axes, never trust internal state alone.
+**Promoted to:** This entry.
+**Tags:** `mistake`, `process-change`
+
+---
+
+**Session:** e65c (xmaxed-racing-game v86–v101)
+**Date:** 2026-07-11
+**Context:** Mounting a procedural rider (avatar) onto the bike model.
+**What happened:** Rider seat height came from the seat group's bounding-box top and grip positions from constants — on the XMAX's STEPPED seat the bbox top is the PILLION hump, ~8cm above the rider pad, so the rider's backside and hands floated by the same margin.
+**Root cause:** Bounding boxes lie on stepped/compound shapes; constants inherit the reference error; contact was verified from a rear camera where the gap is invisible.
+**Mitigation / pattern:** Anchor avatars/props by MEASURING the actual geometry at build time (per-vertex sampling of the specific contact region; locate hardware like handlebars geometrically) with sane fallbacks — and verify contact from an angle that can actually show the gap (side-ish profile), numbers first, screenshot second.
+**Promoted to:** This entry.
+**Tags:** `mistake`
+
+---
+
+**Session:** e65c (xmaxed-racing-game v86–v101)
+**Date:** 2026-07-11
+**Context:** Racing bikes cloned from a configurator model authored parked on its centre stand.
+**What happened:** The race hid the stand meshes but the rear wheel stayed 6.7cm off the deck (measured: front 0.000/rear 0.067) — a centre stand lifts the rear wheel, and that lift is baked into the authored pose. Grounding on the combined tyre minimum planted the front and left the rear floating, shadow gap included.
+**Root cause:** Hiding a prop does not undo the pose the prop created; combined-min grounding assumes both contact patches are coplanar in the source.
+**Mitigation / pattern:** Parked-pose CAD must be re-POSED for motion: pitch about the planted contact patch until every tyre lands (iterate to <5mm — single-shot angles from box centres over/undershoot by the patch-vs-axle error, and apply the pitch as a WORLD-frame quaternion, see the CAD-diagonal lesson above). Instrument it: per-axle ground-clearance probe + an audit assertion (≤2cm) so the class can never ship silently again.
+**Promoted to:** This entry.
+**Tags:** `mistake`, `process-change`
+
+---
+
+**Session:** e65c (xmaxed-racing-game v86–v101)
+**Date:** 2026-07-11
+**Context:** Multi-session parallel development on one repo (three M2 windows interleaving commits).
+**What happened:** A parallel session legitimately grew the finish-picker colour catalog 8→24 swatches; this session's audit then failed on a hardcoded `sw.length === 8`. The fail surfaced amid genuinely flaky camera-timing checks, so triage cost real time before reading the assertion itself.
+**Root cause:** Audit assertions written as magic numbers encode a snapshot of content, not an invariant — any sibling session's valid content growth breaks them.
+**Mitigation / pattern:** Write audit assertions against invariants or the live catalog (`>= minimum`, or read the source-of-truth length), never frozen literals. Triage order for a "new" audit fail under parallel development: clean-reload rerun → read the failing CHECK's assertion → check `git log` for sibling-session commits — BEFORE suspecting your own diff.
+**Promoted to:** This entry.
+**Tags:** `process-change`, `discovery`
+
+---
+
+**Session:** m2xg7 (xmaxed-model-integrity, v92–v97 + colour catalog)
+**Date:** 2026-07-11
+**Context:** Deleting geometry from a purchased CAD asset based on its material looking wrong.
+**What happened:** "Wrong-looking material" was mistaken for grounds to delete geometry three separate times on one asset — a rear number plate, front-cowl mirror halves, and (inherited from a prior session, fixed this one) the entire headlight fascia housing. In every case the material was fixable and the geometry was load-bearing (the visible surface itself).
+**Root cause:** A visually-off material or an oversized-looking bounding box gets diagnosed as "junk" without checking whether the mesh is actually the visible surface, from every angle, first.
+**Mitigation / pattern:** Before deleting any named object over ~50 vertices: check dead-front AND dead-rear with an unmissable emissive marker. If the material looks wrong, fix the material — deletion is reserved for geometry confirmed fully occluded from every exterior angle.
+**Promoted to:** This entry.
+**Tags:** `mistake`, `process-change`
+
+---
+
+**Session:** m2xg7 (xmaxed-model-integrity, v92–v97 + colour catalog)
+**Date:** 2026-07-11
+**Context:** A runtime heuristic (per-vertex "wholeness" threshold) deciding whether a mesh already had both left/right halves before allowing a display-time mirror clone.
+**What happened:** A threshold tuned to catch over-mirrored (already-whole) panels also misclassified a genuine, still-one-sided left/right cowl pair as "already whole," silently dropping its mirror and opening a new hole the user hadn't seen before.
+**Root cause:** A single numeric threshold can't distinguish "this panel is whole" from "this panel happens to cross the centreline" without a structural check for geometry actually present on both named sides.
+**Mitigation / pattern:** For panels that are genuinely ambiguous at the centreline, fix the SOURCE (mirror-join once, in the asset) rather than trying to make a runtime heuristic smarter — durable, not another threshold to tune later. Separately: `Box3.setFromObject()`'s corner-derived centre diverges from a mesh's true vertex-sampled centre whenever the object sits under a non-uniformly-scaled, rotated-child transform hierarchy — this silently tilts any derived symmetry/centreline plane. Any code deriving "is this centred / one-sided" on such an asset must sample real vertex positions, never a Box3 corner centre.
+**Promoted to:** This entry.
+**Tags:** `mistake`, `discovery`, `process-change`
+
+---
+
+**Session:** m2xg7 (xmaxed-model-integrity, v92–v97 + colour catalog)
+**Date:** 2026-07-11
+**Context:** Two Claude sessions editing the same working directory (not separate git worktrees) on one repo.
+**What happened:** This session's uncommitted finish-line-camera edits were sitting on disk when a concurrent session (e65c) committed its own, unrelated centre-stand fix — both ended up inside one commit, under a message describing only the concurrent session's half. Nothing was lost (verified by grep after the fact), but `git log` alone gave a wrong picture of the commit's scope.
+**Root cause:** Shared working directory + no coordination signal between sessions means whoever commits next silently sweeps up whatever the other left uncommitted.
+**Mitigation / pattern:** Builds on the existing parallel-session lesson (2026-07-11, e65c: check `git log`/read the failing assertion before suspecting your own diff). This is the mirror case: read the actual diff of any commit on a shared-directory repo before assuming its message describes everything it contains, especially when 2+ sessions are known to be active.
+**Promoted to:** This entry.
+**Tags:** `tool-gotcha`
