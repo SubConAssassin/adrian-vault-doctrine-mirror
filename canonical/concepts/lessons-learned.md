@@ -5,8 +5,8 @@ status: canonical
 tier: 2
 firewall_class: working-internal
 created: 2026-05-04
-updated: 2026-07-09
-last_updated: 2026-07-09
+updated: 2026-07-12
+last_updated: 2026-07-12
 tags: [adrian-os, learning, mitigations, infrastructure]
 related:
   - canonical/concepts/shutdown-protocol.md
@@ -663,3 +663,25 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Mitigation / pattern:** Builds on the existing parallel-session lesson (2026-07-11, e65c: check `git log`/read the failing assertion before suspecting your own diff). This is the mirror case: read the actual diff of any commit on a shared-directory repo before assuming its message describes everything it contains, especially when 2+ sessions are known to be active.
 **Promoted to:** This entry.
 **Tags:** `tool-gotcha`
+
+---
+
+**Session:** sonn (xmaxed-carbon-cvt-realengine-reject)
+**Date:** 2026-07-12
+**Context:** Fetching genuine-part reference photography for 3D modeling work; parts-catalog sites (easyparts.com, cmsnl.com) return HTTP 403 to both `WebFetch` and raw `curl`.
+**What happened:** eBay listing pages also can't be curled directly, but the CDN image URLs eBay serves the actual product photos from (`i.ebayimg.com/images/g/...`) ARE directly curl-fetchable — no page load or auth needed for the image asset itself.
+**Root cause:** Bot-detection on parts sites gates the HTML page, not the downstream CDN asset host — the two are different origins with different protection.
+**Mitigation / pattern:** For any future real-part reference-photo harvest: navigate the listing page via the Browser pane (which renders past the bot-gate), collect `img.src` values matching the CDN host pattern from the live DOM, then `curl` those CDN URLs directly rather than retrying WebFetch/curl on the listing page itself.
+**Promoted to:** This entry.
+**Tags:** `discovery`, `tool-gotcha`
+
+---
+
+**Session:** sonn (xmaxed-carbon-cvt-realengine-reject)
+**Date:** 2026-07-12
+**Context:** Rebuilding a scooter engine's 3D cutaway from verified web-sourced dimensions (bore, stroke, valve sizes) after the client rejected a purely procedural build as "not remotely realistic."
+**What happened:** A second, dimensionally-correct procedural rebuild (real bore/stroke, real port/flange positions, real internals) was rejected again — "still doesn't remotely look like an X-Max engine."
+**Root cause:** Dimensional correctness and casting-language correctness are separate problems. An organic cast part's webbing, boss shapes, and surface texture cannot be parameterized from primitives no matter how accurate the underlying measurements are — only photo-matched modeling reproduces them.
+**Mitigation / pattern:** Before committing to procedurally model any organic cast/machined real-world part (engine block, head, case), first ask "do I have a photograph of this specific part" — not just "do I have its dimensions." If no photo reference exists, either source one (see the eBay-CDN lesson above) or set client expectations that the result will read as a schematic, not a replica. Client set a standing product rule from this: the feature ships only when it passes a "does this read as the real part" bar, not a "are the numbers right" bar.
+**Promoted to:** This entry.
+**Tags:** `mistake`, `process-change`
