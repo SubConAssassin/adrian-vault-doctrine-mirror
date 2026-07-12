@@ -1,0 +1,8 @@
+- [216pts] Show HN: Smart model routing directly in Claude, Codex and Cursor  (https://github.com/workweave/router)
+- [119pts] Launch HN: Context.dev (YC S26) – API to get structured data from any website  (https://www.context.dev)
+- [93pts] Show HN: Formally verified polygon intersection – Opus 4.8 oneshots, prev failed  (https://github.com/schildep/verified-polygon-intersection)
+- [83pts] Show HN: I mapped 8.5M research papers into an interactive atlas  (https://tomesphere.com/atlas)
+- [66pts] Show HN: Frugon – Find which LLM calls a cheaper model could handle (local, MIT)  (https://github.com/Rodiun/frugon)
+- [53pts] Show HN: GolemUI – Declarative Form Engine  (https://golemui.com)
+- [24pts] Ask HN: What was the last task where only a frontier model could do it?  (https://news.ycombinator.com/item?id=48863171)
+- [174pts] Show HN: Onit – Source-available ChatGPT Desktop with local mode, Claude, Gemini  (https://github.com/synth-inc/onit)
