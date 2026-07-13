@@ -685,3 +685,174 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Mitigation / pattern:** Before committing to procedurally model any organic cast/machined real-world part (engine block, head, case), first ask "do I have a photograph of this specific part" — not just "do I have its dimensions." If no photo reference exists, either source one (see the eBay-CDN lesson above) or set client expectations that the result will read as a schematic, not a replica. Client set a standing product rule from this: the feature ships only when it passes a "does this read as the real part" bar, not a "are the numbers right" bar.
 **Promoted to:** This entry.
 **Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-13-001 [mistake, process-change] — MLX memory leak from missing cache clear
+
+**Session:** 2ecf (pipeline-forensic-audit-and-attribution-incident) · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-09
+
+**Context:** M2's mlx-whisper daemon (`audio-tx-mlx.py`) found in a live memory emergency (69MB physical free) after ~58h uptime.
+
+**What happened:** The daemon's per-file loop never called `mx.clear_cache()` after each `mlx_whisper.transcribe()`, so MLX's internal memory pool grew unbounded — 24GB footprint from an expected ~3-4GB baseline.
+
+**Root cause:** MLX (Apple's array framework) does not automatically release its internal buffer cache between calls; this must be done explicitly per iteration for any long-running loop.
+
+**Mitigation / pattern:** Any long-running mlx_whisper (or other MLX-based) processing loop must call `mx.clear_cache()` in a `finally:` block after every unit of work, not just on exit. Verified via direct before/after footprint measurement, not just "no more crashes" — the same daemon had been "fixed" once before by restart alone without addressing the root cause.
+
+**Promoted to:** This entry.
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-13-002 [tool-gotcha] — Claude Code scheduled tasks require the app to stay resident
+
+**Session:** 2ecf · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-09
+
+**Context:** Built a Claude Code *scheduled task* (`m2-overnight-safety-check`, every 20min) as an overnight memory-emergency safety net while Adrian slept with screen-sharing off.
+
+**What happened:** It never fired once in ~9 hours — no `lastRunAt`, same "23 min" nextRunAt on recheck as at creation. The memory emergency recurred and was only caught by Adrian's own manual check-in.
+
+**Root cause:** The scheduled-tasks feature appears to require the Claude Code app itself to remain resident/foregrounded to fire; it is not a true OS-level cron equivalent.
+
+**Mitigation / pattern:** For anything that MUST run unattended overnight regardless of app state, use a real `launchd` agent (`StartInterval`, independent binary/script) — not a Claude Code scheduled task. Built `com.adrianvault.m2-mem-watchdog` as the replacement; confirmed working across multiple full overnight windows since.
+
+**Promoted to:** This entry.
+
+**Tags:** `tool-gotcha`, `process-change`
+
+---
+
+### LL-2026-07-13-003 [mistake, process-change] — launchd kills sustained daemons declared ProcessType Background
+
+**Session:** 2ecf · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-10
+
+**Context:** M1's transcription shard was crash-looping every ~2.5 minutes for days, reprocessing the same handful of files with no visible error.
+
+**What happened:** macOS's own unified log (`log show --predicate 'process == "launchd"'`) showed the true cause: `Successfully spawned python3[...] because inefficient` — launchd's efficiency governor was killing the process for violating its declared resource class. All FOUR transcription daemons fleet-wide (M2, M1, mini, i7-audio) had `ProcessType: Background` set in their plists — appropriate for a lightweight idle-friendly task, wrong for a sustained CPU/GPU transcription workload.
+
+**Root cause:** `ProcessType: Background` + `Nice` in a launchd plist puts the process under macOS App Nap / efficiency throttling, which can periodically kill processes judged to be using resources inconsistently with that declared class.
+
+**Mitigation / pattern:** Set `ProcessType: Standard` for any launchd-managed daemon doing sustained real compute (transcription, rendering, heavy CPU/GPU work). Diagnostic pattern worth keeping generally: when a process crash-loops with NO application-level error, check `log show` filtered to `process == "launchd"` for the actual spawn/kill reason before assuming a code bug.
+
+**Promoted to:** This entry.
+
+**Tags:** `mistake`, `discovery`, `process-change`
+
+---
+
+### LL-2026-07-13-004 [mistake, process-change] — Filename collision destroyed every WAV-source transcription job, silently, forever
+
+**Session:** 2ecf · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-12
+
+**Context:** After fixing the ProcessType issue, M1 still crashed cleanly (no traceback) on one specific `.WAV` source file every cycle, right after finishing an unrelated file.
+
+**What happened:** `node-cloud-pipeline.py`'s intermediate download path was `claim_key(stem) + ".wav"`. For any source file whose extension was `.WAV`/`.wav`, this intermediate path resolved to THE SOURCE'S OWN FILENAME on case-insensitive APFS — ffmpeg was told to write its output over the file it was still reading, and died instantly with no useful error surfaced to the pipeline's own logging. Every wav-source recording this pipeline had EVER attempted (an unknown but likely large fraction of the historic ffmpeg-fail skip list) had silently failed this exact way since the script's inception.
+
+**Root cause:** Deriving an intermediate filename from the source stem without checking for collision against the source's own on-disk name, combined with case-insensitive filesystem semantics on macOS.
+
+**Mitigation / pattern:** Give intermediate/derived files in any pipeline a suffix that cannot collide with a plausible source extension (used `.16k.wav`). More generally: when a "mysterious silent failure" only affects one file *type* consistently, suspect a naming/path collision before suspecting the file's content. Verified fix live: a Zoom-recorder seminar WAV completed end-to-end for the first time in this pipeline's history immediately after the fix deployed.
+
+**Promoted to:** This entry.
+
+**Tags:** `mistake`, `discovery`, `process-change`
+
+---
+
+### LL-2026-07-13-005 [mistake, process-change] — norm() stem-matching bug masked a fully-complete corpus behind infinite reprocessing
+
+**Session:** 2ecf · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-12
+
+**Context:** A parallel CLI-team audit (codex + agy, independently) confirmed a bug already suspected from reading the pipeline source.
+
+**What happened:** `norm(s) = re.sub(r'[\s_]+',' ', os.path.splitext(...)[0].strip()).lower()` called `.strip()` BEFORE the whitespace/underscore-collapse regex. A source file ending in `_` (e.g. `"...Monopolized_.mp3"`) produced a stem with a TRAILING SPACE (the trailing `_` becomes a space via the regex, applied after strip already ran). The uploaded transcript's filename, re-derived through the same function on read-back, had its OWN trailing space stripped at a different point in the sequence — the two derivations disagreed, `st in done` never matched, and the file was re-transcribed forever. This masked, for an unknown period, that the entire assigned corpus (`dropbox-ss:`, 17,904 files) was actually functionally complete.
+
+**Root cause:** Order-of-operations bug: `.strip()` before a regex substitution that can itself introduce new leading/trailing whitespace, applied inconsistently between the "write" and "read-back" code paths.
+
+**Mitigation / pattern:** Always apply `.strip()` AFTER any substitution that could introduce new boundary whitespace, and use the exact same normalization function (not a re-derivation) for both write and match paths wherever possible. General pattern worth keeping: when "we've done a huge amount of work but the completion percentage barely moves," check for a stem/key-matching bug before concluding the work estimate was simply wrong.
+
+**Promoted to:** This entry.
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-13-006 [mistake, process-change] — done-state check must distinguish "unknown" from "empty"
+
+**Session:** 2ecf · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-12
+
+**Context:** Same CLI-team audit as LL-005, found independently by both models.
+
+**What happened:** `done_stems()` cached a "last-good" done-set, but on a genuinely FRESH process start where the very first gdrive listing call failed (network hiccup, auth lag), there was no last-good set to fall back to — the function returned an empty `set()`. The main loop treated an empty done-set as "nothing is done yet" and would begin re-transcribing the ENTIRE corpus, silently overwriting nothing (uploads are idempotent) but wasting massive compute, exactly when the node was already restarting frequently (a launchd-thrash situation, see LL-003) and therefore hitting this cold-start path often.
+
+**Root cause:** Conflating "we have no data" with "the answer is empty" — a classic cache/fallback bug.
+
+**Mitigation / pattern:** A done-state (or any authoritative "what's already complete" check) must be able to represent and signal UNKNOWN distinctly from EMPTY. On unknown, the caller should pause/retry, never proceed as if the answer were a known zero.
+
+**Promoted to:** This entry.
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-13-007 [mistake] — Raw throughput/log-line counts are not a progress metric
+
+**Session:** 2ecf · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-12
+
+**Context:** Repeatedly reported the fleet's throughput ("630 files/hour," "processed 9,000 more files") as evidence of progress across several status updates.
+
+**What happened:** Adrian asked for the ETA to completion; reconciling against the true vault-wide backlog revealed net completions had barely moved despite enormous logged activity — the fleet was reprocessing a tiny set of already-done files at massive scale (M2 alone re-decoded its own ~1,545 files an average of 32x each). Confronted directly with "why are you letting this happen" — the honest answer was that raw activity metrics had substituted for the metric that actually mattered.
+
+**Root cause:** Measuring "is it crashing" and "is the log growing" instead of "is the count of genuinely new, distinct completions increasing against the true target."
+
+**Mitigation / pattern:** Any recurring status report on a processing pipeline must reconcile against a ground-truth target (here: unique stems in the done-state, checked against the actual corpus size) — not against the pipeline's own self-reported activity log. If asked for an ETA and the honest answer is "I can't give a reliable one without checking net-new vs. total," say that rather than extrapolate from an activity rate that might be mostly noise.
+
+**Promoted to:** This entry.
+
+**Tags:** `mistake`
+
+---
+
+### LL-2026-07-13-008 [mistake, process-change] — Folder-keyword matching is not scope verification (the attribution incident)
+
+**Session:** 2ecf · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-12/13
+
+**Context:** Built a "subconscious surgery priority" processing manifest by matching folder-path keywords across the whole indexed corpus, per Adrian's instruction to prioritize his SS long-form teaching content overnight.
+
+**What happened:** The keyword match swept in, across the same night, third-party voice content under two different people's named folders (13 files: "Josh podcast," "Josh speech zurich"), then — after Adrian's first, furious correction — a systematic re-scan (prompted only by his SECOND, more furious message about the pattern repeating) found five MORE named-person folders (16 more files: Ken, Alan, Naomie, two Helen folders, "Croner-Mark Russell") that a spot-check would have missed. One additional file in an unverifiable folder ("Rugby") was pulled proactively without a specific complaint about it, on the reasoning that a second wrong guess in the same breath was unacceptable.
+
+**Root cause:** Treating "the folder path contains my search keyword" as sufficient grounds for inclusion in a live processing queue, rather than as mere candidacy pending verification. Compounded by responding to the FIRST correction with a narrow, item-specific fix instead of immediately generalizing to "what ELSE does this same blind spot affect."
+
+**Mitigation / pattern:** New standing default: exclude-by-default for any auto-built processing list; a candidate only earns inclusion after passing explicit checks (named-third-party folder scan done systematically across the WHOLE list, not spot-checked; cross-reference against any existing attribution/diarization data with real coverage awareness; technical processability check — see LL-009). When any correction reveals a *pattern* rather than an isolated miss, immediately re-scan the entire remaining list against that pattern in the same turn, not just the specific flagged item. Full protocol written up at `canonical/concepts/content-scope-verification-before-processing.md` (new canonical file, this shutdown).
+
+**Promoted to:** [content-scope-verification-before-processing.md](content-scope-verification-before-processing.md)
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-13-009 [discovery, process-change] — Cheap technical probe (audio-stream presence) prevents burning fleet time on unprocessable files at scale
+
+**Session:** 2ecf · **Archive:** [raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md](../../raw/sessions/2026-07-13-1435-pipeline-forensic-audit-and-attribution-incident.md)
+**Date:** 2026-07-13
+
+**Context:** A stall-detector (armed earlier the same night, alerting if net-new completions froze for ~90 minutes while the queue was non-empty) fired correctly during the priority night-run.
+
+**What happened:** Investigated rather than dismissed: both active nodes were burning through a large batch (456 of 740 files, 62%) of GUID-named files under a folder called "subconscious Assassin" (an account/brand name that had matched the "subcon" keyword, not actual teaching content) that were instant-failing ffmpeg. A single diagnostic download + `ffmpeg -i` on one sample proved the root cause immediately: **the source files contain no audio stream at all** ("Output file does not contain any stream") — silent auto-synced phone-camera clips. Removed all 456 with hard technical proof (not a judgment call), and real progress resumed within the same check.
+
+**Root cause (of why this wasn't caught earlier):** The manifest-building step never checked whether a candidate file was even technically capable of producing a transcript before adding it to the queue; the pipeline only discovered "no audio" per-file, live, after a full download.
+
+**Mitigation / pattern:** For any newly-built processing list at meaningful scale (100+ files), run a cheap technical-processability probe (`ffprobe`/`ffmpeg -i` for audio-stream presence, or the equivalent for the content type) BEFORE installing the list on live nodes — not as a per-file discovery during a live run. This is now folded into the standing scope-verification protocol (LL-008) as check #1 (cheapest, run first). Separately: the stall-detector itself worked exactly as designed here — a good pattern to keep using (alert on the true stall condition — net-new frozen while queue non-empty — then investigate before dismissing as noise).
+
+**Promoted to:** [content-scope-verification-before-processing.md](content-scope-verification-before-processing.md)
+
+**Tags:** `discovery`, `process-change`
