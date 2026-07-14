@@ -856,3 +856,22 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Promoted to:** [content-scope-verification-before-processing.md](content-scope-verification-before-processing.md)
 
 **Tags:** `discovery`, `process-change`
+
+---
+
+### LL-2026-07-14-001 [discovery, tool-gotcha, process-change] — MLX Metal cache growth measured wrong, and a live daemon script drifted with zero trail
+
+**Session:** b3fc · **Archive:** [raw/sessions/2026-07-14-1029-m2-audio-mlx-leak-refix-and-file-drift.md](../../raw/sessions/2026-07-14-1029-m2-audio-mlx-leak-refix-and-file-drift.md)
+**Date:** 2026-07-14
+
+**Context:** Asked to find and fix the confirmed memory leak in `/Users/subconm2/audio-tx-mlx.py` (the mlx-whisper daemon) — same leak documented in session 2ecf's 2026-07-13 fix.
+
+**What happened:** Three findings worth keeping. (1) `ps -o rss=` reported 377MB on the daemon while `vmmap -summary | grep "Physical footprint"` reported 4.7GB on the SAME process at the SAME instant — RSS badly undercounts MLX/Metal-backed memory on Apple Silicon; use physical footprint (what Activity Monitor shows) for any GPU-memory investigation on this hardware. (2) A first verification attempt using files with repeated/similar durations showed no leak (false negative) — MLX's buffer cache is keyed by array shape, so repeated shapes just hit the cache with zero growth; reproducing this class of leak requires many files with genuinely distinct durations, matching real-world recording variability. (3) The live file had already been fixed once (session 2ecf, 2026-07-13) but had regressed to the pre-fix version by this session's start, then changed AGAIN (to a fuller, still-correct version) after this session's own re-fix — with no lease, no git history, and no NODE-STATUS/INTENT.md/m2-state.md entry naming either change. Outcome was benign (final state is correct), but the mechanism is unknown.
+
+**Root cause:** (1)/(2) are measurement-methodology gaps, not caused by any prior mistake. (3) is a structural gap — `audio-tx-mlx.py` and its siblings are machine-local scripts outside the vault's version control and outside the Dispatcher lease system, so nothing records who changes them or when, unlike canonical/ writes.
+
+**Mitigation / pattern:** Use `vmmap -summary <pid>` physical footprint (not `ps` RSS) for MLX/Metal memory investigations on Apple Silicon. Use widely-varied, non-repeating input sizes when reproducing shape-keyed cache growth. `mx.clear_cache()` in a `finally:` block after each inference call is the standard fix. For the drift gap: flagged as Secretary action `m2-local-script-drift-detection` for Adrian's judgment call (git-track local daemon scripts, or at minimum log a content hash on daemon startup) rather than building a fix unilaterally.
+
+**Promoted to:** Secretary actions `m2-audio-file-drift-investigate`, `m2-local-script-drift-detection` (no new canonical safeguard file yet — awaiting Adrian's scope decision).
+
+**Tags:** `discovery`, `tool-gotcha`, `process-change`
