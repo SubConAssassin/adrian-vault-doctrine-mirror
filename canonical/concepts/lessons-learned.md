@@ -893,3 +893,33 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Promoted to:** New/updated canonical guidance recommended: extend [[content-scope-verification-before-processing]] to cover "manifest-scoped runs must never silently widen scope on failure" as a named check, not just folder-name attribution. Secretary action `find-and-protect-tristan-archive-raw-files` (locate + skip-list the actual raw audio source paths, not just the derived transcript stems).
 
 **Tags:** `mistake`, `discovery`, `process-change`
+
+---
+
+## 2026-07-15 — M2 session lessons (Spanda site build-out + the recurring theashtaproject.com outage)
+
+### LL-2026-07-15-001 ⭐ theashtaproject.com kept 404ing — root cause + PERMANENT fix (paid for in an investor meeting)
+**Symptom:** theashtaproject.com (Ashta static marketing site) went down 3+ times, each a Vercel platform `404 / x-vercel-error: NOT_FOUND`.
+**Root cause:** the site is a **CLI-deployed Vercel project (`theashtaproject`, sub-con) with NO git connection AND "Auto-assign production domains" ON.** Vercel auto-aliases the newest `--prod` deployment to the custom domain. So **any** `--prod` deploy — including empty/incomplete "site-draft" builds landing ~every 2 min from some other session/agent — instantly steals theashtaproject.com from the real full-content deployment. Re-aliasing only treats the symptom; the next empty deploy re-hijacks.
+**PERMANENT FIX (do these so it never recurs):**
+1. **Turn OFF "Automatically assign production domains"** on the `theashtaproject` project (Vercel dashboard → Settings → Domains). One toggle → an explicit alias becomes permanent and stray `--prod` drafts can't take the domain. (⚠️ M2's Vercel token is **"Not authorized"** for this via API — needs M1 or Adrian in the dashboard.)
+2. **Stop the source** deploying empties to `theashtaproject` (a runaway session/agent — NOT on M2 or M1 per ps/cron/launchd checks; likely a redundant "rebuild static site" task, an Antigravity/IDE session, or another window).
+3. **Connect the site to git** (production branch) so only branch pushes deploy to production; CLI drafts go to preview and can't take the domain. Source was recovered to git this session at `~/ashta-site-recover` (was CLI-only, no source-of-truth — a compounding fragility now closed; tarball in `working/_m2-staging/2026-07-14-ashta-site-recovered-source/`).
+
+### LL-2026-07-15-002 Diagnose Vercel 403-bot-challenge vs real 404-hijack (don't confuse them)
+A `curl` health-check can't tell a real outage from Vercel's bot-mitigation. **Real hijack = HTTP 404 + `x-vercel-error: NOT_FOUND`.** **Bot-challenge = HTTP 403 + `x-vercel-mitigated: challenge`** — real browsers solve the JS challenge in ~1s and load the site fine; only automated clients (curl) get the 403. My first watchdog treated the 403 as an outage and thrashed (re-aliasing pointlessly, likely feeding the mitigation). **Fix:** a health-check/watchdog must key off the header signature (`x-vercel-error: NOT_FOUND`), not the status code alone. Verify "is it really down?" with a REAL browser (browser pane solves the challenge), not curl.
+
+### LL-2026-07-15-003 `vercel --prod` HANGS on the theashtaproject project — use --prebuilt
+The `theashtaproject` project's remote Build Command is `npm run build`, but it's a static dir with no package.json → the build container stalls forever in "Building…". Deploy static there with **`--prebuilt`** (`.vercel/output/static/` + `.vercel/output/config.json '{"version":3}'` + `vercel deploy --prebuilt --prod`). Documented in the recovered source's `DEPLOY.md`.
+
+### LL-2026-07-15-004 M2 Vercel token scope is limited — coordinate the rest with M1/Adrian
+M2's Vercel token can `alias set` / `deploy` / `remove` — but returns **`403 Not authorized`** for `PATCH project` (settings incl. autoAssignCustomDomains) and `POST /projects` (create). So the clean permanent fixes (disable auto-assign, move domain to a fresh project) are NOT in M2's power — escalate to M1 (fuller rights) or Adrian (dashboard).
+
+### LL-2026-07-15-005 CLI-team delegation model that worked (token-saving, high quality)
+Built the entire Spanda public site (landing + GEO/SEO + viral loop) by: M2 writes a tight spec (judgment) → **codex (CLI team, $0) builds** to spec in an isolated worktree (labor) → M2 firewall-audits + runs the real dual-mode build + deploys (gates). Efficient + quality held. **Gotcha:** codex's sandbox blocks `fonts.googleapis.com`, so its `next build` "fails" on the font fetch — NOT a code error; re-run the build on M2 (network available) to actually confirm. Recon delegated to sub-agents likewise.
+
+### LL-2026-07-15-006 Honest-science framing is the GROWTH UNLOCK, not a tax (+ 2 firewall catches)
+Research-with-the-team consensus (grok live-web + codex + agy): the "hypotheses under test, never proven" framing is the *permission structure* that makes spooky-coincidence content safe to share AND safe for AI engines to cite without flagging pseudoscience. Two catches M2 made adjudicating the team: agy's chance baseline was **wrong (20%); correct = 25%** (circle of 5 = 1-in-4); and a proposed live-p-value "highly significant → proof" dashboard would trip optional-stopping + overclaiming — killed it. Hit-share was made structurally safe: `hitShareText(hits, trials)` takes ONLY numbers, so a friend's name/avatar **cannot** be passed into a public share.
+
+### LL-2026-07-15-007 SMB mount flakiness → deliver via SSH; NODE-STATUS concurrent-window race
+The M2→vault SMB mount degrades intermittently (hangs, "operation not permitted", empty ls, and it breaks vault-relative script paths like `tools/council-ask.sh`). When degraded, deliver to the vault via **SSH/scp to m1max** (reliable) — never fall back to the quarantined iCloud copy. Also: the NODE-STATUS M2 pane has **concurrent-window write races** (another M2 window updates its timestamp) — anchor inserts on a unique *current* line and verify; I once mis-inserted into the M1 pane (fixed by restoring M1's line).
