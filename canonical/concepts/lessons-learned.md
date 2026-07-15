@@ -943,3 +943,19 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** Secretary action `relocate-legal-archive-raw-folders` (Adrian decision — moving personal file organization, not something to do unilaterally). This is the second entry in one day on the same underlying gap — recommend this becomes the canonical example in [[content-scope-verification-before-processing]] for "protect the source, not just the derived output."
 
 **Tags:** `mistake`, `discovery`, `process-change`
+
+---
+
+### LL-2026-07-16-001 [mistake, process-change] — `launchctl bootout` alone doesn't permanently disable a job; renaming the plist does
+
+**Session:** 2ecf (continued) · **Date:** 2026-07-16 (just past midnight)
+
+**Context:** LL-2026-07-15's midday incident (old `com.adrianvault.cloud-manifest` generator overwrote the priority manifest with a 17,904-file dump) was fixed at the time with `launchctl bootout` only. i7's manifest was later found re-corrupted to the same exact dump, cause unlisted as "unknown" in that entry.
+
+**What happened:** The job reloaded itself at some point after the bootout (exact trigger not identified — plausibly a login/reload event; `bootout` unloads from the current session but does not remove the plist, so anything that re-registers LaunchAgents brings it straight back). `launchctl list` confirmed it loaded again hours later. Its own script (`cloud-manifest.py`) directly `scp`s its output to `i7:/Users/admin/cloud-manifest.tsv` on every run — independent of `ss-night-refresh.sh`, which had been the only suspect considered. This fully explains the "unknown" re-corruption.
+
+**Root cause:** Inconsistent disable method within the same session — the bridge trio (`m1-dispatcher`/`m2-cloud-bridge`/`overnight-collect`) were correctly disabled by renaming their plists (survives reload), but `cloud-manifest` was only `bootout`'d (does not survive reload). Same mistake class, different rigor applied without a clear reason.
+
+**Mitigation / pattern:** Renamed the plist (`.disabled-20260716-...` suffix, matching the established convention) so it cannot silently reload. **Going forward: `launchctl bootout` is for an immediate stop only; a job being retired for cause always gets its plist renamed in the same action, never bootout alone** — this session's own bridge-trio fix already knew this, it just wasn't applied uniformly. All 3 fleet manifests reverified correct (128 lines) after the fix.
+
+**Tags:** `mistake`, `process-change`
