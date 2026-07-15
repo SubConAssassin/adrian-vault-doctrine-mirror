@@ -875,3 +875,21 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 **Promoted to:** Secretary actions `m2-audio-file-drift-investigate`, `m2-local-script-drift-detection` (no new canonical safeguard file yet — awaiting Adrian's scope decision).
 
 **Tags:** `discovery`, `tool-gotcha`, `process-change`
+
+---
+
+### LL-2026-07-15-001 [mistake, discovery, process-change] — Stale manifest silently degraded to unscoped self-listing, swept legally-sensitive third-party archive content into the general Transcripts store
+
+**Session:** 2ecf (continued) · **Date:** 2026-07-15
+
+**Context:** A hardcoded LAN IP for mini (`192.168.1.48`) in M1's ss-night-refresh.sh and its SSH config went stale after a DHCP renewal (real IP became `.12`), silently breaking the manifest-freshness touch loop. Both M1 and mini hit `MANIFEST_MAX_AGE` at various points overnight and fell through to `node-cloud-pipeline.py`'s self-listing fallback (`REMOTES=["dropbox-ss:"]`), which has zero attribution/scope awareness.
+
+**What happened:** Self-listing found and transcribed raw audio files whose content had already been identified as `firewall_class: strictly-private-legal-personal` (participants named, part of the Tristan/Stefi legal archive — see [[tristan-stefi-legal-archive]]) by a separate, dedicated extraction project back in May — but the raw source files themselves were never removed or skip-listed at the general-corpus level, so a generic scan stumbled onto them independently of that protected workflow. Confirmed 5 such files transcribed into the shared `gdrive:Transcripts` store, plus 1 unrelated third-party interview clip ("dasha", a participant in someone else's recorded training session) and 1 benign personal recording (no action needed). Caught only because Adrian explicitly pushed back on treating the ~1000 raw completion-log lines as "too many to audit" — a diff-based approach (before/after transcript-store snapshot, minus known-legitimate manifest stems) cut the real audit surface from a misleading ~1000 to an exact, tractable 7.
+
+**Root cause:** Two independent bugs compounded: (1) the stale-IP DHCP-drift bug (M1's ssh config never got the DHCP-resilient Bonjour-hostname treatment that i7/Studio already had), and (2) a design flaw where `node-cloud-pipeline.py` treated "manifest explicitly configured but temporarily unreadable" the same as "no manifest was ever configured" — degrading a deliberately scoped run into an unscoped one instead of just waiting.
+
+**Mitigation / pattern:** (1) Fixed the SSH config to use `Adrians-Mac-mini.local` (AddressFamily inet, matching the established i7/Studio pattern) instead of a raw IP, with a `.local`-independent LAN fallback alias for symmetry — repointed `ss-night-refresh.sh` at the alias. (2) Patched `node-cloud-pipeline.py`: when `MANIFEST_FILE` is set, the node now waits indefinitely (with logging) rather than ever falling through to self-listing — self-listing only fires when no manifest was ever configured at all. Deployed + md5-verified to M1 and mini (i7 pending its reconnect). (3) Quarantined the 6 real files to `gdrive:Transcripts/_QUARANTINE-attribution/` and hard-skip-listed their specific stems on both nodes. (4) **The raw source files for the 5 legal-archive stems are still sitting unprotected somewhere in the general corpus** — their location wasn't pinned down (would need a slow full-`dropbox-ss:` recursive search); flagged as an open Secretary item, not resolved.
+
+**Promoted to:** New/updated canonical guidance recommended: extend [[content-scope-verification-before-processing]] to cover "manifest-scoped runs must never silently widen scope on failure" as a named check, not just folder-name attribution. Secretary action `find-and-protect-tristan-archive-raw-files` (locate + skip-list the actual raw audio source paths, not just the derived transcript stems).
+
+**Tags:** `mistake`, `discovery`, `process-change`
