@@ -959,3 +959,21 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Mitigation / pattern:** Renamed the plist (`.disabled-20260716-...` suffix, matching the established convention) so it cannot silently reload. **Going forward: `launchctl bootout` is for an immediate stop only; a job being retired for cause always gets its plist renamed in the same action, never bootout alone** — this session's own bridge-trio fix already knew this, it just wasn't applied uniformly. All 3 fleet manifests reverified correct (128 lines) after the fix.
 
 **Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-16-002 [mistake, discovery, process-change] — A 13,953-entry skip-list with single-character entries was silently blocking 97% of any manifest
+
+**Session:** 2ecf (continued) · **Date:** 2026-07-16 morning
+
+**Context:** Morning check found the SS-talks priority manifest completion count frozen at 15/128 despite all 3 fleet nodes running healthy, all night, on the correct manifest. The pipeline's own internal `todo` count showed only 8 remaining — a 105-file gap against reality that needed explaining, not just reporting.
+
+**What happened:** `.node-pipeline-skip.txt` (accumulated across many sessions/days as a "known-empty/junk file" list) had grown to 13,953 entries. `skip()` does a raw substring match (`s in stem`, not exact/word-boundary). At least 19 entries were single characters or two-letter fragments (`"1"`, `"2"`, `"3"`, `"7"`, `"8"`, `"9"`, `"99"`, `"yo"`, `"yo-2"`, `"yo-3"`, `"eft"`, `"aha"`, `"abl"`, `"able"`, `"hack"`, `"sbr"`, `"32.5"`, `"80%"`, `"ety"`) — these matched almost any filename containing that digit/fragment anywhere (e.g. `vid_20161026_092928` skipped because it contains "8"; `challeng your reality` skipped because it contains "yo" inside "y-o-ur"). Verified: **125 of 128 manifest files were being silently skipped** — not done, not failing, just invisible to the pipeline. Beyond the single-character entries, ~105 more matches came from a second, harder problem: many legitimately-different personal audio clips share short generic names ("power pose", "rainbow", "theta", "empathic") with unrelated files that were skip-listed for different reasons previously — real name collisions, not typos.
+
+**Root cause:** An accumulated safety mechanism (skip known-bad files one at a time, forever) combined with substring matching degrades badly at scale — every new short/generic addition is a small amount of added risk, but the risk compounds silently until, in aggregate, it can block almost everything. Nothing here was a single bad decision; it was many individually-reasonable one-off additions compounding into a systemic failure with no one positioned to notice the aggregate effect.
+
+**Mitigation / pattern:** For this run: deployed a minimal, purpose-built skip-list (just today's specific legal-archive safety exclusions, 128 entries, zero false matches against the curated manifest) to all 3 nodes instead of the accumulated 13,953-entry list — verified zero false matches, confirmed real throughput resumed immediately (`todo` jumped 8→119 on all 3 nodes within the same restart cycle). Original list backed up, not deleted, on all 3 nodes (`.bak-20260716-full...`). **Not yet done, flagged for a real decision:** the master 13,953-entry list itself still has this substring-fragility for ANY future self-listed/broad run — it needs either (a) a minimum-length + word-boundary matching fix to `skip()`, or (b) a one-time audit-and-clean of the accumulated list. This has likely been silently suppressing throughput on more than just tonight's run — worth asking whether historical "why is this so slow" questions trace back to this.
+
+**Promoted to:** Secretary action `fix-skip-list-substring-matching` (code fix: minimum length + word-boundary check in `skip()`) and `audit-clean-full-skip-list` (one-time cleanup of the 13,953-entry accumulated list) — both for Adrian's prioritization, not urgent tonight since the targeted workaround is live and verified.
+
+**Tags:** `mistake`, `discovery`, `process-change`
