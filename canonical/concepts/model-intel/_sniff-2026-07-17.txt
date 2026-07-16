@@ -1,0 +1,7 @@
+- [216pts] Show HN: Smart model routing directly in Claude, Codex and Cursor  (https://github.com/workweave/router)
+- [93pts] Show HN: Formally verified polygon intersection – Opus 4.8 oneshots, prev failed  (https://github.com/schildep/verified-polygon-intersection)
+- [85pts] Launch HN: Agnost AI (YC S26) – Extract user feedback from agent conversations  (https://agnost.ai)
+- [83pts] Show HN: I mapped 8.5M research papers into an interactive atlas  (https://tomesphere.com/atlas)
+- [53pts] Show HN: GolemUI – Declarative Form Engine  (https://golemui.com)
+- [36pts] Company behind GLiNER model released open source model for running LLM guardrail  (https://pioneer.ai/blog/gliguard-16x-faster-safety-moderation-with-a-small-language-model)
+- [174pts] Show HN: Onit – Source-available ChatGPT Desktop with local mode, Claude, Gemini  (https://github.com/synth-inc/onit)
