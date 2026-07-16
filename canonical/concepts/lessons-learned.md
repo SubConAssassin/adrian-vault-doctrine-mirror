@@ -977,3 +977,5 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** Secretary action `fix-skip-list-substring-matching` (code fix: minimum length + word-boundary check in `skip()`) and `audit-clean-full-skip-list` (one-time cleanup of the 13,953-entry accumulated list) — both for Adrian's prioritization, not urgent tonight since the targeted workaround is live and verified.
 
 **Tags:** `mistake`, `discovery`, `process-change`
+
+**LL-2026-07-15-001 UPDATE (2026-07-16): the hijack did NOT stop.** M1's 07-15 "no deploys in 13h" read went stale — two more empty `--prod` deploys landed 07-16 (`c5eko2af5` ~4h, `9qd92hqb7` ~7h), genuine 404/NOT_FOUND hijacks. Source is intermittent-but-active (~every few hours), still unlocatable on M2/M1 (guess: stuck Antigravity/IDE agent or another machine). **HANDED TO M1** (Adrian: "shutdown + hand over to M1, I'll get M1 to fix it") — M1 to flip auto-assign-off (its CLI may have scope M2's API token lacks: 403) and/or kill the source and/or git-connect the site. Watchdog whack-a-mole is NOT a fix; do the toggle. Handover: `_claude-bridge/m2-to-m1-2026-07-16-theashtaproject-HANDOVER-M1-OWNS-FIX.md`.
