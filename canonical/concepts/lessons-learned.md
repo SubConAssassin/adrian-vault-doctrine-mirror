@@ -705,6 +705,8 @@ The user-level `~/Downloads` is explicitly NOT included. Files there are invisib
 
 **Tags:** `mistake`, `process-change`
 
+**LL-2026-07-13-001 UPDATE (2026-07-17): the "~3-4GB baseline" this entry compares against was itself wrong.** Direct `top -l1 PhysMem` measurement (LL-2026-07-17-002) found whisper-large-v3-mlx's real active working set on the Studio is ~10-11GiB, not ~3-4GB — that figure captured resident model size only, not the full transcription-time footprint. Budget headroom accordingly; ~3-4GB is no longer a safe planning number for this daemon even with the cache-clear fix applied.
+
 ---
 
 ### LL-2026-07-13-002 [tool-gotcha] — Claude Code scheduled tasks require the app to stay resident
@@ -977,5 +979,77 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** Secretary action `fix-skip-list-substring-matching` (code fix: minimum length + word-boundary check in `skip()`) and `audit-clean-full-skip-list` (one-time cleanup of the 13,953-entry accumulated list) — both for Adrian's prioritization, not urgent tonight since the targeted workaround is live and verified.
 
 **Tags:** `mistake`, `discovery`, `process-change`
+
+---
+
+### LL-2026-07-17-001 [mistake, process-change] — Don't patch a memory-safety watchdog's metric on one favorable idle-state reading; test against real active load first
+
+**Session:** e04c · **Date:** 2026-07-17
+
+**Context:** `com.adrianvault.m2-mem-watchdog` was force-restarting `com.adrianvault.m2-audio` (the Studio's local mlx_whisper daemon) every ~120s, so it never completed a single transcription. The watchdog's `free_mb()` used raw `vm_stat "Pages free"`, and its own log showed continuous 56-115MB readings.
+
+**What happened:** Cross-checked with `top -l1 PhysMem`, which read ~11GiB genuinely unused at that one moment (right after stopping the daemon). Concluded — by analogy to an already-documented "inactive-page illusion" pattern on the i7 node — that the watchdog's metric was unreliable, and patched `free_mb()` to parse `top -l1 PhysMem unused` instead. Verified the patched function in isolation (returned ~11264MB, matching `top`) and restarted the daemon. **It kept crash-looping identically.** Checked `top -l1` again, live, mid-loop: `PhysMem: 31G used ... 283M unused` — a real, severe squeeze, on the exact metric just called "reliable." The 11GiB reading had been real but momentary (the window right after stopping the daemon, before it reloaded); the instant the model actually loads, real memory genuinely collapses.
+
+**Root cause:** A single idle-state snapshot was treated as proof the watchdog's trigger condition never fires validly, without testing the fix against an actual active-load spike — the one scenario the watchdog exists to catch.
+
+**Mitigation / pattern:** Reverted the patch (diff-verified clean against `.bak-20260717-freefix`) — the original `vm_stat`-based logic was correct all along. **Before "fixing" any memory/resource-pressure check as a false positive, force the condition it's supposed to catch (start the actual resource-heavy process) and re-measure under that load, not just at rest.** A watchdog reading low continuously for 28+ minutes across many independent samples is much stronger evidence than one favorable reading is counter-evidence.
+
+**Promoted to:** Secretary action `studio-memory-headroom-for-m2-audio` (Adrian: free up real headroom before re-enabling local transcription).
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-17-002 [discovery] — whisper-large-v3-mlx's real active memory footprint on the Studio is ~10-11GiB, not the ~3-4GB previously documented
+
+**Session:** e04c · **Date:** 2026-07-17
+
+**Context:** Prior memory (`node-cloud-pipeline-tuning`) documented `mlx-community/whisper-large-v3-mlx` as "~3-4GB resident/stream." Debugging the crash-loop above required knowing the real number.
+
+**What happened:** Directly measured, twice, via `top -l1 PhysMem`: idle (daemon stopped) ~11GiB unused; within seconds of the daemon actually loading the model and starting transcription, ~280-300MB unused — a genuine ~10-11GiB delta, not model-loading overhead alone (audio decode buffers + Metal command buffers under MLX's unified-memory architecture likely account for the gap beyond static model-weight size).
+
+**Root cause:** The original ~3-4GB figure likely captured resident model size only, not the full active working set during real transcription.
+
+**Mitigation / pattern:** When planning headroom for local mlx_whisper runs on the Studio, budget ~10-11GiB active, not ~3-4GB — and remember the Studio also frequently carries ~20GiB+ baseline from Claude Desktop/Chrome/CLI processes, so 8-11GiB "free" at rest is not sufficient evidence of safe headroom for an active run.
+
+**Promoted to:** Secretary action `studio-memory-headroom-for-m2-audio`.
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-07-17-003 [discovery, process-change] — A shared manifest going silently stale past its own safety window blocks the entire fleet behind a calm-looking log line
+
+**Session:** e04c · **Date:** 2026-07-17
+
+**Context:** `supervisor4` (an earlier session's fleet supervisor) self-terminated on schedule at 08:38 after its last manifest refresh. `node-cloud-pipeline.py`'s `MANIFEST_MAX_AGE=2h` gate deliberately refuses to self-list once the shared `cloud-manifest.tsv` ages past 2 hours (a genuinely correct safety design — "waiting forever is always safer than widening scope").
+
+**What happened:** Nothing refreshed the manifest after 08:38. By ~10:38 it crossed the 2h threshold; M1, mini, and i7 all correctly began logging `manifest not ready — waiting (N)` every ~60-120s and produced zero output for 1.5-3.5 hours before this session noticed. The log line reads calm/routine, not alarming, so it's easy to mistake "waiting" for "still working."
+
+**Root cause:** Manifest freshness was an implicit responsibility of whichever supervisor happened to be running, not an explicit, continuously-covered one — when that supervisor's window ended, the responsibility silently lapsed with it.
+
+**Mitigation / pattern:** `touch`ing the identical manifest (same content, zero scope change) immediately unblocked all 3 nodes within one poll cycle. Any future fleet supervisor should treat manifest-freshness refresh as a standing, explicit responsibility with its own cycle well under `MANIFEST_MAX_AGE` (this session's `fleet-supervisor-2026-07-17.sh` refreshes every 20min against the 2h ceiling) — and "manifest not ready — waiting" in a log should be treated as a P1 signal to check freshness immediately, not background noise.
+
+**Promoted to:** Secretary action `pipeline-manifest-scope-decision-2026-07-17`.
+
+**Tags:** `discovery`, `process-change`
+
+---
+
+### LL-2026-07-17-004 [tool-gotcha] — `launchctl kickstart -k` fails on a job that was fully `bootout`'d; use `bootstrap` to reload it
+
+**Session:** e04c · **Date:** 2026-07-17
+
+**Context:** A hand-written fleet supervisor script tried to restart `com.adrianvault.m2-audio` via `launchctl kickstart -k gui/<uid>/<label>` after the job had earlier been stopped via `launchctl bootout`.
+
+**What happened:** `kickstart -k` returned `Could not find service "com.adrianvault.m2-audio" in domain for user gui: 501` — silently doing nothing, not restarting the daemon. `bootout` fully unloads a job from launchd's domain (not just stops the process); `kickstart` only works on an already-loaded job. Needed `launchctl bootstrap gui/<uid> <plist-path>` instead, which loads AND starts it.
+
+**Root cause:** `kickstart` and `bootout`/`bootstrap` operate at different levels (running-state vs domain-membership) and the failure mode is silent (a clean exit-code-nonzero, easy to miss in a background loop's log).
+
+**Mitigation / pattern:** Any script that both stops (`bootout`) and later conditionally restarts a launchd job should attempt `kickstart -k` first and fall back to `bootstrap` on failure (`cmd1 || cmd2`), rather than assuming one command covers both cases.
+
+**Promoted to:** none (a code-level fix within this session's own `fleet-supervisor-2026-07-17.sh`, not a canonical process needing separate Secretary tracking).
+
+**Tags:** `tool-gotcha`
 
 **LL-2026-07-15-001 UPDATE (2026-07-16): the hijack did NOT stop.** M1's 07-15 "no deploys in 13h" read went stale — two more empty `--prod` deploys landed 07-16 (`c5eko2af5` ~4h, `9qd92hqb7` ~7h), genuine 404/NOT_FOUND hijacks. Source is intermittent-but-active (~every few hours), still unlocatable on M2/M1 (guess: stuck Antigravity/IDE agent or another machine). **HANDED TO M1** (Adrian: "shutdown + hand over to M1, I'll get M1 to fix it") — M1 to flip auto-assign-off (its CLI may have scope M2's API token lacks: 403) and/or kill the source and/or git-connect the site. Watchdog whack-a-mole is NOT a fix; do the toggle. Handover: `_claude-bridge/m2-to-m1-2026-07-16-theashtaproject-HANDOVER-M1-OWNS-FIX.md`.
