@@ -1053,3 +1053,75 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Tags:** `tool-gotcha`
 
 **LL-2026-07-15-001 UPDATE (2026-07-16): the hijack did NOT stop.** M1's 07-15 "no deploys in 13h" read went stale — two more empty `--prod` deploys landed 07-16 (`c5eko2af5` ~4h, `9qd92hqb7` ~7h), genuine 404/NOT_FOUND hijacks. Source is intermittent-but-active (~every few hours), still unlocatable on M2/M1 (guess: stuck Antigravity/IDE agent or another machine). **HANDED TO M1** (Adrian: "shutdown + hand over to M1, I'll get M1 to fix it") — M1 to flip auto-assign-off (its CLI may have scope M2's API token lacks: 403) and/or kill the source and/or git-connect the site. Watchdog whack-a-mole is NOT a fix; do the toggle. Handover: `_claude-bridge/m2-to-m1-2026-07-16-theashtaproject-HANDOVER-M1-OWNS-FIX.md`.
+
+---
+
+### LL-2026-07-19-001 [tool-gotcha] — `git checkout <branch>` silently carries uncommitted working-directory changes across branches when there's no file conflict
+
+**Session:** 9eb88d20 · **Date:** 2026-07-19
+
+**Context:** Executing the SS Mastermind page rebuild (`~/Documents/localhost/subconscious-surgery-next`), which had substantial unrelated uncommitted WIP already on the checked-out branch (`feat/kajabi-enrollment-webhook`). After stashing it, pulling the mastermind files, committing on a new branch, and switching back to restore the Kajabi WIP, a second `checkout` (to inspect the mastermind branch for a push attempt) carried the just-restored Kajabi dirty files onto the mastermind branch's working directory.
+
+**What happened:** `git checkout` is not a stash-forcing operation. It only blocks a checkout (forcing a stash/commit first) when the *target branch's own commit history* actually conflicts with the dirty files. If the dirty files are untouched by that branch's history, they come along silently — the working directory's uncommitted state effectively "follows" you across branches whenever there's no collision. This happened twice in the same session before being correctly diagnosed.
+
+**Root cause:** Mental model mismatch — `checkout` is commonly assumed to snapshot/isolate working-directory state per branch, but it only guards against *conflicting* changes, not all changes.
+
+**Mitigation / pattern:** When working across branches with uncommitted WIP present, always run `git stash push -u` → `checkout` → `stash pop` as one atomic sequence, then avoid further branch-switching for inspection purposes. Use `git log <branch> -1 --stat` and `git show <branch>:<path>` to inspect a branch's content without re-checking it out. Always include `-u` on the stash (an earlier sub-attempt this same session omitted it and left new untracked files exposed during a "clean base" test).
+
+**Promoted to:** none (general git knowledge, not a vault-specific process — logged here as the forward-readable reference).
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-07-19-002 [discovery] — `cli-ask.sh` grok-inline delivery can silently truncate a payload well below its own documented 40000-byte threshold
+
+**Session:** 9eb88d20 · **Date:** 2026-07-19
+
+**Context:** `/Users/subconm2/pipeline-refresh-2026-07-17/classify_catchup.py` on Studio had silently stalled for ~23 hours, calling `cli-ask.sh grok --stdin` per batch.
+
+**What happened:** The script's batch payloads were being silently truncated by grok's inline-delivery path even though they sat below `CLI_ASK_GROK_INLINE_MAX`'s documented 40000-byte default (see `cli-ask-grok-large-payload-fix.md`, which fixed the >40KB case via a file-read idiom). Forcing `CLI_ASK_GROK_INLINE_MAX=1000` in this script's own subprocess env resolved it immediately — verified live, 2975 records classified cleanly in the resumed run.
+
+**Root cause:** Not fully diagnosed. The 40000-byte default appears to be unsafe for at least this payload shape (JSON-heavy batch classification prompts), suggesting the safe threshold depends on payload *structure*, not just raw byte count — but this was not confirmed against other callers.
+
+**Mitigation / pattern:** The scoped fix (forcing the env var down for this one script) is deployed and verified. The vault-wide default is NOT yet re-validated — flagged as an open Secretary action (`cli-ask-grok-inline-threshold-review`) for a dedicated investigation rather than force-changing the shared default on this session's evidence alone.
+
+**Promoted to:** Secretary action `cli-ask-grok-inline-threshold-review` (open, owner: claude-next-session).
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-07-19-003 [process-change] — standing `manifest-keepalive` LaunchAgent retires the recurring silent-stale-manifest catch (LL-2026-07-17-003)
+
+**Session:** 9eb88d20 · **Date:** 2026-07-19
+
+**Context:** During the 2026-07-18→19 12h overnight grind, the LL-2026-07-17-003 "silent stale manifest" pattern recurred roughly every 2 hours on M1 (cycles 6/11/16/21) and i7 (cycles 14/19) — each time caught manually by the supervisory loop and fixed with a no-op `touch`.
+
+**What happened:** The prior session's ad-hoc `fleet-supervisor-2026-07-17.sh` fix was scoped to that one session and did not survive as a standing process — the same gap (no continuous, explicit owner of manifest freshness) reappeared the next night exactly as LL-2026-07-17-003 predicted it would without one.
+
+**Root cause:** Manifest freshness had no dedicated, persistent owner — it depended on whichever ad-hoc script or supervisory loop happened to be running at the time.
+
+**Mitigation / pattern:** Built `tools/pipeline/manifest-keepalive.sh` (touches M1's local manifest + ssh-touches i7 and mini's copies every invocation) wired to `~/Library/LaunchAgents/com.adrianvault.manifest-keepalive.plist` (StartInterval 900s, RunAtLoad true, survives reboot/session-end). This is a genuinely standing fix, not another session-scoped catch — confirmed running post-install with clean exit status between cycles.
+
+**Promoted to:** none further needed — the LaunchAgent itself is the promoted artifact; this entry closes the loop LL-2026-07-17-003 opened.
+
+**Tags:** `process-change`
+
+---
+
+### LL-2026-07-19-004 [mistake] — `open-actions.md` regeneration silently broken since ~2026-07-15 by unannounced schema drift in `action-register.ndjson`
+
+**Session:** 9eb88d20 · **Date:** 2026-07-19
+
+**Context:** Executing this session's own Secretary step (shutdown protocol Step 3), appending new action entries and running `working/_secretary/.regenerate-open-actions.py`.
+
+**What happened:** The script crashed with `KeyError: 'action_id'`. Investigation showed the register's original/canonical schema (`event`/`action_id`/`ts`/`title`/`context`, 8-char hex ids) had silently drifted, starting around 2026-07-15, to a different ad-hoc shape (`id`/`status`/`created`/`summary`/`tags`, slug-style ids) used by several subsequent sessions without anyone updating the regen script or noticing the crash. `open-actions.md`'s own header confirms this: last successful generation 2026-07-13, and even that run flagged itself as an incomplete "incremental append," not a full rebuild. Net effect: the Secretary's action register — the exact mechanism the Shutdown Protocol's hard rule #2 exists to protect ("NEVER skip Step 3... the firewall against work evaporating") — had been quietly failing its own regeneration step for at least 4 days across multiple sessions' shutdowns, none of which caught it.
+
+**Root cause:** Two independent causes compounding: (1) no schema validation on append — anything JSON-shaped silently lands in the ndjson regardless of field names; (2) the regen script has no error-visibility contract — a crash on `python3 .regenerate-open-actions.py` produces a traceback in the terminal but nothing writes that failure anywhere durable, so a session that doesn't read the script's own stdout (or that assumes success) never learns the file didn't update.
+
+**Mitigation / pattern:** Patched `.regenerate-open-actions.py` to normalize both schemas before processing (`id`→`action_id`, `created`→`ts`, `summary`→`title`, `status`→`event`), so entries in either shape are now included. Regeneration now succeeds: 94 open actions, 4 overdue (vs. the stale 78-with-known-gaps from 07-13). **Still open:** no schema validation was added at the append point, so future drift can recur; and there's no automated check that flags a shutdown session if the regen step fails rather than silently leaving the prior `open-actions.md` in place. A future session should consider adding a minimal jsonschema check (or even just a required-field assertion) at append time, and having the regen script's exit code surface loudly (not just print a traceback) if run inside an automated shutdown flow.
+
+**Promoted to:** the fix itself (schema-normalizing regen script) is the promoted artifact.
+
+**Tags:** `mistake`, `process-change`
