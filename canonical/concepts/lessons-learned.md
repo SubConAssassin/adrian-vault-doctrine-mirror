@@ -1125,3 +1125,111 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** the fix itself (schema-normalizing regen script) is the promoted artifact.
 
 **Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-12-001 [discovery] — Independent-design-then-blind-second-audit-then-adjudicate found real bugs each side missed alone
+
+**Session:** spnd0712 (M2 Claude Code, Spanda overhaul design phase) · **Date:** 2026-07-12 (written at late closure, 2026-07-21)
+
+**Context:** Adrian commissioned a full design pass across 6 pillars of the Spanda app overhaul, then separately asked for the same briefs to be run through codex/GPT-5.6 as a peer review.
+
+**What happened:** Six pillar designs were built by Claude agents, each independently adversarially reviewed (a second Claude agent instructed to refute, not confirm). Separately, the exact same six briefs were run through `codex-terra` completely blind — no access to the Claude designs or reviews. A third round of Claude agents then adjudicated every disagreement between the two independent audits against the real repo. Result: the blind codex pass caught ~6-9 repo-verified findings per pillar that the primary design AND its own adversarial review had both missed (examples: a detached `void` push dispatch that Vercel's serverless response-freeze could silently kill; a fourth unauthenticated endpoint the primary security pillar didn't enumerate; a legacy-consent-seeding plan that would have laundered non-consenting data into a research dataset). In the other direction, the Claude-side adversarial reviews caught build-breaking defects codex's blind pass missed entirely (a migration that would fork silently on a legacy backfill; a cron job that would double-fire across two Vercel projects sharing one vercel.json; a live cherry-picking bug in the stats layer). Neither single pass — design, single adversarial review, or blind peer audit alone — would have caught everything the combination did.
+
+**Root cause:** n/a (this is a discovery, not a bug fix).
+
+**Mitigation / pattern:** For any large, hard-to-reverse, multi-pillar design commission (schema changes, security posture, anything touching a live production system), the load-bearing pattern is: (1) parallel independent designs per pillar, (2) a same-model adversarial reviewer per design instructed to refute, (3) a SECOND, architecturally-different model given the same brief with zero visibility into (1)/(2), (4) a repo-grounded adjudication pass resolving every disagreement with real evidence, never taking either side's word. Skipping any one stage measurably loses real findings — this was not redundant effort.
+
+**Promoted to:** no new canonical doc; this is the generalizable form of what `working/_m2-staging/2026-07-12-spanda-overhaul-design/CODEX-DIFF.md` did concretely — cite that file as a worked example if reusing the pattern.
+
+**Tags:** `discovery`, `process-change`
+
+---
+
+### LL-2026-07-12-002 [process-change] — Parallel design agents will independently collide on migration filenames/numbers; never trust agent-chosen numbering
+
+**Session:** spnd0712 · **Date:** 2026-07-12 (written at late closure, 2026-07-21)
+
+**Context:** Three of the six Spanda pillar design agents (P2 push, P4 scientific data, P5 security), working in parallel with no visibility into each other's output, each independently proposed a new database migration and each called it `0016_*.sql`.
+
+**What happened:** Caught during reconciliation, not in production — but had any two of the three been applied without a serialization pass, one would have silently clobbered or been rejected by the other, or (worse, on some migration tools) both could have "succeeded" against different assumed prior states. Fixed by the orchestrating pass assigning a single serialized numbering (0016-0020) across all pillars post-hoc, based on what was actually free in the migrations directory at apply time — not on any agent's guess.
+
+**Root cause:** Parallel agents each see only the migrations directory as it existed at THEIR read time; none can see a sibling agent's in-flight proposal, so "pick the next free number" independently produces collisions whenever more than one agent proposes a schema change in the same round.
+
+**Mitigation / pattern:** Whenever fanning out more than one design/build agent that might touch the same numbered/ordered resource (migrations, feature flags, ticket IDs, anything with a human-assigned sequence), treat every agent's proposed number as a placeholder, not a claim — always run a single serialization/renumbering pass immediately after collecting all outputs and before any apply step, re-deriving the true next-free number from the actual current state of the target directory/table at serialization time, not at each agent's individual read time.
+
+**Promoted to:** no new canonical doc — this reinforces the existing migration-apply discipline (`apply by hand, verify by direct query`) already documented in the Spanda handoffs; adds the specific parallel-fan-out collision risk as a reason to never skip a numbering-reconciliation pass.
+
+**Tags:** `process-change`
+
+---
+
+### LL-2026-07-12-003 [discovery] — A Postgres view with no `security_invoker` and open DML grants is a distinct RLS-bypass class, easy to miss in a table-policy-focused audit
+
+**Session:** spnd0712 · **Date:** 2026-07-12 (written at late closure, 2026-07-21)
+
+**Context:** The Spanda security pillar's adversarial review, and independently the pre-apply gate on migration 0016, both hunted for RLS holes on the `tuned_events` table (found and fixed: a member-readable SELECT policy leaking pre-reveal trial data). A second, distinct hole was found on two VIEWS (`tuned_relationship_latest`, `active_feedback_responses`) that had full INSERT/UPDATE/DELETE grants to `anon`/`authenticated` and no `security_invoker` setting — meaning DML through the view ran with the VIEW OWNER's privileges, not the querying user's, silently bypassing the base table's own RLS policies (including its `WITH CHECK` clause). One of the two views was auto-updatable, so an authenticated user could have inserted a `feedback_responses` row with a spoofed `member_id` through it.
+
+**What happened:** Neither the design agent nor its own adversarial reviewer initially flagged the two views as in-scope — the audit's mental model was "check every table's RLS policies," and a view has no RLS policies of its own to check, so it read as out-of-scope unless someone specifically asked "does this view's DML bypass the base table it reads from." The Phase-0 apply-gate agent, prompted explicitly to attack the migration on multiple fronts including "the retained SELECT grant on the views we're keeping," caught it.
+
+**Root cause:** RLS-focused audits naturally enumerate tables-with-policies. A view sits outside that enumeration by default even when it is a live write path into an RLS-protected table, because the vulnerability lives in `security_invoker`/grants, not in a policy definition.
+
+**Mitigation / pattern:** Any RLS/data-access audit on a Postgres/Supabase schema should explicitly enumerate ALL views granted to `anon`/`authenticated` (not just tables) and check three things per view: (1) is `security_invoker` set (PG15+; without it, DML/SELECT runs as the view owner); (2) is the view auto-updatable (single-table, no aggregates — meaning DML through it is possible at all); (3) do the granted privileges (SELECT/INSERT/UPDATE/DELETE) match what the view is actually meant to support, or are they leftover defaults. Fix pattern used here: `alter view ... set (security_invoker = true)` plus `revoke insert, update, delete, ... from anon, authenticated` where the view was never meant to be writable.
+
+**Promoted to:** no new canonical doc; worth folding into whatever canonical RLS-audit checklist exists for future Supabase-schema security passes (P5's `BUILD-PLAN.md` phase-3 RLS audit item already carries this forward within the Spanda plan specifically).
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-07-21-001 [tool-gotcha] — Counting real MCP/skill tool usage from transcripts must anchor to the `tool_use` content-block shape, never a raw substring grep
+
+**Session:** c5a493fe (M2 Claude Code `/doctor` + plugin/connector audit) · **Date:** 2026-07-21
+
+**Context:** M2 ran `/doctor` and scanned its own transcripts for real plugin/MCP-server usage (13 of 14 installed plugins came back zero over 50 sessions/4 weeks). Asked M1 to run the same check on its own side before recommending removal.
+
+**What happened:** M1's first-pass check — a naive grep for `mcp__<server-id>__toolname` anywhere in its transcripts — returned wildly inflated numbers (496,914 "Adobe" hits, 147,521 "Wix" hits). The naive grep was matching the tool-definition/skill-listing text that gets re-embedded in the deferred-tools system-reminder every session and after every compaction, not real invocations. Plain-English substring matching on a connector's name has the same failure mode: "Canva" vs "Canvas" collapsed 4,042 raw hits to 30 real ones on a word-boundary check; "Descript" vs "description" collapsed 18,474 to 91.
+
+**Root cause:** Transcripts contain both the tool *definitions* (re-injected as context every session/compaction) and the tool *invocations* (actual calls). Any text-matching approach that doesn't distinguish the two silently counts definition noise as usage.
+
+**Mitigation / pattern:** Anchor real-usage counts to the actual `tool_use` content-block shape: `{"type":"tool_use","name":"mcp__<id>__<tool>", ...}` for MCP tools, or `{"type":"tool_use","name":"Skill","input":{"skill":"<name>"}}` for skill dispatches — parse JSONL structurally (even a small script matching on block `type`, not a `grep`), never a raw substring search. M2's own `/doctor` scan used this method from the start and produced numbers M1's structural re-check confirmed as correct.
+
+**Promoted to:** this entry is the reference method — cite it (or the `/doctor` skill's own transcript-scan section) before running any future "is X actually used" audit.
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-07-21-002 [discovery] — A single-node usage audit understates true value for anything that's an orchestrator-side job by design
+
+**Session:** c5a493fe (M2 Claude Code `/doctor` + plugin/connector audit) · **Date:** 2026-07-21
+
+**Context:** M2's `/doctor` scan flagged the Wix and a Gmail-like connector as zero-use, based only on M2's own transcripts. Adrian pushed back ("i am sure we have them for a reason don't we?") before any removal was proposed to him as final.
+
+**What happened:** Cross-checking with M1 showed both connectors are genuinely load-bearing — Wix carries the OSB order-monitor cron (1,775 real calls, 1,415 sessions) and the Gmail-like connector carries real correspondence work (64 real calls) — entirely on M1's side, invisible to an M2-only scan. M2 is the worker/inference node in the established M1/M2 topology; orchestrator-side jobs (crons, correspondence, business-system integrations) run on M1 and simply never appear in M2's transcripts regardless of whether the tool is genuinely used.
+
+**Root cause:** Usage-based decluttering audits implicitly assume the audited surface sees all real usage. In a two-node split-role setup, that assumption is false for anything whose natural home is the other node's role.
+
+**Mitigation / pattern:** Before recommending removal of anything connector- or plugin-shaped in a multi-node setup, either audit all nodes or state explicitly that the audit only covers one node and a zero there does not mean zero overall. Adrian's instinct to question a single-node "unused" claim was correct here and should be treated as the default posture, not overridden by one node's data alone.
+
+**Promoted to:** none further needed — this entry is the reference case.
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-07-21-003 [tool-gotcha] — A slow/hanging first `ls` on the M1 vault SMB mount is not proof the mount is down
+
+**Session:** c5a493fe (M2 Claude Code `/doctor` + plugin/connector audit) · **Date:** 2026-07-21
+
+**Context:** Resuming a 6-day-idle chat, M2 needed to write to the shared vault and first checked the mount per the project `CLAUDE.md`'s MOUNT-DOWN GUARD (`ls /Users/adriantaffinder/Documents/Adrian-Vault` returning nothing ⇒ treat as OFFLINE, remount, never fall back to iCloud).
+
+**What happened:** The first `ls` hung past a 10-second check and a backgrounded `find` over the same mount took over two minutes. Rather than immediately concluding MOUNT-DOWN, checked two cheap local signals first: the local `mount` table (instant, no network round-trip — confirmed the SMB share was present) and a Tailscale ping to M1 (instant, host answered). Both checked out, so retried the `ls` — it succeeded immediately on the retry. The mount was never down; it was a cold/idle SMB session's first-touch latency, not an outage.
+
+**Root cause:** The MOUNT-DOWN GUARD's literal check (`ls` returning nothing) doesn't distinguish "the mount is genuinely offline" from "the mount is live but slow to wake after being idle" — both can look like a hung/empty `ls` from the caller's side within an impatient timeout.
+
+**Mitigation / pattern:** Before treating a hung/empty `ls` on the vault mount as MOUNT-DOWN, check the local `mount` table and ping M1 over Tailscale first (both instant, no dependency on the SMB share itself responding) — if both come back healthy, retry the `ls` once before invoking the guard's remount/iCloud-avoidance instructions. A genuinely down mount will fail the ping or show no mount entry, not just be slow.
+
+**Promoted to:** none further needed — this entry is the reference diagnostic; consider folding a one-line version into the MOUNT-DOWN GUARD text in the project `CLAUDE.md` itself next time that file is touched.
+
+**Tags:** `tool-gotcha`
