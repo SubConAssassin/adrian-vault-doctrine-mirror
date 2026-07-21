@@ -1341,3 +1341,22 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** this entry is the fix; the doc edits it describes are already live on M2.
 
 **Tags:** `process-change`
+
+---
+
+### LL-2026-07-21-006 [mistake, discovery] — Re-derived and failed the exact fix LL-2026-07-17-001 already tried and reverted; quantified why
+
+**Session:** b3fc · **Archive:** [raw/sessions/2026-07-21-2021-m2-audio-shutdown-and-guard-revert.md](../../raw/sessions/2026-07-21-2021-m2-audio-shutdown-and-guard-revert.md)
+**Date:** 2026-07-21
+
+**Context:** Reopened a 7-day-stale chat about `audio-tx-mlx.py`'s memory leak (this thread's own 07-14 work) to run the shutdown protocol, and walked into a live crash-loop: the daemon was reaching its memory-guard check, passing it, then dying silently on every attempt for the ~20 minutes observed.
+
+**What happened:** Diagnosed live rather than checking the record first: measured that a killed instance's memory releases as a `vm_stat` free+speculative spike peaking ~18GB, decaying to true steady-state (~0.1GB on this box that night) within ~19s — the guard's single instantaneous snapshot was sampling inside that decay window. Built `stable_free_gb()` (settle 45s, worst-of-3 samples) to dodge it, verified the *timing* changed as designed, then checked outcome: zero new successful transcriptions logged afterward — same crash-loop, just delayed ~50s per cycle. Only then found `LL-2026-07-17-001`: a prior session (`e04c`) had made the structurally identical mistake five days earlier (swapped the check's metric instead of its sampling strategy, verified the patch in isolation, found it "kept crash-looping identically" under real load) and reverted for the same underlying reason — no pre-load snapshot, however carefully timed or sampled, substitutes for testing under the actual load (this daemon genuinely needs ~10-11GiB active, which this box does not have free right now, full stop).
+
+**Root cause:** Didn't check `canonical/concepts/lessons-learned.md` or the NODE-STATUS M1 pane's standing conclusion on this exact daemon *before* starting a fresh empirical investigation — only checked after building and testing a fix that then failed the same way the documented one had.
+
+**Mitigation / pattern:** Before attempting ANY fix to a resource-pressure check that's already been touched by a prior session (visible via its own docstring dates, e.g. this file's "MEMORY GUARD (fix 2026-07-19)" / "(2026-07-20)" markers), grep `lessons-learned.md` for the file/daemon name FIRST. If a prior attempt at the same class of fix exists, read it in full before writing new code, not after. Reverted the attempted fix (settle+worst-of-N sampling) back to the plain single-snapshot check M1 verified working 2026-07-20; logged what was tried and why directly in the script's docstring rather than deleting the trail. The real fix remains Secretary action `studio-memory-headroom-for-m2-audio` (07-17, still open) — free real headroom, don't keep tuning the check.
+
+**Promoted to:** No new canonical file — `LL-2026-07-17-001`'s existing mitigation already covers this precisely; this entry extends it with the quantified mechanism (the ~18GB/~19s decay curve) as supporting evidence for future readers who might otherwise think "but what if I sample more carefully" is worth trying again.
+
+**Tags:** `mistake`, `discovery`
