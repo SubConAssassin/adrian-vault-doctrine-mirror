@@ -1233,3 +1233,111 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** none further needed — this entry is the reference diagnostic; consider folding a one-line version into the MOUNT-DOWN GUARD text in the project `CLAUDE.md` itself next time that file is touched.
 
 **Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-07-17-005 [mistake, process-change] — Technical QC passing does not mean the content is coherent; a frankenbite reel shipped because nothing checked narrative/audio continuity
+
+**Session:** 9734 (written up 2026-07-21, late shutdown of a 07-16→07-18 session — see full archive) · **Date:** 2026-07-17
+
+**Context:** A short-form reel was built by splicing beats from widely non-contiguous timestamps (spanning most of a 27-minute source) into a single cut, then run through the full technical QC battery: frame-exact A/V parity, loudness normalization, caption safe zones, full-timeline scrub.
+
+**What happened:** Every technical check passed. Adrian watched it and rejected it immediately: "a complete mishmash of text which makes no sense. the audio is from different recordings and dont go together." The assembled speech was real, verbatim, word-for-word — but reordered/spliced across the talk into something no one ever actually said as a continuous passage, and the room tone/mic energy audibly jumped at every splice.
+
+**Root cause:** The QC battery was entirely technical (does the file conform to spec) and had no check for editorial coherence (does the assembled content make sense as something a person actually said in one take). "QC passed" was being reported and understood as a general quality signal when it only covered one dimension.
+
+**Mitigation / pattern:** Adopted a hard contiguous-pull rule: a reel's speech must come from ONE continuous passage of the source (small internal trims fine, no reordering, no splicing across distant sections). Added two new mandatory pre-render checks: (1) an assembled-transcript readthrough — print the exact words in final-cut order and confirm it reads as one coherent spoken take; (2) a splice-audio check at every remaining cut boundary. Written into the `social-media-reel-editing` skill as R-006. General pattern worth carrying beyond reels: when a QC battery is entirely mechanical/structural, say so explicitly rather than letting "QC passed" imply coverage it doesn't have.
+
+**Promoted to:** skill rule R-006 (`.claude/skills/social-media-reel-editing/SKILL.md`, this machine); memory file `ss-reel-editing-craft-standards.md`.
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-17-006 [mistake, process-change] — Source-file risk was judged per-extracted-passage instead of per-file, letting two risky clips slip past an automated safety screen
+
+**Session:** 9734 (written up 2026-07-21 late shutdown) · **Date:** 2026-07-17
+
+**Context:** A discovery pass across several source recordings screened each candidate passage independently for firewall/attribution risk before handing it to a build agent.
+
+**What happened:** A safety classifier correctly blocked 4 build attempts (a client's private personal story used without consent; a named-third-party demo already flagged SUSPECT in a prior verification pass; two clips from a live multi-speaker Mastermind call). Two MORE clips from those same risky source files were NOT blocked and were built and delivered, because each individual extracted passage happened to read as a clean solo monologue in isolation — the screening never checked whether the passage's own SOURCE FILE (filename pattern, sibling clips' verdicts, document-level sensitivity tags) carried risk beyond what that one passage's transcript showed.
+
+**Root cause:** Attribution/risk screening operated at passage granularity when the actual risk (who else is in this recording, what is this document classified as) lives at file granularity. A locally-plausible read of one 4-second extract said nothing about the other 30 minutes of the same file.
+
+**Mitigation / pattern:** Before clearing any passage as safe, check the FULL source file's risk profile — filename patterns (e.g. "Mastermind"/group-call naming), any existing SUSPECT verdict on sibling clips from the same file, and document-level sensitivity tags — not just whether the extracted span sounds clean alone. If one clip from a file gets held, every other clip from that file needs the identical scrutiny by default. Written into the skill as R-007.
+
+**Promoted to:** skill rule R-007 (`.claude/skills/social-media-reel-editing/SKILL.md`).
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-18-001 [mistake, discovery, process-change] — Crop-tracking engine had no bounds-checking against real content region; shipped 2 reels with the speaker partly off-screen on a pillarboxed source, invisible to interval-based QC
+
+**Session:** 9734 (written up 2026-07-21 late shutdown) · **Date:** 2026-07-18
+
+**Context:** A source video was pillarboxed across its entire runtime (real picture content only ~42% of the nominal frame width, black bars either side, constant at every timestamp checked). The shared face-tracked punch-in engine computed crop x-offsets directly from the tracked subject position with no clamping against the real content bounds.
+
+**What happened:** Two reels built from this source shipped with the speaker pushed into the black bars whenever the tracked crop drifted near either edge of the real content strip — confirmed by frame pull, not just measurement. Neither reel's own QC caught it: the mandatory full-timeline scrub sampled at fixed 2-second intervals, which by chance never landed on the exact frames where the tracked position was at its extreme (the only frames where the bug was visible).
+
+**Root cause:** Two independent gaps: (1) the engine assumed the nominal frame width was the real content width, with no pillarbox/letterbox detection; (2) the QC methodology sampled "the timeline" generically rather than the specific coordinates (tracked-position extremes) where a bounds bug would actually manifest.
+
+**Mitigation / pattern:** Added optional `content_l`/`content_r` real-content-bounds parameters to the shared crop engine (additive — confirmed byte-identical output when omitted, so no other build was silently affected). QC now requires an explicit frame pull at the facetrack min AND max x-values for any tracked-crop reel, in addition to the interval scrub — general pattern: when QC samples "the timeline" at fixed intervals, that's necessary but not sufficient for any bug whose visibility depends on a *value* (like a tracked position) rather than *time*; also sample at that value's own extremes. Written into the skill as R-008.
+
+**Promoted to:** `working/reels-build/_engine/punch_arc.py` (code fix); skill rule R-008.
+
+**Tags:** `mistake`, `discovery`, `process-change`
+
+---
+
+### LL-2026-07-18-002 [discovery] — One already-cleared long source can yield many more standalone reels than initially cut; mine it before reaching for new sources
+
+**Session:** 9734 (written up 2026-07-21 late shutdown) · **Date:** 2026-07-18
+
+**Context:** Asked for a much larger batch of reels for review, and initially framed this as constrained by editing throughput.
+
+**What happened:** The real constraint turned out to be cleared-source scarcity, not editing speed — a single 27-minute already-attribution-cleared talk had only ~2 minutes of it cut into reels. A full-talk transcript already existed on disk from the original build; reading it end-to-end in one discovery pass surfaced 12 more genuinely distinct, non-overlapping, firewall-clean passages worth their own standalone reels.
+
+**Root cause:** N/A (discovery, not a mistake) — simply hadn't occurred to treat one long cleared source as a multi-reel mine rather than a single-cut source.
+
+**Mitigation / pattern:** When asked for more volume and a source is already attribution-cleared and reasonably long, do a full-transcript discovery pass over it BEFORE sourcing new, unverified material — the yield-per-unit-of-clearance-effort is much higher on an already-cleared file.
+
+**Promoted to:** informal pattern, no dedicated doc — worth a line in whatever reel-sourcing doctrine exists if a future session formalizes one.
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-07-21-004 [process-change] — When closing an old chat days late, re-verify claimed-open items against live state before writing them into a fresh handoff
+
+**Session:** 9734 · **Date:** 2026-07-21 (about a session whose real work was 2026-07-16→18)
+
+**Context:** Running shutdown protocol on a chat left open for 5 days, per Adrian's explicit "batch-close several old chats, don't overwrite anything" instruction.
+
+**What happened:** Before writing the handoff/Secretary items, re-checked a handful of the session's own claimed-open items against current live state rather than trusting the session's last-known snapshot. One (a Kajabi email sequence pending a pricing decision) turned out to have already been picked up, resolved differently than either option the old session had drafted, and shipped live by a later session — would have been a stale, misleading "still needs a decision" flag if not checked. Another (3 landing pages from the same funnel) turned out to be genuinely untouched since creation — a real, still-open gap, correctly flagged as such.
+
+**Root cause:** N/A (process-change, not a mistake this specific time — but the risk is obvious and general).
+
+**Mitigation / pattern:** A shutdown/handoff running significantly after the work it describes must not treat its own session's internal state as current truth. Spend a few targeted checks (not a full re-audit) confirming whether the specific items about to be flagged as "open" are actually still open, and say explicitly, per item, what was verified-still-open vs verified-resolved-by-others vs unable-to-confirm. A late handoff that just restates stale state as if fresh is worse than no handoff, because it actively misdirects the next reader.
+
+**Promoted to:** this entry; also written into the late-closing session's own archive (`raw/sessions/2026-07-18-0020-pipeline-carryon-launchpack-reelbatch-pillarbox.md`) as a first-class lesson, not a footnote.
+
+**Tags:** `process-change`
+
+---
+
+### LL-2026-07-21-005 [process-change] — Point-in-time audit findings stamped into standing doctrine files go stale within days on a system this dynamic
+
+**Session:** ad0a · **Date:** 2026-07-21 (about a session whose real work was 2026-07-18)
+
+**Context:** A 2026-07-18 hive audit found the M2 launchd roster larger than doctrine claimed and `com.adrianvault.overnight-supervisor` unloaded/historical, then wrote both facts into `project CLAUDE.md` and `memory/overnight-grind-supervisor.md` as if they were durable state. Re-verified live during this session's shutdown pass (2026-07-21, 3 days later).
+
+**What happened:** `overnight-supervisor`, `m2-cloud`, `fleet-worker`, and `m2-audio` were found loaded AND actively running (real PIDs, ~8h42m elapsed) — an authorized overnight-style grind had started in the interim. Both the CLAUDE.md service line and the memory stamp were wrong again within 3 days of being written. (Note: this session also independently hit the adjacent lesson already captured as LL-2026-07-21-004 — re-verify claimed-open items before reporting on a stale chat — not repeated here to avoid duplication; this entry is the distinct half of that finding.)
+
+**Root cause:** Conflating "what an audit observed right now" with "what should be asserted as standing doctrine." A launchd roster on a node that runs on-demand grinds is inherently a live-query fact, not a documentable constant — stamping a specific snapshot into a doctrine file just relocates the staleness problem instead of solving it.
+
+**Mitigation / pattern:** When a fact is genuinely volatile (service roster, running processes, disk usage, anything that changes with normal operation rather than with a deliberate decision), document the **live-check command** in doctrine/memory files, not the value observed at write time. Reserve point-in-time stamps for facts that only change on a deliberate action (e.g. "the media-delivery rule was staged 07-15 and not yet promoted" is fine to stamp — it only changes when someone promotes it). Applied live in this session: `project CLAUDE.md`'s service-roster line and `memory/overnight-grind-supervisor.md`'s status line were both rewritten to point at `launchctl list | grep adrianvault` instead of asserting a specific count/state.
+
+**Promoted to:** this entry is the fix; the doc edits it describes are already live on M2.
+
+**Tags:** `process-change`
