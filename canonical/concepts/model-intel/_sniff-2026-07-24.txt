@@ -1,0 +1,8 @@
+- [216pts] Show HN: Smart model routing directly in Claude, Codex and Cursor  (https://github.com/workweave/router)
+- [183pts] Show HN: Cactus Hybrid: We taught Gemma 4 to know when it's wrong  (https://github.com/cactus-compute/cactus-hybrid)
+- [105pts] Can a MUD evaluate LLMs? A $99 proof of concept  (https://cruciblebench.ai/)
+- [85pts] Launch HN: Agnost AI (YC S26) – Extract user feedback from agent conversations  (https://agnost.ai)
+- [85pts] Show HN: I mapped 8.5M research papers into an interactive atlas  (https://tomesphere.com/atlas)
+- [53pts] Show HN: GolemUI – Declarative Form Engine  (https://golemui.com)
+- [38pts] Launch HN: Screenpipe (YC S26) – Record how you work and turn that into agents  (https://news.ycombinator.com/item?id=49024620)
+- [174pts] Show HN: Onit – Source-available ChatGPT Desktop with local mode, Claude, Gemini  (https://github.com/synth-inc/onit)
