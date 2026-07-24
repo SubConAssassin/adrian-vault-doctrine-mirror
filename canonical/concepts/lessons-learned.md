@@ -1360,3 +1360,64 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** No new canonical file — `LL-2026-07-17-001`'s existing mitigation already covers this precisely; this entry extends it with the quantified mechanism (the ~18GB/~19s decay curve) as supporting evidence for future readers who might otherwise think "but what if I sample more carefully" is worth trying again.
 
 **Tags:** `mistake`, `discovery`
+
+---
+
+### LL-2026-07-24-001 [tool-gotcha, mistake] — osxphotos: not concurrency-safe, and CLI subprocess spawns never surface the Photos TCC prompt at all
+
+**Session:** (unregistered, M2 ad hoc) · **Archive:** [raw/sessions/2026-07-24-1918-m2-icloud-video-pipeline-build.md](../../raw/sessions/2026-07-24-1918-m2-icloud-video-pipeline-build.md)
+**Date:** 2026-07-24
+
+**Context:** Building an iCloud video processing pipeline (9,689 videos), using `osxphotos export --download-missing` to trigger on-demand iCloud downloads of videos a "Optimize Mac Storage" library only has thumbnails/previews for locally.
+
+**What happened:** Two separate real failures. (1) A bare `osxphotos export ...` invoked from Claude's own subprocess never surfaces the Photos permission dialog at all — no entry appears in System Settings > Privacy & Security > Photos to even manually approve, the request just silently fails forever. Fixed by running the identical command once through `Terminal.app` (via `osascript ... tell application "Terminal" to do script ...`) — a real Apple-signed app gets a real prompt, and the grant is per-requesting-app, so ALL subsequent work must also run through Terminal, not a bare subprocess. (2) Once working, tried 4 concurrent `osxphotos export` calls (each to its own separate destination directory) to speed up the single-threaded download bottleneck. osxphotos maintains export-tracking state that is NOT directory-scoped — concurrent calls threw "you are attempting to export files into a directory that is either the parent or a child directory of a previous export" and one config-parsing crash, wrongly marking ~16 real files as permanently failed within ~90 seconds. The corrupted `.osxphotos_export.db` this left behind then kept causing the same failure even after reverting to single-threaded, until manually deleted.
+
+**Root cause:** (1) TCC prompts require the requesting process to be a properly-bundled, Apple-trusted app with the right entitlements declared — a raw CLI subprocess from an automation tool doesn't qualify, and macOS doesn't even surface a deniable request, it just fails silent. (2) osxphotos's export-state tracking is a shared/global mechanism, not scoped to the destination directory, so it wasn't designed for concurrent invocation against the same library.
+
+**Mitigation / pattern:** For any macOS TCC-gated automation (Photos, Contacts, Calendar, etc.) driven by a non-standard/scripted process: test the permission grant via Terminal.app FIRST, and keep all subsequent calls routed through Terminal, not a bare subprocess — don't assume "it asked for permission" will actually produce a clickable prompt. For osxphotos specifically: never parallelize `export` calls against the same library, even to different directories — single-threaded only. If a "parent/child of a previous export" error appears even after fixing concurrency, check for and delete a stale `.osxphotos_export.db` in the destination directory before assuming the code fix didn't work.
+
+**Promoted to:** `memory/icloud-video-pipeline-2026-07-24.md` (M2's own project memory — full detail, code paths, exact commands)
+
+**Tags:** `tool-gotcha`, `mistake`
+
+---
+
+### LL-2026-07-24-002 [mistake, process-change] — A single-threaded producer's per-node backpressure check silently stalled an entire multi-node pipeline for over an hour
+
+**Session:** (unregistered, M2 ad hoc) · **Archive:** [raw/sessions/2026-07-24-1918-m2-icloud-video-pipeline-build.md](../../raw/sessions/2026-07-24-1918-m2-icloud-video-pipeline-build.md)
+**Date:** 2026-07-24
+
+**Context:** Same iCloud video pipeline — a single-threaded producer downloads files and hands them to whichever of 3 nodes (PC/mini/i7) a hash puts them on, with a backpressure check (`while remote_queue_depth(node) >= MAX_QUEUE_DEPTH: sleep`) before each submission to avoid flooding a slow node's queue.
+
+**What happened:** i7 (freshly added to the rotation) hit an unrelated crash (`OMP: Error #15`, duplicate OpenMP runtime init) on every attempt to load its whisper model, so its queue never drained. The NEXT uuid that happened to hash to i7 caused the producer to block in the backpressure sleep-loop forever — but because the producer is single-threaded and serves ALL three nodes, this silently stopped submissions to PC and mini too, even though both were completely healthy and idle. A watchdog (correctly built earlier the same session) detected the orchestrator process going stale and restarted it every ~13 minutes — but restarting just re-hit the identical block on the next i7-bound uuid, so the pipeline looked "alive" (fresh start messages in the log every 13 min) while making zero real progress for over an hour. Only surfaced because Adrian asked directly "what is the pc doing" and a live check showed 0% GPU, empty queue, idle since the stall began.
+
+**Root cause:** Backpressure was implemented as a blocking wait scoped to the whole producer loop, not scoped to (or skippable per) the specific node being blocked on. A liveness watchdog that only checks "is the process running and is the log recent" cannot detect this class of stall — the process WAS alive and WAS logging (the restart banner itself counts as recent activity), it just wasn't making progress.
+
+**Mitigation / pattern:** In any producer/consumer fan-out across multiple worker nodes, backpressure against one node must never block submissions to other nodes — skip the blocked item (requeue for later, or just move to the next item in a round-robin sense) rather than sleep-wait. Separately: a health check for a work-queue pipeline should verify actual THROUGHPUT (e.g. "has the done-count increased in the last N minutes") not just process liveness / log recency — a process can be alive and actively logging while genuinely stuck. Not yet fixed in code as of session end — flagged as the first item for the next session (Secretary action `icloud-video-pipeline-resume`).
+
+**Promoted to:** `memory/icloud-video-pipeline-2026-07-24.md`; Secretary action `icloud-video-pipeline-resume` (open)
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-24-003 [tool-gotcha] — Cluster of Python/macOS/Windows environment gotchas hit building a new CUDA+diarization worker fleet
+
+**Session:** (unregistered, M2 ad hoc) · **Archive:** [raw/sessions/2026-07-24-1918-m2-icloud-video-pipeline-build.md](../../raw/sessions/2026-07-24-1918-m2-icloud-video-pipeline-build.md)
+**Date:** 2026-07-24
+
+**Context:** Standing up matching whisper+diarization+vision worker environments across PC (Windows/CUDA), mini (Apple Silicon), and i7 (old Intel Mac, Python 3.9 system default).
+
+**What happened, each independently real and each cost real debugging time:**
+- `faster-whisper`/ctranslate2 on Windows needs `os.add_dll_directory()` for the nvidia cudnn/cublas/cuda_nvrtc/cuda_runtime pip-package DLL dirs, AND a `PATH` env fallback — either alone silently still fails with `cublas64_12.dll not found`. (Already known/documented from an earlier session's `pc-cloud-pipeline.py` — reused the exact fix, just noting it recurred.)
+- `setuptools>=81` dropped the bundled `pkg_resources` shim; speechbrain's dependency chain still imports it directly, failing deep inside an unrelated import (`No module named 'pkg_resources'`) with no hint it's a setuptools version issue. Pin `setuptools<81` in any venv running speechbrain.
+- On i7 (Python 3.9, x86_64 macOS), plain `pip install` for `torch`/`webrtcvad` triggered a slow from-source compile (stuck 8+ minutes on one build step) because no prebuilt wheel existed for that exact platform/version combo for the LATEST package versions. Fixed by (a) pinning `torch<2.3` (has a prebuilt cp39 wheel) and using `--only-binary=:all:` to force-fail-fast instead of silently compiling, and (b) for `webrtcvad` specifically (which has no wheel at all for this combo, from anyone), using the `webrtcvad-wheels` PyPI package — a prebuilt-wheel fork that still imports as `webrtcvad`, zero code changes needed.
+- `OMP: Error #15: libiomp5.dylib already initialized` — a duplicate-OpenMP-runtime crash from torch and another linked library (likely scipy/numpy's own bundled OpenMP) both trying to initialize. Standard unsafe-but-widely-used workaround: `KMP_DUPLICATE_LIB_OK=TRUE` env var. Not yet applied (found at session end) — next session should add this to i7's launchd plist before re-trusting it in the fleet rotation.
+- Whisper's language auto-detect is unreliable on quiet/near-silent clips — misfired as Nynorsk, Latin, and Italian across unrelated files this week. For a corpus known to be one language, force it explicitly rather than trust auto-detect, and separately filter whisper's classic hallucination phrases on silence ("to be continued...", "thank you for watching", etc.) since forcing the language doesn't stop those.
+- Fleet nodes other than studio (mini, i7) cannot reach the PC over its Tailscale IP (`100.102.175.8`) — only studio has full Tailscale mesh access to it. Cross-node HTTP calls between workers (e.g. mini calling the PC's vision model) need the PC's local LAN IP instead.
+
+**Mitigation / pattern:** When bringing up a new Python environment on an older/less-common machine in the fleet (old Intel Mac, in particular), default to `--only-binary=:all:` on the first install attempt rather than a plain `pip install` — it fails fast and loud on anything that would've silently compiled for minutes, giving a much faster diagnostic loop. Check for a `-wheels`-suffixed fork on PyPI before accepting "no prebuilt wheel exists" as final for any single stubborn C-extension package.
+
+**Promoted to:** `memory/icloud-video-pipeline-2026-07-24.md`
+
+**Tags:** `tool-gotcha`
