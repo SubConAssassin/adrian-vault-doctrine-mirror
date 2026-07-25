@@ -164,6 +164,20 @@ still works) — `cli-ask-selftest.sh` now **16/16**.
 
 ---
 
+## §5b — NEXT: the compression pass (handed over, not done)
+
+This map fixed **correctness**. It did not fix **size** — measured honestly, the 2026-07-25 pass moved
+the five imported files from 104,869 → 110,901 chars (**+1,508 tokens/session**), because relocated
+content and contradiction records outweighed the duplication removed.
+
+The real compression is `canonical/concepts/delegation-first-operating-doctrine.md`: **53,768 chars of
+fourteen dated accretion layers** (§1→§14), where later layers supersede earlier ones without deleting
+them. Collapsing it to a single current statement + an archive targets **~28KB (~6–7k tokens off every
+session)**.
+
+**Plan, 52-rule verification checklist, hard constraints and rollback:**
+`working/handoffs/2026-07-25-HANDOVER-delegation-doctrine-layer-collapse.md`.
+
 ## §6 — MAINTENANCE RULE (how to stop the sprawl coming back)
 
 1. **One rule, one home.** Before writing a rule, find its domain in §2. Write it there. If the
