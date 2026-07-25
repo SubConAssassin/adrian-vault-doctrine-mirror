@@ -28,15 +28,22 @@ metadata:
 | Never-reread-the-universe / compress-after-work | **Already law** — STATE-OF-STACK + handoffs + memory + ChromaDB are the compressed-state layer. PROJECT_STATE.md/TASKS.md per-repo pattern = optional, use where a repo already has it; the VAULT files remain canonical (same reconciliation as the cluster roadmap). |
 | **The proactive secretary (monitors Claude's conduct)** | **NEW — BUILT 2026-06-12.** `tools/delegation-sentinel.py`: scans live session transcripts (30-min window), classifies every tool call DIRECT-labour vs DELEGATED (cli-ask/subagent/workflow), scores, and injects a nudge banner into EVERY prompt via UserPromptSubmit hook when Claude is labouring (AMBER ≥30 direct + ratio<12% · RED ≥60 + <5%). GREEN = silent. Self-heals (re-scores when >10min stale). This is the enforcement mechanism the doctrine lacked — the accountant watches tokens; the secretary watches behaviour. |
 
-**Conductor's tier matrix (operational, adopted):**
+**Conductor's tier matrix — REFRESHED 2026-07-25 against the current engine board.** Roles unchanged; the engines behind them moved. Full specs: [[llm-capability-map-2026-07-25]]; binding law: delegation-doctrine **§14**.
 
-| Role | Model/effort | Used for |
+| Role | Model/effort (current) | Used for |
 |---|---|---|
-| Conductor | session model, med | intent, task cards, routing, merge, state |
-| Architect | opus/fable high — escalate deliberately | architecture, strategy, hard debugging, ambiguity, final verification |
-| Builder | sonnet / team CLI (agy default) | implementation after the plan is decided; never re-architects |
-| Auditor | different family from builder (grok/codex vs Claude) | acceptance-criteria check; receives task card + diff, NOT chat history |
-| Scribe | haiku / cheap | changelogs, summaries, state compression, handoffs |
+| Conductor | **Opus 5** @ `high` (the default) | intent, task cards, routing, merge, state |
+| Architect | **Opus 5** @ `xhigh` — **Fable 5** only for genuinely hours-long runs | architecture, strategy, hard debugging, ambiguity, final verification |
+| Builder | **Sonnet 5** @ `medium` / team CLI (**agy = Gemini 3.6 Flash**) | implementation after the plan is decided; never re-architects |
+| Auditor | different family from builder (**codex-sol** / grok / agy vs Claude) | acceptance-criteria check; receives task card + diff, NOT chat history |
+| Scribe | **Haiku 4.5** | changelogs, summaries, state compression, handoffs |
+
+**Three changes worth naming, because they invert prior habits:**
+1. **Sonnet 5 earned the Builder tier on merit, not price.** It beats *Opus 4.8* on Terminal-Bench 2.1 (80.4% vs 74.6%) at $3/$15 vs $5/$25. Routing a build to Sonnet 5 is no longer a quality compromise — it is the correct call, and it is the largest single cost win available inside Claude.
+2. **Fable 5 is NOT simply "the best one".** At $10/$50 and slower, with safety classifiers that false-positive on ordinary coding work, it earns its place only when the run is genuinely long — its lead grows with task length, and shrinks to ~0.5% on CursorBench against Opus 5 at half the cost.
+3. **§4 "Token efficiency rules" and §7's conductor prompt below now carry a caveat.** They were written for 2025-era models that needed anti-laziness scaffolding. Under §14.2, instructing a Claude 5 model to "verify", "double-check" or "reject unverified work *from itself*" causes **over-verification** and costs tokens for zero quality — the model already does it. The Auditor role (a *different* model checking the builder) is unaffected and still correct; what is retired is telling one model to re-check its own work.
+
+**Effort note:** on Claude 5, `effort` governs tool calls as well as thinking — `low` genuinely makes fewer tool calls. Hold effort constant within a cached conversation (changing it invalidates prompt caching).
 
 ---
 

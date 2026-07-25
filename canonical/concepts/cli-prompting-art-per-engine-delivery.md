@@ -38,5 +38,24 @@ The non-web grok branch is now **size-gated** (`CLI_ASK_GROK_INLINE_MAX`, defaul
 5. **Reserve grok for what it's best at:** bounded verification, cross-audit, `grok-web` live research — not 100 KB solo reads. It excelled at the 22 KB cross-audit (23 confirmations + 12 gaps) the same session it failed the 116 KB solo.
 6. **Verify-before-trust every large return:** confirm the engine actually ingested the whole payload (ask it to echo a count/marker) before believing a "clean" audit — a truncated-input audit looks identical to a complete one.
 
+## 2026-07-25 UPDATE — the prompting law inverted, and the current engine strings
+
+Companion: **[[llm-capability-map-2026-07-25]]** (full specs/benchmarks/pricing) + delegation-doctrine **§14**.
+
+**The big inversion: STOP OVER-PROMPTING.** Everything above about *delivery idioms* still holds — but the guidance on *how much* to instruct has flipped for the frontier models. Every vendor published the same finding in Q3-2026. **OpenAI measured that stating each instruction exactly once and deleting repeated rules raises scores 10–15% while cutting tokens up to 66%.** Anthropic's Opus 5 guidance says to *remove* "verify everything" / "double-check" / "use a subagent to verify" outright. The §6 prescriptive-prompt law is **not** repealed — it exists because agy/grok confabulate without exact paths and grounding clauses — but it should now be applied as **structure, not volume**: exact paths, exact output format, one grounding clause. Not the same rule three times.
+
+**Per-engine prompting deltas (2026-07-25):**
+- **Claude Opus 5** — remove verification/double-check/subagent-verify instructions (they compound with behaviour it already has). Add: an explicit conciseness line, a narration-cadence line, a written-deliverable length calibration, and a subagent-delegation cap — it expands scope and delegates readily. Keep thinking ON at `low` effort rather than disabling it (disabled thinking leaks tool-calls-as-text and internal XML tags).
+- **Claude Sonnet 5** — **literal**. "Only report high-severity issues" genuinely suppresses findings. State scope explicitly ("every section"). Non-default `temperature`/`top_p`/`top_k` → **400**.
+- **Claude Fable 5** — brief is enough; give intent/why. **Never ask it to echo or show its reasoning** — trips a `reasoning_extraction` refusal.
+- **GPT-5.6** — already terser than 5.5, so legacy "be brief" now **over-corrects**. Use the `verbosity` parameter; on migration test **one effort level lower** than the 5.5 baseline. Effort adds `none` below `low`.
+- **Gemini 3.6** — the one engine that still wants full prescriptive structure: XML semantic boundaries (`<instructions>`/`<context>`/`<data>`), behavioural rules at the TOP but execution directions AFTER large data blocks (prevents dilution), API-level **JSON response schemas** rather than "output JSON" in prose, and anchor framing *"Based only on the provided text…"*. Don't mix XML tags and markdown fences in one prompt. Failure modes to prompt against: instruction drift, attention-sink overwrite, **false completeness** (confident but logically empty), **imagined completions** (claims a file was written when it wasn't).
+- **Grok 4.5** — hallucination rate is a **measured 54%** (Artificial Analysis; 2× Grok 4.3's 25%). Different-family cross-check before any promotion is now numeric policy, not taste.
+
+**Current engine strings (verified live 2026-07-25):**
+- `agy models` → `gemini-3.6-flash-{high,medium,low}` · `gemini-3.5-flash-{high,medium,low}` · `gemini-3.1-pro-{high,low}` · `claude-sonnet-4-6` · `claude-opus-4-6-thinking` · `gpt-oss-120b-medium`.
+- **`AGY_MODEL` repinned to `gemini-3.6-flash-high`.** The previous default `"Gemini 3.5 Flash (High)"` matched **no** published slug — wrong format, so the pin was not reliably binding and agy could fall back to its last-selected model. Note the slug format when pinning anything here.
+- **codex was down vendor-side on 2026-07-25** (OpenAI 503, `biscuit_baker_service_me_circuit_open`) — an outage, not a quota signal.
+
 ## Grok 4.5 context window — the live-verified fact (settles a recurring confusion)
 **500 000 tokens.** Confirmed 2026-07-18 via WebSearch across xAI docs + OpenRouter + LLMReference + DataNorth + Kingy. This is a **regression from Grok 4.3's 1 M**. Released 2026-07-08. Pricing $2/$6 per M (tiered ×2 above 200 K prompt). Adrian's recollection of "4.5 went to 1 M" is incorrect — it was 4.3 that was 1 M. Sources filed in `working/_research/2026-07-18-cli-prompting-research/`.
