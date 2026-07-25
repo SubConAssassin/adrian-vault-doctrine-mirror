@@ -138,26 +138,29 @@ These were live, and agents were reading both sides. Each is now resolved at its
 
 ---
 
-## §5 — ⚠️ OPEN DEFECT: doctrine and code disagree
+## §5 — ✅ FIXED (same session): the silent cross-engine reroute
 
-`tools/cli-ask.sh:123` auto-routes any prompt over 100,000 chars **to grok**:
+**The defect.** `tools/cli-ask.sh` auto-routed any prompt over 100,000 chars **to grok**, silently
+changing which model answered — the caller asked for agy and got grok. Written when grok had a **1M**
+window; since Grok 4.5 (8 Jul) grok has the **smallest** of the three (500K) *and* a measured 54%
+hallucination rate. So the biggest jobs went to the least suitable engine, inverting delegation
+§13.3.6, and every auto-routed job silently inherited grok's hallucination profile.
 
-```
-if [ "${#PROMPT}" -gt 100000 ] && [ "$MODEL" != grok ]; then   # AUTO-ROUTING to grok
-```
+**Why the obvious fix was wrong.** Deleting the reroute reintroduces the bug it was built for: agy and
+codex take the prompt as a **single argv arg** and stall/degrade on very large inputs. grok was chosen
+because it had `--prompt-file`.
 
-That rule was written when grok had the **1M** context window. Since Grok 4.5 (8 Jul) grok has the
-**smallest** window of the three (500K) *and* a measured 54% hallucination rate. So the script sends
-the biggest jobs to the least suitable engine — backwards relative to delegation §13.3.6.
+**The actual fix (applied 2026-07-25).** Never switch engines behind the caller's back — instead give
+agy and codex the **same file-read idiom already proven for grok**: write the payload to a data file
+and pass a *short* argv instruction telling the engine to read that file in full. The argv is now
+~400 chars regardless of payload size, so the original constraint disappears. Escape hatch retained:
+`CLI_ASK_LEGACY_GROK_REROUTE=1`. Threshold: `CLI_ASK_BIG_MAX` (default 100000).
 
-**Severity: low-but-real.** 100k chars ≈ 25k tokens, well inside 500K, and the >40KB file-read idiom
-already handles delivery — so it is not breaking today. It bites at the top end (a ~2MB payload
-≈500K tokens would overflow grok while agy/codex at 1M would take it), and every auto-routed job
-inherits grok's hallucination profile.
-
-**Recommended fix (NOT applied — this changes live routing behaviour):** route oversized payloads to
-**agy** (1M ctx, biggest pool) with codex as fallback, and keep grok for bounded verification.
-Needs Adrian's go-ahead because it alters a load-bearing script's behaviour.
+**Verified, not assumed.** A 126,228-char payload with a canary token placed *only at the very end*
+plus a countable body — truncation fails the test by construction. Both engines returned
+`TOKEN=ZEBRA-9174-OMEGA COUNT=2000` (canary correct, all 2000 lines counted) and both stayed on the
+requested engine. Regression guards added: **P14** (no silent grok reroute) and **P14b** (legacy hatch
+still works) — `cli-ask-selftest.sh` now **16/16**.
 
 ---
 

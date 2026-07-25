@@ -52,6 +52,17 @@ Companion: **[[llm-capability-map-2026-07-25]]** (full specs/benchmarks/pricing)
 - **Gemini 3.6** — the one engine that still wants full prescriptive structure: XML semantic boundaries (`<instructions>`/`<context>`/`<data>`), behavioural rules at the TOP but execution directions AFTER large data blocks (prevents dilution), API-level **JSON response schemas** rather than "output JSON" in prose, and anchor framing *"Based only on the provided text…"*. Don't mix XML tags and markdown fences in one prompt. Failure modes to prompt against: instruction drift, attention-sink overwrite, **false completeness** (confident but logically empty), **imagined completions** (claims a file was written when it wasn't).
 - **Grok 4.5** — hallucination rate is a **measured 54%** (Artificial Analysis; 2× Grok 4.3's 25%). Different-family cross-check before any promotion is now numeric policy, not taste.
 
+**The file-read idiom is now GENERALISED to all three engines (2026-07-25).** It was grok-only. The
+per-engine table above said agy/codex handle "≤ ~100KB" inline — true, but what happened *above* that
+was the real problem: `cli-ask.sh` silently **rerouted the job to grok**, swapping the model behind
+the caller's back and sending the biggest payloads to the smallest-context, highest-hallucination
+engine. Now every engine keeps its own oversized payloads: the content goes to a data file and the
+engine gets a ~400-char argv instruction to read it in full. **Verified** with a 126,228-char payload
+carrying a canary *only at the very end* — agy and codex both returned the canary plus an exact body
+count (`TOKEN=ZEBRA-9174-OMEGA COUNT=2000`), proving full ingestion. Guards: selftest **P14/P14b**,
+now 16/16. Knobs: `CLI_ASK_BIG_MAX` (default 100000), `CLI_ASK_LEGACY_GROK_REROUTE=1` to revert.
+*Idiom rule #1 still applies — never tell an engine to read a file while also inlining it.*
+
 **Current engine strings (verified live 2026-07-25):**
 - `agy models` → `gemini-3.6-flash-{high,medium,low}` · `gemini-3.5-flash-{high,medium,low}` · `gemini-3.1-pro-{high,low}` · `claude-sonnet-4-6` · `claude-opus-4-6-thinking` · `gpt-oss-120b-medium`.
 - **`AGY_MODEL` repinned to `gemini-3.6-flash-high`.** The previous default `"Gemini 3.5 Flash (High)"` matched **no** published slug — wrong format, so the pin was not reliably binding and agy could fall back to its last-selected model. Note the slug format when pinning anything here.
