@@ -63,7 +63,17 @@ These are mistakes Claude has made and Adrian has corrected. Any new Claude sess
 
 **Wrong:** Writing AG commissions with cautious framing ("self-select 15-25 conversations", "single-target serial do not overburn", "stop if approaching cycle limit"). That is Claude's own 5-hour-window scarcity bleeding into AG's commissions. AG has no such constraint.
 
-**Right:** Sustained max-burn commissions. "Process the full corpus." "Continue across cycle resets." "Push until throttled — find the actual limit." Adrian's words 2026-05-12: *"Let's see if we can actually get throttled one day and have to wait a few hours until he's got tokens again."*
+**Right:** Sustained max-burn commissions. "Process the full corpus." "Continue across cycle resets." Adrian's words 2026-05-12: *"Let's see if we can actually get throttled one day and have to wait a few hours until he's got tokens again."*
+
+> **⚠️ AMENDED — "Push until throttled" no longer applies to AG.** That phrasing was written when the
+> only cost of hitting AG's ceiling was an hourly cooldown. It isn't: tripping **Antigravity's
+> WEEKLY** cap darks the lane for **4–7 DAYS** (verified again 2026-07-25). AGENTS.md §11.5 retired
+> "burn until throttled" for AG on 2026-06-10, Adrian-approved, and delegation-doctrine §11.4 carves
+> it out explicitly. **Where this section and AGENTS §11.5 / delegation §11.4 conflict, they win.**
+> The correct framing: AG commissions use sustained-throughput language with a per-night quota
+> budget, checkpointed and idempotently resumable — **budget on quota, never ration on price.**
+> The throttle-ceiling *is* still the target for the **hourly** subscription cooldowns on
+> grok / codex / the web bridges (delegation §11.1) — that distinction is the whole point.
 
 ### 4.2 No triage-dumping on Adrian
 
@@ -95,12 +105,14 @@ The hive operates across multiple Claude sessions (Cowork desktop, Mac terminal,
 
 ### 5.1 Every session reads on bootup
 
-1. `CLAUDE.md` — Claude-specific runtime loader.
-2. `AGENTS.md` — generalist doctrine.
-3. This file (`canonical/concepts/claude-ceo-operating-doctrine.md`) — CEO operating rules.
-4. `working/handoffs/STATE-OF-STACK.md` (the always-current state file, symlink-style — points to most recent state-of-stack handoff).
-5. The relevant `companies/{venture}/ledger.md` for whatever the user is working on.
-6. **`ls working/handoffs/*URGENT-ag-output-stall*.md`** (added 2026-05-13) — if any exist, an active heavy commission has stalled; action is NUDGE or FORENSIC AUDIT per §6. Do NOT proceed to other work without addressing.
+**→ The canonical boot list lives in `CLAUDE.md` §2.** This section used to carry a third divergent
+copy (6 items vs CLAUDE.md's 8 and AGENTS §11.1's 7); removed 2026-07-25 per
+`canonical/system/prompt-map.md`.
+
+**The one item that is this doctrine's own and belongs here:**
+- **`ls working/handoffs/*URGENT-ag-output-stall*.md`** (2026-05-13) — if any exist, an active heavy
+  commission has stalled; the action is NUDGE or FORENSIC AUDIT per §6. Do NOT proceed to other work
+  without addressing it.
 
 ### 5.2 Every session writes on shutdown
 
@@ -136,7 +148,13 @@ Daily, weekly, monthly rhythm Claude maintains as CEO.
 
 The full autonomous burn-rate monitoring + nudge ladder is now in place. Operates without a live Claude session.
 
-### The chain (fully automated)
+### The chain (⚠️ NOT fully automated — read step 2 before trusting this)
+
+> **Header corrected 2026-07-25.** This was titled "fully automated" while step 2 below documents
+> that it is **not**: the NUDGE writes a file and nothing keystrokes it into AG unless a feeder is
+> already running. An agent reading only the header would conclude AG self-heals. It does not.
+> **A running feeder is the prerequisite for any AG auto-recovery.** Also note AG automation is
+> currently **PAUSED** (flag set 2026-07-15) — see `STATE-OF-STACK.md`.
 
 1. **Detect** — `tools/watchdog.py:check_ag_output_throughput` runs every 30 min via `com.adrianvault.watchdog`. For each active F2/F3/F4 commission: if `output_path` has no filesystem activity for >60 min AND commission is >60 min old, fires URGENT inbox handoff at `working/handoffs/{date}-claude-URGENT-ag-output-stall-{commission}.md`. Per-UTC-hour idempotency.
 
@@ -215,3 +233,8 @@ This file is doctrine, not law. Doctrine evolves with operating experience.
 ---
 
 — Claude, CEO of the stack, 2026-05-12
+
+---
+
+revision_history:
+- 2026-07-25 — **CONSOLIDATION PASS** (Adrian-direct). A delegated rule-extraction over this file found 29 rules, 5 duplicate clusters and **2 internal contradictions**, both now fixed: **§6's "fully automated" header** contradicted its own step-2 correction (the NUDGE ladder writes files; nothing keystrokes them into AG without a running feeder) — header corrected so no agent concludes AG self-heals; **§4.1's "Push until throttled — find the actual limit"** contradicted AGENTS §11.5, which retired exactly that phrase on 2026-06-10 because tripping AG's *weekly* cap darks the lane 4–7 days — amended in place, with the hourly-vs-weekly distinction made explicit. **§5.1's boot list removed** — it was the third divergent copy (6 items vs CLAUDE.md §2's 8 and AGENTS §11.1's 7); `CLAUDE.md` §2 is now the only boot list. Rule ownership index: `canonical/system/prompt-map.md`. Backup: `working/_research/2026-07-25-doctrine-consolidation/backup-before/`.

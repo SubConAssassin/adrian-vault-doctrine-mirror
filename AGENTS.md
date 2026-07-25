@@ -1,6 +1,6 @@
 # Adrian-Vault Operating Doctrine (AGENTS.md)
 **Status:** Canonical Rule of Law for all Autonomous Agents
-**Last updated:** 2026-06-10 (§11.5 burn-rule amended + §11.5.b economics correction, Adrian-approved per decision pack `working/handoffs/2026-06-10-claude-to-adrian-DECISION-PACK-agents-burn-doctrine.md`; prior: 2026-05-22 Apple Notes corpus sync + AG Operating Contract v2)
+**Last updated:** 2026-07-25 (§11.1 bootup read-order gains item 7: the LLM capability map + the two rules from it that bind every agent immediately — STOP OVER-PROMPTING, and Grok's measured 54% hallucination rate requiring a different-family cross-check. Adrian-direct: "update all of the system instructions"; reference-pointer addition, no existing rule altered. Full law: delegation-doctrine §14. Prior: 2026-07-24 (§7 added: automation output must never write into Adrian's personal apps — Adrian-direct, after a rogue LaunchAgent spammed 47 nights of digest notes into his live Apple Notes app before being found and killed; prior: 2026-06-10 §11.5 burn-rule amended + §11.5.b economics correction, Adrian-approved per decision pack `working/handoffs/2026-06-10-claude-to-adrian-DECISION-PACK-agents-burn-doctrine.md`))
 
 ## 1. Core Invariant (The Single Source of Truth Rule)
 There is one canonical truth per category:
@@ -12,6 +12,13 @@ There is one canonical truth per category:
 - **External research inbox (ChatGPT Pro + SuperGrok subscription bridge)** → `working/external-research-in/`
 - **Execution truth** → Verified logs + read-back confirmation
 *Everything else is generated cache, adapter, or external reference only.*
+
+### 1.1 Canonical write discipline (canonical home as of 2026-07-25; previously only in `~/.claude/CLAUDE.md`)
+- **Canonical may be stale.** `canonical/` is the single source of truth, but work happens in chat faster than canonical gets written. Always check for fresher chat/session evidence before acting on canonical alone. `claude-mem` is assistive, **never** authoritative.
+- **Promotion threshold.** Do not write to `canonical/` unless the information is **stable, material, cross-session relevant, and source-grounded**. Uncertain information goes to `working/` or `episodic/`.
+- **Source-grounded override.** Recent source-grounded evidence provisionally overrides stale canonical **and must trigger a canonical review/update**. Silent overwrite is forbidden.
+- **Quarantine triggers.** Route to `episodic/review/` before any canonical promotion when there is: agent disagreement · imported historical corpora · material contradiction · sensitive personal/legal claims · large-scale extraction · unverified claims about other people.
+- **Auto-sync duty.** If canonical is stale, update it *before* answering — never ask Adrian to re-explain something searchable. After substantive work, update the affected canonical notes and write an episodic summary to `episodic/sessions/YYYY-MM-DD-{topic}.md`. Full protocol: `procedural/workflows/memory-auto-sync.md`.
 
 ## 2. Who You Are Working For
 **Adrian Alan Taffinder** — entrepreneur, product designer, dyslexic. Based in Sayan, Ubud, Bali. Prefers structured, concise, actionable responses. Uses voice-to-text — interpret phonetic errors contextually (e.g. "Abee", "Balinese", "amulet", "Crowe's" = Grok's). Born 6 May 1972, 8:20 AM, Horsforth, Leeds, England.
@@ -56,8 +63,18 @@ When instructions conflict, agents must follow this strict hierarchy:
 - **NEVER mention Chelsea** in any context across any project.
 - **AYA is deprecated** — replaced by Bodhisvara.
 - **Erica Johnson (OSB dispute):** Always verify the latest status in the OSB ledger before acting.
-- **Crystal facts:** Discovered in Siberia, grown in a lab outside Moscow (~2 months growth). No "Cosmic Vein." No diamond wire saw mention.
+- **OSB product & provenance rules (the full set — this is their canonical home as of 2026-07-25; they were previously split between here and `~/.claude/CLAUDE.md`):**
+  - Crystal was **discovered in Siberia** but is **grown in a laboratory outside Moscow — NOT in Siberia**. Each crystal takes **~2 months** to grow.
+  - **"Cosmic Vein" is fabricated — never use it.**
+  - **Never mention diamond wire saw cutting** in any marketing.
+  - The website's **2500°C temperature claim is wrong** — correct is **300–400°C under pressure**.
+  - **No teardrop pendant product exists.**
+  - **Diamond origin in the Diamond Edition is unconfirmed** — do not state lab-grown or natural.
+  - **Arcturian pendants CAN be marketed** (hold lifted 2026-05-02, Adrian-direct; the original hold was for un-produced inventory). Website priority: **Merkaba + Tranquility**. Arcturian *philosophy* (oneness, compassion, telepathy, synchronicity) may be woven subtly into copy, but the literal **"Adrian is an Arcturian soul" identity claim remains STRICTLY PRIVATE**. Full doctrine: `canonical/projects/osb/risks-constraints.md` + `canonical/adrian-corpus/personal-facts.md`.
+  - **The KGB origin is real and is a genuine USP — never strip it** (see `memory/feedback-kgb-origin-real-usp.md`).
+- **Wix API behaviour:** write operations are reliable, read operations fail — use **POST + PATCH with Catalog V1**.
 - **Cross-pollination protocol:** If Adrian references prior context ("as we discussed"), search the 3.87M-word corpus (`raw/chatgpt-import/` and Claude past chats) BEFORE asking him to repeat.
+- **Automation output stays in the vault, never in Adrian's personal apps.** No LaunchAgent, script, or agent may write status digests, summaries, or generated content into Apple Notes, iMessage, Mail, or Calendar — those are Adrian's own daily-use tools, not system output surfaces. Vault status belongs in `dashboards/`, `working/handoffs/`, or `STATE-OF-STACK.md`. Read-only corpus ingestion FROM Apple Notes (`raw/notes/`) is unaffected — this rule is about writing generated content INTO personal apps. (2026-07-24, Adrian-direct: a rogue LaunchAgent had spammed 47 nights of digest notes into his live Apple Notes app before being found and killed — see `memory/feedback-no-system-automation-into-apple-notes.md`.)
 
 ## 8. Doctrine Change Protocol
 `AGENTS.md` is constitutional. It cannot be casually edited.
@@ -73,6 +90,13 @@ Changes require:
 - **Manu** — original Subconscious Surgery website developer; holds the 123.reg domain.
 - **Erica Johnson** — former US OSB distributor, active legal dispute (~$27,848 inventory, Inglewood PD case #261279). Always check the OSB ledger for latest status.
 - **Jade and Mohamed** — AYA co-founders (project deprecated, replaced by Bodhisvara — flagged for archival).
+
+### 9.1 Active legal disputes (canonical home as of 2026-07-25; previously duplicated in `~/.claude/CLAUDE.md`)
+**Always verify current status in the venture ledger / `canonical/people/{contact}-timeline.md` before acting — the detail below is the standing summary, not live state.**
+- **Erica Johnson** — ~$27,848 OSB inventory. Inglewood PD report **#261279 SUBMISSION REJECTED 2026-04-29**; sergeant letter sent; Stephan asked to call escalation; civil filing drafted and ready.
+- **German parcel** — **KEP-93/KBC.1301/2026**, state seizure decree.
+- **US parcel** — **CC015043798ID**, undelivered, complaint filed.
+- **Cristina Merlins** (OSB Bali retail partner) — inventory dispute, stalled; Cristina silent since 4 March 2026. Evidence assembled, demand pending.
 
 ## 10. Reconciliation Contract (added 2026-05-08, Phase 1 build)
 Every operator (Claude live, Claude headless, Antigravity, automation, Adrian, external) MUST read AND write to the operational state kernel. State drift is impossible because state is never overwritten — only appended.
@@ -136,18 +160,28 @@ Replaces the prior pattern of "Claude updates a static markdown file" with "ever
 
 Adrian operates across multiple agent substrates in parallel — Claude Cowork (desktop), Claude Mac (terminal), Claude mobile Dispatch, Antigravity, and his own ChatGPT Pro + SuperGrok subscriptions. State coherence across these requires explicit channels.
 
-### 11.1 Bootup read order (every agent, every session)
+### 11.1 Bootup read order
 
-1. `CLAUDE.md` (if Claude) / agent-specific runtime if other
-2. `AGENTS.md` (this file)
-3. **If Antigravity: `canonical/concepts/antigravity-operating-contract.md`
-   — MANDATORY anti-confabulation system prompt, read IN FULL before ANY
-   ingestion/synthesis. ~86% of 2026-05-15 AG output was confabulated; this
-   contract is the correction and is structurally enforced (verify-before-trust
-   gate quarantines any output failing it).**
-4. `canonical/concepts/claude-ceo-operating-doctrine.md` — CEO role + anti-patterns
-5. `working/handoffs/STATE-OF-STACK.md` — what's firing right now
-6. Relevant `companies/{venture}/ledger.md` for active venture
+**→ The canonical boot list lives in `CLAUDE.md` §2. Do not maintain a second copy here.**
+(Until 2026-07-25 this section carried its own list, and `claude-ceo-operating-doctrine.md` §5.1 a
+third — 8 vs 7 vs 6 items, disagreeing on both content and order. One list now, per
+`canonical/system/prompt-map.md`.)
+
+**The one addition that is agent-specific and belongs here:**
+- **If Antigravity: `canonical/concepts/antigravity-operating-contract.md` — MANDATORY
+  anti-confabulation system prompt, read IN FULL before ANY ingestion/synthesis.** ~86% of
+  2026-05-15 AG output was confabulated; this contract is the correction and is structurally
+  enforced (the verify-before-trust gate quarantines any output failing it).
+
+**Two rules from the LLM capability map bind every agent immediately, before you read it:**
+- **STOP OVER-PROMPTING** — state each instruction exactly once; never add "verify"/"double-check"
+  scaffolding to a Claude 5 model, it self-verifies (vendors measured +10–15% quality and −66%
+  tokens from deleting repeated rules). Full law: delegation-doctrine §14.2.
+- **Grok 4.5's hallucination rate is a measured 54%** — no Grok-sourced fact promotes to canonical
+  without a different-family cross-check.
+
+Engine specs, pricing, benchmarks and per-engine prompting idioms:
+`canonical/concepts/llm-capability-map-2026-07-25.md` — **read on demand, not every session.**
 
 ### 11.2 External-subscription bridge (ChatGPT Pro + SuperGrok)
 
