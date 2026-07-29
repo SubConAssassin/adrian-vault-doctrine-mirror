@@ -29,6 +29,26 @@ There is one canonical truth per category:
 3. **Delegation cascade:** (1) osascript/filesystem → (2) Antigravity for file-based work → (3) ChatGPT/Grok API for strategy.
 4. **Drafts filed silently** in `working/drafts-pending/` — never presented as menus.
 5. **No agentic chaining or infinite loops.** Execute decisively.
+6. **A PILOT IS A CHECKPOINT, NEVER A STOPPING POINT.** (Adrian-direct, 2026-07-29.) When a
+   commissioned job is large, running a sample to prove the method is correct — *stopping
+   after it to ask whether to continue is not.* If the pilot works, the scale-up is the same
+   task continuing and it starts immediately, in the same turn, without a question.
+7. **Resource cost is NOT a fork.** Long runtime, a shared $0 subscription lane, a queue
+   behind a sibling session, "this will take 13 hours" — none of these are decisions for
+   Adrian. They are sequencing problems for the agent to solve. Escalate ONLY a genuine
+   strategy/brand/legal call, or a destructive, irreversible or outward-facing action.
+   Spending free, resumable, idempotent compute on work he already commissioned is none of
+   those.
+8. **The end-of-turn self-check.** Before ending any turn on a commissioned job, ask: *"is
+   the thing he asked for finished, or have I only proven it is possible?"* If only proven
+   possible, the turn is not over — continue. Reporting progress is fine; reporting progress
+   **instead of** continuing is the violation.
+
+   *Origin: 2026-07-29. Adrian commissioned a full OSB photo-description audit and left a
+   five-hour window specifically so it would be done. A 120-image pilot ran (of 3,725), then
+   the session stopped and asked permission to proceed. He returned to find it not running:
+   "Why are you asking me to start something I've asked you to already do? You're wasting
+   time... This is unacceptable." Rules 6-8 exist so that no agent repeats it.*
 
 ## 4. Precedence Hierarchy
 When instructions conflict, agents must follow this strict hierarchy:
