@@ -1421,3 +1421,22 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** `memory/icloud-video-pipeline-2026-07-24.md`
 
 **Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-07-29-001 [tool-gotcha, mistake] — iCloud-synced `.git`/`node_modules` can silently degrade to near-zero-CPU stalls; a committed symlink to a machine-specific path 404s everywhere but the authoring machine
+
+**Session:** (unregistered, M1 ad hoc) · **Archive:** `working/_research/2026-07-29-xmaxed-history-consolidation/`
+**Date:** 2026-07-29
+
+**Context:** Repairing the XMAXED `xmaxed-configurator` and `xmaxed-website` repos, both living under `~/Documents` (iCloud-synced).
+
+**What happened:** Two independent, compounding failures. (1) `xmaxed-configurator`'s `model/xmax.glb` had been a *committed git symlink* (not a build artifact, not gitignored — an actual tracked symlink blob) pointing at an absolute path on a different machine (`/Users/subconm2/xmax-modelwork/served/xmax.glb`) since the project's v57 baseline. It only ever resolved on the machine that authored it; every other checkout got a silent 404 with no console error (the app's own HEAD-check loader fallback swallowed it). A second, independent symlink-based workaround for the same problem existed in parallel and was *also* stale by 5 days — neither was ever the real fix. (2) Separately, that same repo's local `.git` had gone corrupt under iCloud sync: `main` pointed at a baseline commit from weeks earlier while newer file *contents* sat uncommitted on disk, and one commit object was missing from the object store entirely. `git log`/`git fetch` against this repo's `.git` hung indefinitely (30s+, no output) — not slow, genuinely stuck. Independently, `npm run build` on the sibling `xmaxed-website` repo (same `~/Documents` tree) hung 6+ minutes while accumulating under 1 second of actual process CPU time — confirming the stall is I/O-blocking on iCloud's file-provider, not real work.
+
+**Root cause:** (1) A symlink committed to git is just a blob containing the target path string — nothing about git or a code-review pass flags "this path only exists on one machine," and it passes every check on the authoring machine by construction. (2) iCloud's file-provider daemon (`brctl`, confirmed mid-`full-sync` at the time) intercepts filesystem calls on files/directories it manages; when it's busy or a file is dataless, operations that should be pure local-disk syscalls (git object reads, npm's many small `.next`/`node_modules` writes) can block for minutes instead of the expected milliseconds — with no visible error, just apparent extreme slowness.
+
+**Mitigation / pattern:** Never commit a symlink to an absolute, machine-specific path as a tracked git asset — for large binaries that must be shipped, commit the actual bytes via git-lfs instead. Separately: if any git or npm operation under this vault's iCloud-synced `~/Documents` tree seems to hang or take far longer than the operation should, don't assume it's just slow — copy the source (excluding `.git`/`node_modules`/`.next`) to a non-synced scratch path (e.g. `/tmp` or the session scratchpad) and run the install/build/git-surgery there instead; only the final source needs to live back in the synced tree. For git specifically, `git bundle create --all` on the sound copy + `git clone <bundle>` in the scratch path is a reliable way to pull a complete history across without touching the slow filesystem during the transfer.
+
+**Promoted to:** `companies/xmaxed/ledger.md` (2026-07-29 Repair Session + Mistakes & Lessons)
+
+**Tags:** `tool-gotcha`, `mistake`
