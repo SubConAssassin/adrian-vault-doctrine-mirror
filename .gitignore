@@ -34,6 +34,14 @@
 !/canonical/concepts/**
 
 # Defence in depth: explicit denials for sensitive paths even if whitelist has a bug
+#
+# NOTE (2026-07-30): origin is a PUBLIC repo and the doctrine-sync agent pushes to it
+# hourly, so anything committed here becomes world-readable within the hour.
+# /companies/ holds commercially sensitive venture state and must never be tracked here.
+# It was previously covered only by the blanket `/*` on line 9 — a single whitelist edit
+# would have exposed it. Now denied explicitly, like the other sensitive trees below.
+# Ledger version history is kept in a separate local repo that has no remote.
+/companies/
 /canonical/people/
 /canonical/projects/
 /canonical/ecosystem/
