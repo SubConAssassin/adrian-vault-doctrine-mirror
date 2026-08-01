@@ -24,8 +24,8 @@ should-do: Full-depth research, alternative angles, GPT-5.5 strength synthesis.
 must-not-do: Same as grok; duplicate work already routed to grok.  
 cost-limit: Equivalent to grok; use ChatGPT Pro web bridge preferentially to spare primary Mac CLI slots.
 
-**M2 Studio (worker node — M3 SOLD, replaced by M2 Mac Studio, 32GB RAM, 30-core GPU, 24/7, no API limits)** `ssh studio` / `192.168.1.2`  
-should-do: HIGH-VOLUME LOW-REASONING grunt ONLY on big corpuses — bulk classification, embeddings, Whisper transcription (`studio-transcribe-queue.py`), first-pass corpus extraction, deduplication, moondream/vision bulk. Also: agy Ultra grind (practically unlimited), Blender headless renders, local LLM via Ollama `qwen2.5:14b` (`http://192.168.1.2:11434`). Primary offload node.  
+**M2 Studio (worker node — M3 SOLD, replaced by M2 Mac Studio, 32GB RAM, 30-core GPU, 24/7, no API limits)** `ssh studio` / `192.168.1.65`  
+should-do: HIGH-VOLUME LOW-REASONING grunt ONLY on big corpuses — bulk classification, embeddings, Whisper transcription (`studio-transcribe-queue.py`), first-pass corpus extraction, deduplication, moondream/vision bulk. Also: agy Ultra grind (practically unlimited), Blender headless renders, local LLM via Ollama `qwen2.5:14b` (`http://192.168.1.65:11434`). Primary offload node.  
 must-not-do: Deep reasoning, synthesis, final judgments, creative writing, high-fidelity code, anything web-dependent (offline only).  
 cost-limit: $0 / unlimited tokens. 32GB RAM — size batches accordingly. Must stay 100% loaded 24/7; never idle.
 
