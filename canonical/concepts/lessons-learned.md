@@ -1886,3 +1886,145 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** No new canonical file — this extends the general "check the record before acting" discipline already established this same day/week (`LL-2026-07-21-006`) to background *infrastructure*, not just documented conclusions.
 
 **Tags:** `discovery`
+
+---
+
+### LL-2026-08-01-011 [tool-gotcha] — `Workflow`'s `args` parameter can arrive at the script as a stringified JSON string, not the parsed object
+
+**Session:** b590 (M2) · **Archive:** [raw/sessions/2026-08-01-1552-m2-stet-venture-research-and-website.md](../../raw/sessions/2026-08-01-1552-m2-stet-venture-research-and-website.md)
+**Date:** 2026-07-24
+
+**Context:** A 28-agent `Workflow` script for a new venture's business-plan research took a `staging` path via `args` so every subagent could `Write` its output to the correct vault directory.
+
+**What happened:** `args.staging` evaluated to `undefined` inside the script even though the tool call passed `{"staging": "/path/...", "date": "..."}` as a proper JSON object. Every agent silently wrote its file into a literal `undefined/` subdirectory of the session's working directory instead of the intended vault path. No error was raised anywhere in the pipeline — the workflow reported success, and the mistake was only caught by manually checking the actual files written to disk after the run completed.
+
+**Root cause:** Not fully diagnosed (the tool's own args-passing contract wasn't inspected line-by-line), but the practical effect was that `args` was not a reliably parsed object inside the script body for this call shape.
+
+**Mitigation / pattern:** Do not thread anything load-bearing (a destination directory, a critical filename) through `args` into a `Workflow` script. Hardcode such paths directly as string literals in the script body instead. If `args` must be used for dynamic values, verify with a cheap early `log(typeof args, JSON.stringify(args))` or similar before trusting a nested field, since a stringified-not-parsed `args` fails silent (`undefined`) rather than loud.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-08-01-012 [tool-gotcha] — A single failed `agent()` result crashes a `Workflow` script's post-processing unless every downstream step null-guards
+
+**Session:** b590 (M2) · **Archive:** [raw/sessions/2026-08-01-1552-m2-stet-venture-research-and-website.md](../../raw/sessions/2026-08-01-1552-m2-stet-venture-research-and-website.md)
+**Date:** 2026-07-25
+
+**Context:** An acid-test workflow's verify phase fanned out 10 adversarial fact-checking `agent()` calls in `parallel()`.
+
+**What happened:** All 10 verify agents failed simultaneously ("You've hit your weekly limit"). The workflow itself then errored out entirely — not with a clean "10/10 agents failed" report, but with an unhandled `TypeError: null is not an object (evaluating 'v.verdict.verdict')` — because the script's post-processing code assumed every entry in the `parallel()` result array was a well-formed object and accessed `.verdict.verdict` on it without checking for `null` first. The two earlier phases' real, valuable output (completed research + financial modelling) was never lost, but the script crashed before it could synthesize or report cleanly, and required manual recovery (reading the intermediate results directly, writing the synthesis by hand).
+
+**Root cause:** `agent()` returns `null` on certain terminal failures (rate limits, terminal API errors after retries) rather than throwing, by design — but post-processing code several steps downstream of the `parallel()` call didn't defensively filter for that, having only null-guarded at the very final synthesis step, not at every intermediate step that touches a result array.
+
+**Mitigation / pattern:** In any `Workflow` script, `.filter(Boolean)` (or equivalent) immediately after every `parallel()`/`pipeline()` call whose results feed further property access — not just once, at the end, but at each stage that dereferences nested fields on the array. Treat a `null` entry as an expected, routine outcome (rate limits and terminal failures happen), not an edge case to handle only at the final step.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-08-01-013 [discovery] — Adversarial verification materially changes venture-research conclusions far more often than it merely confirms them
+
+**Session:** b590 (M2) · **Archive:** [raw/sessions/2026-08-01-1552-m2-stet-venture-research-and-website.md](../../raw/sessions/2026-08-01-1552-m2-stet-venture-research-and-website.md)
+**Date:** 2026-07-24 to 2026-07-25
+
+**Context:** Three separate research packages this session (a business plan, a creator-segment addendum, a hosted-hardware acid test) each ran an adversarial fact-check pass on their own load-bearing claims before being treated as final.
+
+**What happened:** Across all three, 20 load-bearing claims were checked; 12 came back `CORRECTED` (not merely `CONFIRMED`), 0 were `REFUTED` outright. Two of those corrections were not cosmetic — they reversed or materially weakened a load-bearing modelling assumption (a hosted-hardware residual-value curve that was meaningfully too flattering; a "no competitive price anchor exists" claim that was simply false and undercut a pricing-freedom argument). The claims that needed correcting were mostly the unglamorous, seemingly-easy-to-get-right ones — a colo price, a depreciation curve, which company's balance sheet actually held some leased hardware — not the contested or surprising ones an author would think to double-check unprompted.
+
+**Mitigation / pattern:** Treat adversarial verification as mandatory on any venture-research or financial-modelling deliverable that will inform a real capital or strategic decision, not as optional polish applied only to claims that already feel uncertain. The claims worth checking are disproportionately the "obviously fine" ones.
+
+**Promoted to:** —
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-08-01-014 [discovery, process-change] — The recovery pattern for a mid-workflow verify-phase failure: ship with an UNVERIFIED banner, then patch corrections in inline once capacity returns
+
+**Session:** b590 (M2) · **Archive:** [raw/sessions/2026-08-01-1552-m2-stet-venture-research-and-website.md](../../raw/sessions/2026-08-01-1552-m2-stet-venture-research-and-website.md)
+**Date:** 2026-07-25
+
+**Context:** Follows directly from LL-2026-08-01-012 — the acid-test workflow's verify phase died mid-run on a weekly agent-usage limit, with no way to know in advance when capacity would return within the same session.
+
+**What happened:** Rather than block the user on the limit resetting, the two completed research/modelling phases were read directly and the synthesis was written by hand, published immediately with a prominent, unmissable banner at the top of the document stating it was unverified and should not be quoted externally or used to commit capital. Once the weekly limit reset later the same evening, a small *scoped* verify-only workflow ran against just the specific load-bearing claims (not a full re-run of the whole research package), and its corrections were patched into the existing document inline with explicit `[corrected]` markers showing exactly what changed and why, rather than silently rewriting the file. A companion warning banner was also added to a second file (the underlying model) that had used one of the corrected numbers, so a reader landing on either file independently would see the correction.
+
+**Mitigation / pattern:** When a verification step fails mid-pipeline due to a resource limit rather than a content problem: (1) do not block delivery — ship what's built with an explicit, prominent unverified-status banner; (2) once capacity returns, run the smallest possible scoped re-check against just the load-bearing claims rather than repeating the full research; (3) apply corrections as visible inline patches, not a silent rewrite, so the reader can see the delta; (4) check for and flag any *other* file that already consumed the uncorrected number.
+
+**Promoted to:** —
+
+**Tags:** `discovery`, `process-change`
+
+---
+
+### LL-2026-08-01-015 [process-change, tool-gotcha] — A watchdog's restart cadence can collide with the target process's own internal timeout, masking the real bug instead of fixing it
+
+**Session:** c7f6aa58 (M2) · **Archive:** [raw/sessions/2026-08-01-1552-m2-fleet-pipeline-and-pc-fix.md](../../raw/sessions/2026-08-01-1552-m2-fleet-pipeline-and-pc-fix.md)
+**Date:** 2026-07-23/24
+
+**Context:** Built a watchdog for a Windows PC's transcription pipeline after finding it dead. Left running overnight under an explicit unattended mandate.
+
+**What happened:** The watchdog fired 25 times overnight, almost exactly every 30 minutes — its own configured cooldown. On inspection the next morning, the target script had a hardcoded 30-minute *minimum* download timeout, meaning a single rate-limited download would block a worker thread for up to 30 minutes before the script's own retry logic would have kicked in. The watchdog's 30-minute cooldown was landing right at that boundary, quite possibly killing the process just as it would have recovered on its own — so the high restart count looked like "the watchdog is working hard to keep this alive" when it may actually have been interfering with the process's natural self-healing, over and over, all night.
+
+**Root cause:** Picked a watchdog cooldown value without checking whether it coincided with a timeout/retry constant already present in the code being watched.
+
+**Mitigation / pattern:** When adding a restart-on-hang watchdog to a process you didn't write, grep the target's own source for hardcoded timeout/retry/backoff constants first. If the watchdog's detection-and-cooldown window is close to (or a multiple of) an existing timeout in the target, either fix the underlying timeout (preferred, addresses the real bug) or set the watchdog's window well clear of it — otherwise a high restart count is not evidence the watchdog is needed, it may be evidence the watchdog is the reason nothing gets a chance to recover on its own.
+
+**Promoted to:** —
+
+**Tags:** `process-change`, `tool-gotcha`
+
+---
+
+### LL-2026-08-01-016 [discovery] — Live signals (uptime, tailscale status, direct log grep, load average) beat trusting a stale async coordination file, especially in a vault with many concurrent writers
+
+**Session:** c7f6aa58 (M2) · **Archive:** [raw/sessions/2026-08-01-1552-m2-fleet-pipeline-and-pc-fix.md](../../raw/sessions/2026-08-01-1552-m2-fleet-pipeline-and-pc-fix.md)
+**Date:** 2026-07-23/24, confirmed again at 2026-08-01 shutdown
+
+**Context:** Recurred three times in one session: (1) diagnosing a PC as "unreachable" from a single failed ssh/ping before `tailscale ping` + `tailscale status --json` revealed it was actually online; (2) discovering a live sibling Claude session via raw process inspection (`ps aux`, a different scratchpad UUID) that the async STATE-OF-STACK log hadn't caught up to yet; (3) checking M1's live `uptime`/load average before adding work there, rather than trusting its own self-reported NODE-STATUS pane.
+
+**What happened:** In each case, a live, directly-checkable signal gave a clearer and more current answer than an async status file or a single quick network test. Async logs (NODE-STATUS.md, STATE-OF-STACK.md, overnight-STATUS.md) are written by whichever session last got around to it — they can be minutes to (as this same session found at its own shutdown) over a week stale, and a single ping/ssh attempt can catch a machine mid-reboot and wrongly read as "permanently down."
+
+**Mitigation / pattern:** Before concluding a machine/process/session is unreachable, down, or idle, check a live signal that can't be stale: `uptime` + load average, `tailscale ping`/`status --json`, a fresh `ps aux`/`launchctl list`, or a direct grep of the target's own live log for the specific event that would prove activity — not just a tail sample or a single retry. Treat async coordination files as a starting hypothesis to verify, not a final answer, especially once you know (as this vault now demonstrably has) that many sessions write to the same shared state concurrently.
+
+**Promoted to:** —
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-08-01-017 [tool-gotcha] — Large payloads (base64-encoded file content, complex PowerShell) fail silently when passed as inline SSH command arguments; transfer via a file instead
+
+**Session:** c7f6aa58 (M2) · **Archive:** [raw/sessions/2026-08-01-1552-m2-fleet-pipeline-and-pc-fix.md](../../raw/sessions/2026-08-01-1552-m2-fleet-pipeline-and-pc-fix.md)
+**Date:** 2026-07-24
+
+**Context:** Needed to push an edited ~35KB Python file, and separately a multi-line PowerShell diagnostic script, to a Windows box over SSH from macOS.
+
+**What happened:** Base64-encoding the file and passing it inline as a `[Convert]::FromBase64String('<huge string>')` argument to `ssh host "powershell -Command \"...\""` failed with `exec request failed on channel 0` and no further detail — the target file was silently left unchanged, caught only because the fix was verified afterward rather than assumed. Separately, a PowerShell one-liner built by nesting bash-string-escaping inside Python-string-escaping inside an SSH argument produced mangled quoting once it exceeded a few `$_`/`$(...)` levels.
+
+**Mitigation / pattern:** For any payload larger than a trivial one-liner going to a remote host over SSH: write it to a local file, `scp` the file across, then have a short remote command read *that file* and act on it (decode it, or invoke it with `-File` for a real `.ps1` script) — one clean transfer layer instead of stacking multiple shells' worth of string-escaping into a single inline argument. Always verify the change landed (re-read the target) rather than trusting a zero exit code, since this failure mode did not surface as an obvious error on first pass.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-08-01-018 [discovery] — Check machine uptime before assuming a dead unsupervised process was a code bug — a shared reboot is a simpler, more common explanation
+
+**Session:** c7f6aa58 (M2) · **Archive:** [raw/sessions/2026-08-01-1552-m2-fleet-pipeline-and-pc-fix.md](../../raw/sessions/2026-08-01-1552-m2-fleet-pipeline-and-pc-fix.md)
+**Date:** 2026-07-23
+
+**Context:** A manually-launched (non-launchd) grind on the Mac Studio had stopped producing output; a separate PC pipeline was unreachable around the same time.
+
+**What happened:** `uptime` on the Studio showed it had rebooted that morning at almost exactly the moment the grind's log went silent. Checking the PC separately showed it rebooted 37 minutes later. Rather than two unrelated failures needing two separate root-cause investigations, this was very likely one shared cause (never identified — power blip, network event, or similar) affecting both machines, with the difference in outcome explained entirely by supervision: launchd-managed daemons on both boxes auto-resumed at boot, the one manually-nohup'd process did not.
+
+**Mitigation / pattern:** When a background process on a given machine has gone silent, check `uptime` before investigating the process's own code for bugs — a machine-level reboot explains total silence far more simply than a script-level hang, costs one command to check, and immediately tells you whether the fix is "make this process supervised" (launchd/systemd/Scheduled-Task-with-KeepAlive) rather than "debug this script."
+
+**Promoted to:** —
+
+**Tags:** `discovery`
