@@ -1,6 +1,6 @@
 # Adrian-Vault Operating Doctrine (AGENTS.md)
 **Status:** Canonical Rule of Law for all Autonomous Agents
-**Last updated:** 2026-07-25 (§11.1 bootup read-order gains item 7: the LLM capability map + the two rules from it that bind every agent immediately — STOP OVER-PROMPTING, and Grok's measured 54% hallucination rate requiring a different-family cross-check. Adrian-direct: "update all of the system instructions"; reference-pointer addition, no existing rule altered. Full law: delegation-doctrine §14. Prior: 2026-07-24 (§7 added: automation output must never write into Adrian's personal apps — Adrian-direct, after a rogue LaunchAgent spammed 47 nights of digest notes into his live Apple Notes app before being found and killed; prior: 2026-06-10 §11.5 burn-rule amended + §11.5.b economics correction, Adrian-approved per decision pack `working/handoffs/2026-06-10-claude-to-adrian-DECISION-PACK-agents-burn-doctrine.md`))
+**Last updated:** 2026-07-30 (**§7.1 added — the Requested-Notification Registry. DOCTRINE CHANGE, §8 classification: NARROW CARVE-OUT + NEW CONSTRAINT.** Adrian-direct authorisation, verbatim: *"Okay, I'm going to allow you to create a file in my iCloud notes, specifically for the daily astrology and Balinese."* (2026-07-30). **Reason:** §7's personal-apps write ban is absolute, so the daily astrology/Balinese reading Adrian has now asked to receive in iCloud Notes could not be built without either violating the ban or refusing a direct request. Neither is correct: the ban exists to stop *unrequested* agent output colonising his daily-use apps, not to stop him receiving something he asked for. **Changes:** a new §7.1 permits a personal-app notification only when all five conditions hold — Adrian asked for it himself, on the channel and at the cadence he named · it carries that content and never vault status/digests/system state · it is listed in the registry table · it fails loud and is idempotent · it has a one-command kill switch. A **registry table** makes the complete set of authorised notifications countable in one place; **an agent may never add itself or any other automation to it** — registration requires an Adrian-direct request, and a proposed row stops at §8. Two entries registered: `com.adrianvault.daily-reading-note` (Apple Notes, daily 06:30 WITA, this authorisation, not yet built) and `com.adrianvault.balinese-day-brief` (ntfy push → `adrianvault-content`, already live). **The §7 ban itself is unamended, and no other rule in §7 was weakened, removed, or reinterpreted** — verified by byte-identical comparison of §7's remaining content before and after (Chelsea firewall, AYA, Erica Johnson, the full OSB product/provenance set, Wix API behaviour, cross-pollination protocol, and the personal-apps bullet all unchanged). Supersedes the never-approved iMessage carve-out drafted 2026-07-27 (`working/handoffs/2026-07-27-claude-to-adrian-DOCTRINE-CHANGE-imessage-carveout.md`, now marked RESOLVED — Apple Notes authorised, **iMessage was not**). ⚠️ **Live finding surfaced, deliberately NOT actioned:** `tools/balinese-day-send.py` attempts **iMessage first** in its delivery ladder, a channel never authorised — flagged in §7.1's scope notes as still banned, pending Adrian.) Prior: 2026-07-30 (**§6 venture list corrected — DOCTRINE CHANGE, §8 classification: FACTUAL CORRECTION, no rule altered.** Adrian-direct authorisation: *"execute all the fixes you recommend"* (2026-07-30), acting on a verified housekeeping-audit finding. **Reason:** §6 named the venture key `osb`, while §6 itself instructs agents to read `companies/{venture}/ledger.md` — and `companies/osb/` contains **no ledger.md** (only `generated-media/` and `intelligence/`). Every agent resolving the largest venture therefore tripped the CLAUDE.md §2 "Loud Failure" condition. Verified directly: `ls companies/osb/` and `git ls-files companies/`. **Changes:** key corrected to `original-siberian-blue` with `osb` marked an alias · **`xmaxed` added** (it has held a ledger since becoming the 7th venture but was never listed) · `orgone` added as dormant · aliases, sub-brand and legal-entity entries distinguished from ventures · a new invariant added stating every listed key must resolve to a directory containing a `ledger.md`, with the `venture` table in `content-index.db` named as the machine-readable twin. **No existing rule was weakened, removed, or reinterpreted.** Related outstanding item NOT actioned here: 7 pointers across 6 files still target `canonical/projects/osb/`, which does not exist. Prior: 2026-07-25 (§11.1 bootup read-order gains item 7: the LLM capability map + the two rules from it that bind every agent immediately — STOP OVER-PROMPTING, and Grok's measured 54% hallucination rate requiring a different-family cross-check. Adrian-direct: "update all of the system instructions"; reference-pointer addition, no existing rule altered. Full law: delegation-doctrine §14. Prior: 2026-07-24 (§7 added: automation output must never write into Adrian's personal apps — Adrian-direct, after a rogue LaunchAgent spammed 47 nights of digest notes into his live Apple Notes app before being found and killed; prior: 2026-06-10 §11.5 burn-rule amended + §11.5.b economics correction, Adrian-approved per decision pack `working/handoffs/2026-06-10-claude-to-adrian-DECISION-PACK-agents-burn-doctrine.md`))
 
 ## 1. Core Invariant (The Single Source of Truth Rule)
 There is one canonical truth per category:
@@ -67,14 +67,22 @@ When instructions conflict, agents must follow this strict hierarchy:
 - If a personal data point is needed, read `canonical/adrian-corpus/personal-facts.md` first. Never ask Adrian for information he has already provided.
 
 ## 6. Project & Vault Structure
-- **Active Projects:**
-  - `osb` — Original Siberian Blue: luxury spiritual jewelry, cobalt-doped hydrothermal quartz
+- **Active Projects** — *the key is the DIRECTORY NAME under `companies/`. Use it verbatim.*
+  - `original-siberian-blue` — Original Siberian Blue: luxury spiritual jewellery, cobalt-doped hydrothermal quartz. **⚠️ `osb` is an ALIAS, not the key** — `companies/osb/` exists but holds no `ledger.md`, so resolving `osb` trips the CLAUDE.md §2 Loud Failure condition on the largest venture. This section named `osb` until 2026-07-30.
   - `subconscious-surgery` — 1:1 transformational coaching + Kajabi mastermind
   - `aga-bali` — 13-hectare conscious community/retreat, Candidasa, East Bali
-  - `tri-hita-wte` — PT Tri Hita WtE Indonesia: modular biomethane, V7.0 framework (upgraded from V6.4 2026-05-19; Grok amendments incorporated: pemulung 17.5%, BTC sensitivity, CapEx contingency, carbon credit)
+  - `tri-hita-wte` — PT Tri Hita WtE Indonesia: modular biomethane, V7.0 framework (upgraded from V6.4 2026-05-19; Grok amendments incorporated: pemulung 17.5%, BTC sensitivity, CapEx contingency, carbon credit). Alias: `tri-hita`.
   - `ashta` — distributed consciousness research platform
-  - `bodhisvara` — voice-analytics/therapist-matching, concept stage, parked
+  - `xmaxed` — performance-modified Yamaha XMAX scooters. **Was missing from this list** despite holding a ledger since its addition as the 7th venture.
+  - `bodhisvara` — voice-analytics/practitioner-matching, concept stage, **parked**
+  - `orgone` — **dormant**, retained so its content stays attributable rather than lost. Alias: `orgon-app`.
+- **Not ventures, but present under `companies/`:** `mindhala` (sub-brand of `aga-bali`) · `mystic-creations` (legal entity, not a content brand) · `_archive`.
 - **Venture Ledgers:** Always read `companies/{venture}/ledger.md` before acting on a venture.
+  **Invariant: every key listed above resolves to a directory containing a `ledger.md`.** If you add a
+  venture here, create the ledger in the same change; if a key has no ledger, that is a Loud Failure,
+  not a naming preference. The machine-readable form of this list is the `venture` table in
+  `tools/content/content-index.db` (`status` = active | parked | dormant | alias | sub_brand |
+  legal_entity); keep the two in agreement.
 - **Handoffs:** Agent-to-agent files live in `working/handoffs/`. Read the latest before starting work.
 - **Raw Corpora:**
   - `raw/notes/` — Canonical iCloud Apple Notes folder, containing the master chronological registry and indexed contact cross-references.
@@ -95,6 +103,59 @@ When instructions conflict, agents must follow this strict hierarchy:
 - **Wix API behaviour:** write operations are reliable, read operations fail — use **POST + PATCH with Catalog V1**.
 - **Cross-pollination protocol:** If Adrian references prior context ("as we discussed"), search the 3.87M-word corpus (`raw/chatgpt-import/` and Claude past chats) BEFORE asking him to repeat.
 - **Automation output stays in the vault, never in Adrian's personal apps.** No LaunchAgent, script, or agent may write status digests, summaries, or generated content into Apple Notes, iMessage, Mail, or Calendar — those are Adrian's own daily-use tools, not system output surfaces. Vault status belongs in `dashboards/`, `working/handoffs/`, or `STATE-OF-STACK.md`. Read-only corpus ingestion FROM Apple Notes (`raw/notes/`) is unaffected — this rule is about writing generated content INTO personal apps. (2026-07-24, Adrian-direct: a rogue LaunchAgent had spammed 47 nights of digest notes into his live Apple Notes app before being found and killed — see `memory/feedback-no-system-automation-into-apple-notes.md`.)
+
+### 7.1 The ONLY exception to §7's personal-apps ban: the Requested-Notification Registry
+**The ban above is not weakened by this section. Every word of it still stands.** §7.1 does not
+create a category of "automation Adrian would probably want"; it creates a **closed, countable list**
+of specific messages he has personally asked to receive. Anything not on the list is banned, exactly
+as before. The Apple Notes incident happened because one plausible-looking automation ran unattended
+for 47 nights — the registry exists so that the complete set of things allowed to reach him is
+readable in one place, in one screenful, at any time.
+
+**A scheduled message MAY be delivered into a personal app only when ALL FIVE hold:**
+- **(a) Adrian asked for it himself.** Explicitly, for that specific message, on the specific channel
+  he named, at the cadence he named. Not inferred from a related request, not extended from a similar
+  one, not "he'd find this useful."
+- **(b) It carries the content he asked for** — never vault status, agent digests, run summaries,
+  system state, alerts, or errors. Those go to `dashboards/`, `working/handoffs/`, or
+  `STATE-OF-STACK.md` as §7 requires.
+- **(c) It is listed in the registry table below**, with its channel, cadence, authorising date and
+  kill switch.
+- **(d) It fails LOUD and is idempotent** — never double-sends, never silently no-ops. A notification
+  that can fail quietly is how a dead automation goes unnoticed for weeks and a runaway one goes
+  unnoticed for 47 nights.
+- **(e) It has a one-command kill switch**, recorded in the table and verified to work at the time of
+  registration.
+
+> 🔒 **AN AGENT MAY NEVER ADD ITSELF — OR ANY OTHER AUTOMATION — TO THIS TABLE.**
+> Registration requires an **Adrian-direct request** for that specific notification. Not a handoff,
+> not a prior agent's proposal, not a plausible reading of an older instruction, not a commission
+> whose scope "obviously implies" it. An agent that believes a new entry is warranted **proposes it
+> under §8 and stops.** Adding a row without an Adrian-direct request is a doctrine violation of the
+> same class as the incident that created §7 — and because the registry is what makes the exception
+> countable, a self-added row defeats the entire mechanism. **Adding a row is the one edit here an
+> agent can never make on its own judgement.**
+
+**Registry of authorised personal notifications — this table is the complete set.**
+It also lists non-personal-app channels (e.g. push) so the full set of scheduled automations that
+reach Adrian personally is enumerable in one place. **Listing a non-personal-app channel here grants
+it nothing it did not already have, and extends the §7 carve-out to nothing.**
+
+| # | Automation | Channel | Cadence | Content | Authorised | Status | Kill switch (one command) |
+|---|---|---|---|---|---|---|---|
+| 1 | `com.adrianvault.daily-reading-note` | **Apple Notes (iCloud)** — one dedicated note/folder, not his general notes | daily, **06:35** WITA | daily astrology + Balinese day reading — nothing else | **2026-07-30, Adrian-direct:** *"Okay, I'm going to allow you to create a file in my iCloud notes, specifically for the daily astrology and Balinese."* | **LIVE 2026-08-01** — one rolling note "Daily Reading", newest entry prepended at top; kill switch verified; write proven under launchd (not just interactively) by read-back of note `p3157`. 06:35 not 06:30, to avoid contending with the ntfy brief. | `launchctl unload -w ~/Library/LaunchAgents/com.adrianvault.daily-reading-note.plist` |
+| 2 | `com.adrianvault.balinese-day-brief` | **ntfy push** → topic `adrianvault-content` | daily, 06:30 WITA | Balinese day reading | 2026-07-27, Adrian-direct commission of a daily day-reading | LIVE | `launchctl unload -w ~/Library/LaunchAgents/com.adrianvault.balinese-day-brief.plist` |
+
+**Scope notes binding on the table above:**
+- Entry 1 is authorised for **Apple Notes only**, in a note/folder created for this purpose. It does
+  not authorise writing anywhere else in Apple Notes, and it does not authorise any other channel.
+- Entry 2 is authorised on **ntfy push only**. ⚠️ `tools/balinese-day-send.py` currently attempts
+  **iMessage first** in its delivery ladder. **iMessage has never been authorised** — the 2026-07-27
+  proposal that would have permitted it was never approved, and Adrian's 2026-07-30 authorisation
+  names Apple Notes, not iMessage. That leg is therefore **outside the carve-out and remains banned
+  by §7**; it must be disabled, or an Adrian-direct request obtained. Do not treat its presence in
+  running code as evidence that it was ever permitted.
+- **Removing** an entry, or firing a kill switch, never requires authorisation. Only adding does.
 
 ## 8. Doctrine Change Protocol
 `AGENTS.md` is constitutional. It cannot be casually edited.

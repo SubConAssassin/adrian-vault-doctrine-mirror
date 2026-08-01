@@ -1440,3 +1440,56 @@ The M2→vault SMB mount degrades intermittently (hangs, "operation not permitte
 **Promoted to:** `companies/xmaxed/ledger.md` (2026-07-29 Repair Session + Mistakes & Lessons)
 
 **Tags:** `tool-gotcha`, `mistake`
+
+### LL-2026-08-01-001 [mistake, discovery, process-change] — iCloud video lane: a Photos.app wedge from a killed export, a two-step misdiagnosis of a real outage, a self-matching `pgrep`, and a backoff design that slows but doesn't stop attrition
+
+**Session:** 1158760b (M2) · **Archive:** [raw/sessions/2026-08-01-1130-m2-icloud-lane-and-gate-verify.md](../../raw/sessions/2026-08-01-1130-m2-icloud-lane-and-gate-verify.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** Resuming the 2026-07-31 overnight gate-grind commission, this session found and fixed
+the iCloud video lane's real blocker (a Photos/TCC permission issue an earlier session had filed as
+"NEEDS ADRIAN" but wasn't), then chased a genuine, evolving iCloud-fetch outage across several hours.
+
+**What happened:**
+- Killing a probe process mid-`osxphotos export --use-photos-export` left Photos.app alive but unable
+  to answer AppleEvents (`osascript … to quit` → `AppleEvent timed out (-1712)`). Every export
+  attempted afterward silently exited 0 with no file, surfacing as `export claimed success but no file
+  found` — not an auth error — and burning a real attempt against the orchestrator's
+  `MAX_ATTEMPTS=5` permanent-write-off threshold each time.
+- The same error text also occurs as ordinary attrition (255 times since 2026-07-24 against 1,700
+  successful videos). Reading a handful of occurrences as proof of an outage was wrong; then
+  over-correcting to "it's just attrition" purely because of that historical frequency was *also*
+  wrong. The signal that actually distinguishes the two: **zero successful submissions over a real
+  time window (healthy = ~one every 20–40s) combined with `cloudd`/`photolibraryd`/`fileproviderd` all
+  near-0% CPU while a download is actively being requested.**
+- A watcher script's `pgrep -f icloud-video-orchestrator-v2.py` liveness check silently self-matched —
+  the watcher's own launch command (via `osascript … do script "…icloud-video-orchestrator-v2.py…"`)
+  quoted the target filename, so the check believed the lane was already running and exited instantly,
+  twice, before being caught.
+- Hours later, a separate session/process restarted the lane directly (bypassing a
+  prove-fetch-first gate this session had deliberately put in place) while the underlying iCloud
+  account-level throttling was still active. The specific video this session had stopped the lane to
+  protect was written off within seconds of that restart — `MAX_ATTEMPTS=5` doesn't distinguish "this
+  one asset is bad" from "everything is failing right now," so it eventually sacrifices whatever is at
+  the head of the queue regardless of cause.
+
+**Mitigation / pattern:**
+1. Never SIGTERM an in-flight `osxphotos --use-photos-export`. If interrupted anyway,
+   `kill -9` Photos.app and delete the destination's `.osxphotos_export.db` (it persists the wedge
+   across a clean relaunch) before trying again.
+2. Diagnose "is iCloud fetch actually working" by submission rate + daemon CPU together, not by error
+   text or its historical frequency alone.
+3. When a liveness check greps a process's command line, verify the match is the real executable
+   (`ps -o comm= -p <pid>`), not just that some process's argv contains the string — a wrapping shell
+   invocation (osascript, a launcher script) can self-match.
+4. **Design gap, not yet fixed:** `icloud-video-orchestrator-v2.py`'s escalating backoff (present since
+   2026-07-28) slows retries during a sustained stall but does not stop per-asset attempt consumption,
+   so a long outage still converts the backlog into individually-doomed videos one at a time. It should
+   pause consuming new attempts entirely once a sustained-stall is detected, resuming only after an
+   out-of-band probe confirms a real download — the pattern this session's own external watcher used,
+   which the orchestrator does not yet apply to itself.
+
+**Promoted to:** `memory/icloud-video-pipeline-2026-07-24.md` and `memory/frictionless-protocol.md`
+(both M2-personal memory, updated in-session).
+
+**Tags:** `mistake`, `discovery`, `tool-gotcha`, `process-change`
