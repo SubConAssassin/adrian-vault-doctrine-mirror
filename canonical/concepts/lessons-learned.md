@@ -5,8 +5,8 @@ status: canonical
 tier: 2
 firewall_class: working-internal
 created: 2026-05-04
-updated: 2026-07-12
-last_updated: 2026-07-12
+updated: 2026-08-01
+last_updated: 2026-08-01
 tags: [adrian-os, learning, mitigations, infrastructure]
 related:
   - canonical/concepts/shutdown-protocol.md
@@ -1506,3 +1506,383 @@ before manually intervening for several hours, and duplicated some of that exist
 already-solved problems (the same TCC/Terminal.app technique, the same `pgrep` self-match fix) as a
 result. Worth its own tag: `tool-gotcha` — always run the mandated live-service check before manual
 infra work, not only at session start.
+
+---
+
+### LL-2026-08-01-002 [mistake] — Check for existing supervision before building any
+
+**Session:** ccf6e459 (M2) · **Archive:** [raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md](../../raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** Resuming the overnight gate-grind commission, this session found the iCloud video
+orchestrator apparently unsupervised and built a watchdog for it.
+
+**What happened:** `~/icloud-video-watchdog.sh` + `com.adrianvault.icloud-video-watchdog` (launchd,
+`StartInterval 300`) already supervised the orchestrator — and better than what this session wrote,
+because it checks log *progress*, not just liveness. The session did not look, built a duplicate
+supervisor, and briefly created **two owners of one process**. That is the same collision class as
+the 2026-07-29 transfer-ownership incident, and worse here: concurrent `osxphotos` corrupts shared
+export state. Several restarts this session attributed to itself were actually the pre-existing
+watchdog's.
+
+**Root cause:** No pre-flight check for existing automation before adding new automation on the same
+target.
+
+**Mitigation / pattern:** Before building any supervisor, run `launchctl list | grep adrianvault` and
+check for `~/*watchdog*`. One owner, one process — a rule this file has now stated for three separate
+incidents (transfer ownership 07-29, this one, and LL-2026-08-01-001's own restatement of it).
+
+**Promoted to:** —
+
+**Tags:** `mistake`
+
+---
+
+### LL-2026-08-01-003 [tool-gotcha] — `ps aux` truncates; `pgrep -f` self-matches
+
+**Session:** ccf6e459 (M2) · **Archive:** [raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md](../../raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** Checking whether the iCloud video orchestrator was already running before starting work
+on it.
+
+**What happened:** Two independent ways to get a process check wrong on macOS, both hit in one
+session. **`ps aux | grep <script>`** truncates its command column (~200 chars); the orchestrator's
+command line is 236 chars with the script name at the *end* — invisible, so the check falsely read
+"not running" and the session started a second concurrent producer. **`pgrep -f <script>`** matches
+the *checking shell itself* whenever the shell's own command line contains the search string (e.g. a
+monitor loop), producing a false "2 instances" reading.
+
+**Root cause:** Both `ps aux` and `pgrep -f` match against the full command-line string, which is
+subject to column truncation (`ps`) or self-inclusion (`pgrep` run from a shell whose own argv
+contains the target string) — neither checks the *executable identity* of the matched process.
+
+**Mitigation / pattern:** Use `pgrep -f "MacOS/Python <script>.py"` — a longer, more specific anchor
+that survives truncation and doesn't self-match. This exact trap was already documented in a
+2026-07-28 comment inside `icloud-video-watchdog.sh` — read existing tooling before debugging a
+process-liveness question, not just before building new supervision (LL-2026-08-01-002).
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-08-01-004 [process-change] — A give-up counter must not charge work during a systemic outage
+
+**Session:** ccf6e459 (M2) · **Archive:** [raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md](../../raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** `icloud-video-orchestrator-v2.py` marks a video permanently done after 5 failed download
+attempts (`MAX_ATTEMPTS=5`), intended to write off genuinely bad assets.
+
+**What happened:** During a 19-hour outage where *every* download failed, the give-up path silently
+wrote off backlog as if each failure were asset-specific — one video (`9B2531F1-…`) was permanently
+lost before it was caught, with two more at 3/5 and 2/5 attempts. The stall detector already *saw*
+the outage and logged `SUSTAINED STALL`; it just never stopped the give-up path from continuing to
+consume attempts against it.
+
+**Mitigation / pattern:** Fix applied: `systemic = (_successes_this_run == 0) or (_consec_failures >=
+3)`. `_consec_failures` alone is insufficient — it resets on every process start, so the first 3
+videos of every restart were still charged, and with deterministic newest-first ordering that is the
+*same* 3 videos each restart. Generalises beyond this pipeline: any queue whose failure path can
+permanently delete or write off work needs an "is the pipeline otherwise healthy?" guard before
+charging a per-item retry/give-up counter — not just a per-item failure count.
+
+**Promoted to:** `icloud-video-orchestrator-v2.py` (fix applied in-session; ledger held at 0 new
+write-offs through hours of failures afterwards).
+
+**Tags:** `process-change`
+
+---
+
+### LL-2026-08-01-005 [discovery] — `ZREMOTEAVAILABILITY` is ground truth for iCloud fetchability
+
+**Session:** ccf6e459 (M2) · **Archive:** [raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md](../../raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** Diagnosing a 19-hour, 264-failure iCloud video download stall.
+
+**What happened:** The stall resolved to `ZINTERNALRESOURCE.ZREMOTEAVAILABILITY = 0` for all
+**277,434** resources in the Photos library database. With it at 0, Photos believes nothing is
+fetchable and `osxphotos --download-missing` returns `missing: 1` in 0:00:00 without attempting
+anything — `rc=0` with `missing: N` is osxphotos' silent-failure signature. `osxphotos`'s `incloud`
+field derives from this same column, so any code trusting `incloud` inherits the same blind spot.
+
+**Mitigation / pattern:** Remedy is `launchctl kickstart -k gui/$(id -u)/com.apple.cloudphotod` —
+plain `kill` does not respawn it correctly for this purpose. Remote-availability climbed 0 → 995
+within ~30 min of the kickstart and downloads resumed. When an iCloud-dependent pipeline goes cold
+with no error text, check this column (or the kickstart) before assuming an account-level throttle.
+
+**Promoted to:** —
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-08-01-006 [mistake] — Report correlations as hypotheses, not conclusions
+
+**Session:** ccf6e459 (M2) · **Archive:** [raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md](../../raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** Chasing the root cause of the same 19-hour iCloud download stall across several hours.
+
+**What happened:** Four root-cause claims were asserted and then disproven in the same session: a
+stale export db; `nohup` launch parentage (the foreground form died too, ruling it out); Photos.app
+holding a library lock (it later ran 1h44m alongside the orchestrator with no conflict); and
+"`originals/` is 0 B" (it is in fact 11 GB). Each was stated as settled on the strength of a single
+correlation. One was written into memory as "proven" and had to be retracted later in the same
+session.
+
+**Mitigation / pattern:** A correlation is a hypothesis until a test discriminates it from the
+alternatives. The work that held up under scrutiny this session — the give-up-counter fix, the ledger
+repair, the G9 write — was verified live *before* being claimed, not after. Applies directly to §8
+verify-on-return: the same discipline Claude owes the team's output, a session owes its own
+intermediate claims.
+
+**Promoted to:** —
+
+**Tags:** `mistake`
+
+---
+
+### LL-2026-08-01-007 [tool-gotcha] — `photolibraryd`: when to restart, and the cost
+
+**Session:** ccf6e459 (M2) · **Archive:** [raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md](../../raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** `photolibraryd` saturating at 100% CPU (confirmed via a `cpu_resource` diagnostic in
+`/Library/Logs/DiagnosticReports/`) was making Photos exports and `osxphotos query` fail.
+
+**What happened:** `kill -9` was required — `SIGTERM` does not take it — and launchd respawns it
+(~200% CPU while rebuilding, settling to ~99%). But doing so **zeroed `ZREMOTEAVAILABILITY`
+library-wide**, adding a second, larger fault on top of the one being fixed. It also must **never**
+be killed while `Photos.sqlite` is growing with an open `ImportSession-*.plj` journal — that indicates
+an import in progress, and killing it restarts that import from scratch.
+
+**Root cause:** `photolibraryd` restart is a blunt instrument with a side effect (remote-availability
+reset) that is worse than the saturation it fixes, if triggered at the wrong moment.
+
+**Mitigation / pattern:** Diagnose an in-progress import first: `stat -f%z` the `Photos.sqlite` file
+twice, 10s apart — if it's growing, wait. Only `kill -9 photolibraryd` once confirmed idle, and expect
+to need the `ZREMOTEAVAILABILITY` kickstart (LL-2026-08-01-005) as a follow-up, not an alternative.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-08-01-008 [discovery] — Never cache a media workset — the ceilings move continuously
+
+**Session:** ccf6e459 (M2) · **Archive:** [raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md](../../raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** Building the G9/G4 processing batches for gate-grind work against the local media
+library.
+
+**What happened:** The same populations, measured 15 hours apart, moved purely from live iCloud
+eviction: G9 probeable **427 → 325 (−24%)**, G4 genuinely-local **358 → 273**. A batch built from a
+stored list taken at the start of the session would have tried to materialise ~100 evicted files
+straight back onto a disk that had just recovered from an emergency (the private-backup / disk-full
+incident tracked elsewhere in this file and in STATE-OF-STACK).
+
+**Mitigation / pattern:** Re-`lstat` immediately before touching each file in a batch, rather than
+working from a list snapshotted at batch-build time — this degrades eviction to a skip instead of a
+forced re-download. Both runners this session did so and recorded `vanished=0`.
+
+**Promoted to:** —
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-08-01-009 [tool-gotcha] — `voiceprint-diarize.py` cannot produce `adrian-solo`
+
+**Session:** ccf6e459 (M2) · **Archive:** [raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md](../../raw/sessions/2026-08-01-1445-m2-gate-grind-and-icloud-recovery.md)
+**Date:** 2026-07-31 / 2026-08-01
+
+**Context:** Running G4 acoustic diarization verdicts on 204 recordings as part of the gate-grind
+commission.
+
+**What happened:** `n = max(2, min(6, len(segs)//8 or 2))` forces at least 2 speaker clusters
+regardless of content, so a genuinely solo recording still gets split and part of it labelled
+not-Adrian. Adrian's own solo voice notes therefore score **0.84–0.95, never 1.00** — the
+`adrian_share` column's existing `adrian-solo` value is mechanically unreachable by this pipeline. A
+2-segment recording yields `adrian_share == 0.50` by construction, which affected 18 of 126 verdicts
+this session produced.
+
+**Root cause:** The clustering floor (`min(...)  or 2`) has no path to a single-speaker verdict no
+matter how confident the acoustic signal.
+
+**Mitigation / pattern:** Trust only verdicts resting on ≥8 speech segments (per this session's own
+staged recommendation — accept only 84 of 126). Separately noted for anyone re-running this tool:
+`setuptools<81` is required (`webrtcvad` imports `pkg_resources`), and `_embedder()` currently rebuilds
+the 85 MB ECAPA model on every call rather than caching it.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-07-15-008 [tool-gotcha] — mlx_whisper `word_timestamps=True` silently drops word-level data unless explicitly extracted from the nested `words` key
+
+**Session:** 9811 (M2) · **Date:** 2026-07-15
+
+**Context:** SS reel-rebuild corpus transcription (`working/reels-build/2026-07-14-corpus-rebuild/transcribe_one.py`) — punch-in timing and caption pacing both depend on real word-level timestamps, not just segment-level.
+
+**What happened:** Requesting `word_timestamps=True` from mlx_whisper produces the data, but the naive segment-serialization code was only keeping `{"start","end","text"}` per segment — the nested per-word `words` array (each with its own `word`/`start`/`end`) was silently discarded on save. Nothing errored; the output JSON just quietly lacked what every downstream beat-timing/caption tool actually needed.
+
+**Root cause:** Copy-pasted a segment-only serialization pattern from an earlier script that never needed word-level data, without checking the actual dict shape mlx_whisper returns when `word_timestamps=True` is set.
+
+**Mitigation / pattern:** When any transcription call requests word-level timestamps, verify the saved JSON actually contains a populated `words` array on a real sample before building anything downstream on top of it — don't assume the flag alone guarantees the field survives serialization. Fixed shape: `"words": [{"w": w["word"].strip(), "s": w["start"], "e": w["end"]} for w in s.get("words", [])]`.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-07-15-009 [tool-gotcha, mistake] — Dropbox materialize-timing race produced an alternating OK/FAIL pattern that looked like bad data but wasn't
+
+**Session:** 9811 (M2) · **Date:** 2026-07-15
+
+**Context:** Same transcription grind, running against source files under `Dropbox/Subconscious Surgery adrian/Videos to edit/` mounted via SMB re-export.
+
+**What happened:** 11 of 26 files failed with a perfectly alternating OK/FAIL pattern per folder. A blind idempotent re-run only converged 2 files per pass — far too slow to be a content problem. Direct isolated `stat`/`test -f` checks on the failed paths confirmed it was a Dropbox placeholder-materialize race (the file wasn't fully downloaded yet when ffmpeg tried to read it), not corrupt or missing source data.
+
+**Root cause:** The grind read files immediately after triggering materialization, with no wait/retry — under SMB re-export, Dropbox's on-demand download can lag behind the file becoming "visible" to the reading process.
+
+**Mitigation / pattern:** Added in-iteration retry+backoff (3 attempts, 8s sleep) directly in `grind.sh` rather than relying on repeated full-grind re-runs. When a transcription/processing grind against Dropbox-backed source shows an alternating or seemingly-random per-file failure pattern, suspect a materialize race before suspecting the data — confirm with a direct `stat`/existence check on a couple of failure paths before building a bigger fix.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`, `mistake`
+
+---
+
+### LL-2026-07-15-010 [tool-gotcha] — ffmpeg pixel-format/alpha/duration gotchas hit repeatedly while building the reel composer
+
+**Session:** 9811 (M2) · **Date:** 2026-07-15
+
+**Context:** Building `compose_v3.py`/`compose_v4.py`/`build_cta.py`/`punch_arc.py` — the full reel assembly pipeline.
+
+**What happened:** Several distinct ffmpeg failure modes hit across the build: (1) fast `-ss` placed BEFORE `-i` gave imprecise/wrong frames near concat segment boundaries — must go AFTER `-i` for accurate frame-level seeking. (2) RGBA overlay frames encoded with `-c:v libx264 -pix_fmt yuv420p` silently lost their alpha channel, breaking the CTA/caption compositing — must round-trip through `-c:v qtrle -pix_fmt argb` instead. (3) `-c:v copy` combined with `-shortest` silently truncated final output duration — needed a full re-encode when duration correctness mattered. (4) `zoompan`'s `z` accumulator is monotonic within one continuous filter chain — a genuine zoom-OUT can't be expressed as a single zoompan expression; had to build it as several short concatenated static-crop segments instead (the stepped-ramp design in `punch_arc.py`).
+
+**Root cause:** All four are ffmpeg filter/codec behaviors that fail silently (wrong output, no error) rather than raising — each was only caught by actually inspecting the output (a QC frame pull, a duration check, a visible alpha bug), not by the command succeeding.
+
+**Mitigation / pattern:** Treat these four as standing defaults for this pipeline, not per-build discoveries: `-ss` after `-i`; alpha overlays through qtrle/argb; full re-encode (not `-c:v copy`) whenever exact duration matters; zoom-out arcs built from concatenated static-crop segments, never a single zoompan expression.
+
+**Promoted to:** `canonical/concepts/reel-production-architecture.md` Addendum 2026-07-15 (rule 30).
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-07-15-011 [discovery, process-change] — Punch-ins must be timed to content (land/hold/release), never round-robin — the single most repeated correction from Adrian
+
+**Session:** 9811 (M2) · **Date:** 2026-07-15
+
+**Context:** Two consecutive rounds of Adrian's direct, detailed rejection of shipped reels (v2, then v3) — both centered on punch-in/crop-zoom editing reading as random and meaningless.
+
+**What happened:** Earlier reel versions punched in/out on a fixed or arbitrary schedule, unrelated to what was being said. Adrian's correction, verbatim in spirit: the zoom should land exactly as an emphatic word starts, hold through that word plus the reaction after it (a laugh, a pause), then ease back out — "the art of video editing is entirely in the timing itself." A punch that isn't tied to a specific word's timestamp reads as amateur regardless of technical execution.
+
+**Root cause:** N/A (discovery, not an error) — the earlier composer scripts simply had no content-timing concept built in; punches were placed by even spacing.
+
+**Mitigation / pattern:** Built `working/reels-build/_engine/punch_arc.py` → `render_punch_arc()`, which takes `land_time` (when peak zoom is reached) and `hold_end` (when the hold through the reaction ends) as explicit, content-derived timestamps pulled from real word-level transcript data — never evenly spaced or guessed. Every future punch-in call site must derive these from the actual words being emphasized in that beat.
+
+**Promoted to:** `canonical/concepts/reel-production-architecture.md` Addendum 2026-07-15 (rules 22-23).
+
+**Tags:** `discovery`, `process-change`
+
+---
+
+### LL-2026-07-15-012 [mistake, process-change] — Small thumbnail grids are unreliable for QC'ing punch-in magnitude; full-resolution frame pulls are required
+
+**Session:** 9811 (M2) · **Date:** 2026-07-15
+
+**Context:** QC'ing whether `punch_arc.py`'s zoom mechanic was producing a real, visible magnitude change per Adrian's "roughly 40%" spec.
+
+**What happened:** Twice in this session, a punch-in was judged "not working" from a small (~150×266px) contact-sheet thumbnail comparison. Both times, an isolated full-resolution before/after frame comparison proved the mechanism WAS working correctly — the crop-tightness difference was real and visible at full resolution, just compressed away at thumbnail scale.
+
+**Root cause:** Small thumbnails lose exactly the kind of subtle-but-real spatial detail this specific check depends on (crop-boundary shift), so a QC method that's fine for other checks (framing, color, content) gave a false negative here.
+
+**Mitigation / pattern:** For any check involving crop/zoom magnitude specifically, always pull and compare full-resolution frames at the land/hold timestamps — never judge pass/fail from a thumbnail grid for this class of check.
+
+**Promoted to:** `canonical/concepts/reel-production-architecture.md` Addendum 2026-07-15 (rule 24).
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-15-013 [discovery, process-change] — A concept named in the voiceover needs an actual illustrated animation of that concept, not a text card
+
+**Session:** 9811 (M2) · **Date:** 2026-07-15
+
+**Context:** Adrian's second rejection round, specifically on the brain/RAS and eye/megapixel beats: "where's the animation of the eye? ...it's like Google, let's have the brain searching lots of information."
+
+**What happened:** The earlier version illustrated these beats with kinetic-typography text cards (stat numbers, emphasized words). Adrian's correction: when the speaker names a concrete visual concept (a brain, an eye), the animation should be an actual illustrated representation of that concept in motion — not text standing in for it.
+
+**Root cause:** N/A (discovery) — text cards are a legitimate tool for numbers/short phrases, but were being used as the default for every graphic beat regardless of whether the content named something illustratable.
+
+**Mitigation / pattern:** Built `working/reels-build/_engine/icon_animate.py` with real iconographic motion graphics (`brain_scan`: organic blob shape with a scan/search sweep; `eye_dataflow`: eye shape with a visible outward data/particle stream) — genuine illustrated concept animation, not typography. `stat_card.py` remains correct for pure numeric/text beats; `icon_animate.py` is now the required tool whenever the VO names a concrete visual concept.
+
+**Promoted to:** `canonical/concepts/reel-production-architecture.md` Addendum 2026-07-15 (rule 26).
+
+**Tags:** `discovery`, `process-change`
+
+---
+
+### LL-2026-07-15-014 [mistake, process-change] — On-screen presence is an audio-continuity rule, not a visual-tracking rule
+
+**Session:** 9811 (M2) · **Date:** 2026-07-15
+
+**Context:** v2 had the subject drifting half-off-frame at one point; the fix attempt was heading toward more precise face-tracking before Adrian redirected the approach entirely.
+
+**What happened:** Adrian's direct correction: he doesn't need to be tracked/kept in frame for the whole clip — he only needs to be FULLY visible whenever he IS shown; any moment that can't keep him fully framed should cut to B-roll/graphic instead, with his voiceover continuing uninterrupted underneath. The problem being solved was never "track him better," it was "don't show a bad half-off-frame crop at all."
+
+**Root cause:** Treated an editorial/coverage problem (what to show when the framing can't hold the subject) as a computer-vision precision problem (track him more accurately), which was the wrong axis entirely.
+
+**Mitigation / pattern:** When source framing can't keep the subject fully in shot for a beat, cut to B-roll or a graphic rather than forcing or improving a partial crop — the audio (his voice) is what must never be interrupted; the visual only needs to be either "him, fully visible" or "B-roll," never "him, partially visible."
+
+**Promoted to:** `canonical/concepts/reel-production-architecture.md` Addendum 2026-07-15 (rule 25).
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-07-15-015 [mistake, process-change] — Double-captioning over baked-text graphic zones; and confirm which file version before acting on feedback
+
+**Session:** 9811 (M2) · **Date:** 2026-07-15
+
+**Context:** v4 build (icon_animate.py graphic beats) and Adrian's second feedback round.
+
+**What happened:** Two distinct mistakes in one round: (1) `icon_animate.py` bakes its own text into the rendered clip, but the standard word-caption overlay wasn't filtered to exclude those time ranges — the same words got captioned twice, stacked, over the graphic beats. (2) Adrian's detailed feedback round initially described issues that were already fixed in a later version, because he'd clicked an older file (v2) by mistake while believing he was reviewing the latest (v3) — required clarifying which version the feedback actually described before acting, rather than silently re-fixing already-fixed problems or silently assuming the newest file.
+
+**Root cause:** (1) No exclusion step existed between the graphic-beat timestamp ranges and the global caption word list. (2) No file-identity confirmation step existed when receiving detailed version-specific feedback.
+
+**Mitigation / pattern:** (1) Any composer mixing baked-text graphic segments with a global caption pass must exclude those segments' timestamp ranges from the caption word list before rendering (see `words_v4_filtered.json`). (2) When a user's feedback references specific behavior in "the video," and multiple versions exist, state plainly which version the feedback appears to describe and reconcile before making further changes.
+
+**Promoted to:** `canonical/concepts/reel-production-architecture.md` Addendum 2026-07-15 (rules 27, 29).
+
+**Tags:** `mistake`, `process-change`
+
+---
+
+### LL-2026-08-01-010 [discovery] — When resuming a days-old background job, check whether its PURPOSE was superseded, not just whether it's still alive
+
+**Session:** b3fc · **Archive:** [raw/sessions/2026-08-01-1546-m2-image-pipeline-and-pc-vision-build-shutdown.md](../../raw/sessions/2026-08-01-1546-m2-image-pipeline-and-pc-vision-build-shutdown.md)
+**Date:** 2026-08-01
+
+**Context:** Closing out an 8.5-day-stale chat that had built real vision-captioning infrastructure on the RTX 5080 PC (a Qwen2.5-VL-7B llama.cpp server + a one-shot `dropbox-vision-caption.py` script) and left it running unattended.
+
+**What happened:** The script was dead (not in the process list) — the boring, expected finding. Reading the box's *other* new scripts (`pc-triage.py`, `vision-triage.py`, both dated after this session's own build) before concluding anything revealed the real story: a later session built a materially better, more integrated system covering the exact same goal (describe silent/no-audio content instead of skipping it) using the *same* vision server this session had set up. The one-shot script wasn't just dead, it was obsolete — resurrecting it would have been pure waste, and reporting "the job died, should I restart it?" without that context would have been actively misleading.
+
+**Root cause:** "Is it still running" is the easy, obvious check; "is what it was FOR still needed, or has someone already solved it better" requires reading unfamiliar files that arrived after you stopped watching, which is easy to skip when a process-list check already gives a tidy yes/no answer.
+
+**Mitigation / pattern:** When reconciling a long-idle background job on shared, actively-worked infrastructure, always check for new files/scripts created in the machine's working directory since the job was launched (a simple `dir`/`ls` sorted by date, or diffing against what was there before) — not just the job's own log and process state. If something newer touches the same resource (same model server, same data source, same goal), read it before deciding to relaunch anything.
+
+**Promoted to:** No new canonical file — this extends the general "check the record before acting" discipline already established this same day/week (`LL-2026-07-21-006`) to background *infrastructure*, not just documented conclusions.
+
+**Tags:** `discovery`
