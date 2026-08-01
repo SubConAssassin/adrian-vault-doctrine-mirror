@@ -1493,3 +1493,16 @@ the iCloud video lane's real blocker (a Photos/TCC permission issue an earlier s
 (both M2-personal memory, updated in-session).
 
 **Tags:** `mistake`, `discovery`, `tool-gotcha`, `process-change`
+
+**⚠️ CORRECTION, same session, appended 2026-08-01T11:33:00+08:00:** the "design gap, not yet fixed"
+claim above is superseded — a different M2 session fixed it minutes after this entry was first
+written (see `icloud-video-orchestrator-v2.py`, edited 2026-08-01 11:28:56, comment "2026-08-01 M2
+FIX"): failures are now only charged against a video's attempt count when the pipeline is otherwise
+healthy (`_successes_this_run == 0 or _consec_failures >= 3` = systemic, not charged). That fix's own
+comment also independently confirms `9B2531F1`'s permanent loss as fact, not this session's inference.
+**Separately:** a `com.adrianvault.icloud-video-watchdog` LaunchAgent has existed since 2026-07-24 —
+this session did not check `launchctl list | grep adrianvault` (a standing project requirement)
+before manually intervening for several hours, and duplicated some of that existing infrastructure's
+already-solved problems (the same TCC/Terminal.app technique, the same `pgrep` self-match fix) as a
+result. Worth its own tag: `tool-gotcha` — always run the mandated live-service check before manual
+infra work, not only at session start.
