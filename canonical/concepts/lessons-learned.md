@@ -2113,3 +2113,60 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** `working/state/mining-gate-2026-08-02.json`, `canonical/concepts/client-material-usage-rule.md`
 
 **Tags:** `firewall` `process` `safety`
+
+---
+
+### LL-2026-08-02-001 [mistake, discovery] — A dedup pass can mask a repetition-lock instead of revealing it
+
+**Session:** b2258d19 · **Archive:** [raw/sessions/2026-08-04-0301-max-marmer-voice-ingest-and-ss-reflection-protocol.md](../../raw/sessions/2026-08-04-0301-max-marmer-voice-ingest-and-ss-reflection-protocol.md)
+**Date:** 2026-08-02
+
+**Context:** Ingesting an 85-minute voice memo (Adrian + Max Marmer) with whisper.cpp large-v3, then merging with ECAPA speaker diarization to produce a speaker-attributed transcript and a reflection note for a real third party.
+
+**What happened:** whisper.cpp repetition-locked across ~55 of 85 minutes — the same sentence looping for 11–16 minute stretches, ending in the classic silence-hallucination "Subtitles by the Amara.org community." A collapse-consecutive-exact-duplicate-sentences cleanup was applied and reported as success (27,446 → a "clean" 4,379 words). **That cleanup collapsed repeats *within* segments while the actual failure was looping *across* the whole recording** — so the word-count drop looked like successful denoising when it was actually removing the bulk of the fabricated content and leaving a transcript that was still ~65% hallucinated. A full entity/decision extraction and a first-draft reflection note were built and delivered from this corrupted source before Adrian caught it: *"We spoke so much, you've summarised so little."* The thinness he flagged was missing source material, not editorial brevity.
+
+**Root cause:** Source audio `mean_volume` was -32.6 dB (quiet, distant phone recording) — a known Whisper repetition-lock trigger. `whisper-cli` does not expose `condition_on_previous_text=False`, the setting that actually prevents it; chunking alone (the mitigation the vault's own `voice-memo-transcribe.py` docstring recommends) did not stop it happening within a single 900s chunk.
+
+**Mitigation / pattern:** Never trust a post-cleanup word count as evidence of transcript health — read a sample of the actual output, especially the middle of long recordings, before summarising it for a real recipient. A repetition-lock and a dedup pass produce the same visible symptom (shorter, "cleaner" text) for opposite reasons; only reading catches which one happened. Fix: normalize quiet audio (`ffmpeg loudnorm`) and transcribe with `condition_on_previous_text=False` + `vad_filter=True` + `compression_ratio_threshold=2.4` — `faster-whisper` or `mlx-whisper` expose this, `whisper-cli` does not. This became Phase 0 (Source Integrity Gate) of the new `ss-reflection-protocol` skill, made a hard, un-skippable gate specifically because of this near-miss.
+
+**Promoted to:** `~/.claude/skills/ss-reflection-protocol/SKILL.md` (Phase 0), `working/extraction/media-materialization/voice-memos/retranscribe_faster_whisper.py`
+
+**Tags:** `mistake` `discovery` `process-change`
+
+---
+
+### LL-2026-08-02-002 [discovery] — MLX GPU transcription is ~10× faster than CPU faster-whisper for identical model + settings on Apple Silicon
+
+**Session:** b2258d19 · **Archive:** [raw/sessions/2026-08-04-0301-max-marmer-voice-ingest-and-ss-reflection-protocol.md](../../raw/sessions/2026-08-04-0301-max-marmer-voice-ingest-and-ss-reflection-protocol.md)
+**Date:** 2026-08-02
+
+**Context:** Re-transcribing the corrupted 85-minute recording (LL-2026-08-02-001) correctly, under time pressure.
+
+**What happened:** `faster-whisper` large-v3 on CPU (int8, 8 threads) projected to ~54 minutes for 85 minutes of audio (measured: 1,117s of 5,081s done in 14 minutes). `mlx-whisper` large-v3 on the M1 Max GPU, same anti-repetition settings, same audio — **323 seconds total.** The MLX large-v3 model was already cached locally (2.9GB) but `mlx_whisper` itself was not installed; the CPU job was left running as insurance while GPU was set up, then killed once GPU output was verified (97% unique segments, 8,819 words, zero hallucination markers) — the CPU job never needed to finish.
+
+**Root cause:** N/A (discovery, not a defect).
+
+**Mitigation / pattern:** For any local whisper transcription on Apple Silicon, check for a cached `mlx-community/whisper-large-v3-mlx` model and use `mlx_whisper` before defaulting to CPU `faster-whisper` — the speed difference is large enough to change whether a re-transcription is even feasible within a session. `python3 -m venv` (not `pip install --break-system-packages`) for the install — system Python is PEP-668 externally-managed.
+
+**Promoted to:** should become the fleet default for quiet/long audio — flagged in the session handoff for whoever owns `tools/overnight-whisper-audio.py` and the other whisper-cli-based scripts.
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-08-02-003 [process-change] — When Adrian references a document he gave you, search the vault by provenance/directory before searching by keyword description
+
+**Session:** b2258d19 · **Archive:** [raw/sessions/2026-08-04-0301-max-marmer-voice-ingest-and-ss-reflection-protocol.md](../../raw/sessions/2026-08-04-0301-max-marmer-voice-ingest-and-ss-reflection-protocol.md)
+**Date:** 2026-08-02
+
+**Context:** Adrian asked to apply "a coaching mentor protocol... a full PDF document that I gave you... quite some time ago" to a feedback document being built for Max Marmer.
+
+**What happened:** Two wrong guesses before the right answer. First guess: `grilling`/`grill-me` (real skills in his skills folder, matched "grill" conceptually, wrong document). Second: chased a "Strategic Advisor" prompt found by grepping filenames for coach/mentor/business across the vault and Downloads — a real PDF (NickSader.io Prompt Vault, an Airtable export Adrian had saved), but the wrong lead, and its cells were truncated so even the right prompt inside it wasn't fully readable. Adrian then said "it was bulletproof" — one filename search (`find ... -iname "*bulletproof*"`) immediately found `canonical/frameworks/bulletproof-entrepreneur-blueprint.md`, **already canonical since 2026-05-04**, with a full 240-line application of the framework including the exact 5-question diagnostic used minutes later. It had been in the vault the entire time.
+
+**Root cause:** The search strategy was keyword/description-first (grep for "coach", "mentor", "reality check", "business plan" across file contents and names) rather than provenance-first (list `canonical/frameworks/` — the directory whose entire purpose is externally-sourced applied methodologies). A document Adrian describes as "a PDF I gave you" is, by construction, likely to already be canonicalised somewhere with a name reflecting *what it's called*, not what it does.
+
+**Mitigation / pattern:** When Adrian references a specific prior artifact ("the document I gave you", "the thing we used before"), check `canonical/frameworks/`, `canonical/concepts/`, and top-level directory listings by name/provenance before grepping file contents by description. A directory listing of the 10–20 most relevant top-level folders is cheaper than several rounds of content grep, and won't miss a file whose name doesn't contain the describing keywords.
+
+**Promoted to:** —
+
+**Tags:** `process-change` `mistake`
