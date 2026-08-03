@@ -210,6 +210,31 @@ High-stakes → **≥2 independent-family confirmations before promotion** (§8)
 
 > **NEVER confuse the two.** "Burn to throttle" is a **subscription-pool** instruction; it is NOT licence to hammer a metered wallet. Before any high-volume fan-out, classify each target on this axis first.
 
+**§11.1a — THE GATE (added 2026-08-03, Adrian-direct). This section was already correct and it
+still did not stop the spend — so the rule now has teeth.** On 2026-08-02 an orchestrating
+session authorised ~$35-60 of image/video generation on Adrian's card, reasoning cost was
+*"a sequencing problem, not a fork"*. It is not: §3.7 of `AGENTS.md` covers **free, resumable,
+flat-rate** compute and has never covered his card. Adrian, 2026-08-03: *"You categorically
+cannot use the paid APIs without presidential approval."*
+
+- **Every metered path now routes through `tools/metered-guard.py`** — deny-by-default, signed
+  **single-use per-job expiring** approval token, burned on use, every attempt (allowed **and**
+  denied) appended to `working/_logs/metered-spend.jsonl`, fail-closed on every ambiguity.
+- **An agent may never issue its own approval.** `approve` requires Adrian's verbatim words and
+  is his command. Ask in chat, state the cost, wait.
+- **The list above was incomplete and is corrected:** the metered surfaces are NOT "`ask-*.py`
+  only". A 2026-08-03 audit found **29 live spend paths**, including `hyperspeed_miner.py`
+  (Anthropic, unbounded fan-out), `aeo-tracker.py` (**Perplexity** — on no list anywhere),
+  `gcs/vertex-batch-processor.py` (**GCP ADC — no API key exists in the file to grep for**,
+  which is how unexplained Google charges appear with nothing to trace), and Whisper-API
+  scripts *named like the free local lane*. Full registry: `tools/lanes.py`.
+- **The old `FORCE_API_OVERRIDE` guards only tripped ABOVE $0.10**, so every sub-threshold call
+  spent with no approval at all — which is exactly how one session made 1,053 calls for ~$8.
+  Cost-per-call was never the risk; **calls nobody authorised were.**
+- **Image/video GENERATION has no flat-rate lane at all** — the CLIs are text/coding agents.
+  Ask Adrian, build procedurally, or use the PC's local ComfyUI stack.
+- **Before planning spend-capable work: `python3 tools/metered-guard.py preflight`.**
+
 **§11.2 — Redundancy FOR STATISTICAL EFFICACY (Adrian's "same work multiple times").** Deliberately run the SAME work-unit across multiple independent engines (and multiple passes) so that **consensus = high-confidence** and **divergence = flagged for deeper verification**. This is the §10.4 Council-Rotation filter dialled to high redundancy: don't ask once, ask N ways and score the agreement. Reusable harness: **`tools/council-saturate.sh <outdir> [engines_csv] [maxconc]`** — fans one templated question across a work-list × the flat-rate engines, with throttle-detection logging. Aggregation/tabulation of the many returns is itself delegated; Claude keeps the final firewall + judgment on the scored consensus.
 
 **§11.3 — Multi-node throughput is the goal; the box is the current limit.** True simultaneous processing scales by adding NODES + the async web bridges, NOT by overloading one Mac. **Today's real concurrency:** ~10–12 safe-aggressive CLI clients on the M1 Max 64GB (HARD CAP — 12+ → load 577 → box dead, §1a) **+** M2 Studio's own parallel capacity (agy Ultra + Ollama + Whisper, `ssh studio`) **+** 2 async web bridges (ChatGPT Pro, SuperGrok). Fleet: M1 Max (brain) + M2 Studio (worker, 32GB, 30-core GPU) + i7 Intel Mac (specialist offload: CPU-transcription / ffmpeg-encode / janitor — reactivating 2026-06-22, NOT an LLM node) over Tailscale. M3 SOLD. So: saturate the M-nodes to their ceilings, run the i7's CPU/encode lanes in parallel, AND queue the web bridges — that is how "process the corpus quickly" actually scales.
@@ -345,6 +370,7 @@ That file is the detail; this section is the binding law. Where §13's July-10 b
 ---
 
 revision_history:
+- 2026-08-03 — **§11.1a added: THE METERED-SPEND GATE** (Adrian-direct: *"You categorically cannot use the paid APIs without presidential approval"* / *"make sure we're actually using the channels I've actually already fucking paid for"*). §11.1 already carried the flat-rate/metered distinction and still did not prevent ~$35-60 of unauthorised image/video spend — an agent reasoned that cost was "a sequencing problem, not a fork". The rule now has a mechanism: `tools/metered-guard.py` (deny-by-default, signed single-use per-job expiring token, burned on use, append-only ledger at `working/_logs/metered-spend.jsonl`, fail-closed on every ambiguity) wired into all 29 live spend paths, plus `tools/lanes.py` as the machine-readable flat-rate-first registry. Corrections landed with it: the metered surface list was NOT "`ask-*.py` only" (Perplexity via `aeo-tracker.py` was on no list at all; `gcs/vertex-batch-processor.py` bills via GCP ADC with no API key in the file); and the old `FORCE_API_OVERRIDE` guards only tripped above $0.10, so every smaller call spent unapproved. Also recorded: **image/video generation has no flat-rate lane** — the CLIs are text/coding agents.
 - 2026-07-25 (later, same day) — **CONSOLIDATION PASS** (Adrian-direct: *"run a full consolidation pass… single source of truth so you have this in your database as a prompt map"*). A delegated rule-extraction over this file found **52 normative rules, 10 duplicate clusters and 5 internal contradictions**. Resolved here: **§1's scarcity framing** now explicitly defers to §10.1's abundance correction (delegate for parallelism + comparative advantage, not because tokens are running out) · **§6 scoped** to team prompts so it no longer reads as contradicting §14.2's stop-over-prompting law · **§4's "first throttle → Pro"** struck as superseded by §12.1 · **§4's agy entry** corrected to Gemini 3.6 Flash High + the 2-wide concurrency gate · **the >100K-auto-routes-to-grok defect** documented at §4 (doctrine says §13.3.6; the code at `cli-ask.sh:123` still does the old thing — fix proposed, NOT applied, needs Adrian). New index of which file owns which rule: **`canonical/system/prompt-map.md`**. Backups: `working/_research/2026-07-25-doctrine-consolidation/backup-before/`.
 - 2026-07-25 — **§14 added** (Adrian-direct: "updated LLM map for all the new models… reconfigure the Team Utilization Architecture… learn how to prompt them as well"). Opus 5 (24 Jul) + Gemini 3.6 Flash (21 Jul) fold in; the STOP-OVER-PROMPTING law lands as §14.2 (vendor-measured: +10–15% quality, −66% tokens); effort/ultracode mechanics documented; Sonnet 5 promoted to the Builder tier on its Terminal-Bench win over Opus 4.8; Grok's 54% hallucination rate and Luna's Nerova cliff become hard routing rules. agy repinned to `gemini-3.6-flash-high` (§14.7) after finding the old pin was also the wrong string format. Codex lane was down vendor-side (OpenAI 503 `biscuit_baker_service_me_circuit_open`) — NOT a quota signal, its two research legs were rerouted. Full map: `canonical/concepts/llm-capability-map-2026-07-25.md`; raw research: `working/_research/2026-07-25-llm-map-refresh/`.
 - 2026-07-11 — §12.1 upgrade trigger REVISED (Adrian-direct): "first codex throttle → Pro upgrade" replaced with "recurrent throttling that costs work" after codex's first-ever throttle (burst pile-up, cleared ~10 min) proved a single throttle is noise, not a capacity signal.

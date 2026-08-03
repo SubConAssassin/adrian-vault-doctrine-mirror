@@ -2028,3 +2028,88 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** —
 
 **Tags:** `discovery`
+
+---
+
+## An empty return is a failure mode, not a value
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-02
+
+**Context:** The transcription fleet had been idle four days. The stated cause was "the refeed pool is empty."
+
+**What happened:** An empty pool is a symptom, not a cause. The real failure was that `build-refeed-pool.sh` had died silently on 2026-08-01 09:27 when its dedup key list — the set of already-transcribed stems, built by `rclone lsf gdrive:Transcripts/` — came back **0 bytes** on a transient rclone failure. An empty done-list semantically means *"nothing has been transcribed"*, so continuing would have re-fed 13,430 completed files. The script correctly refused to continue. It did **not** log why. Four days of fleet idleness followed, with nothing anywhere saying what had happened. The same call succeeded first try the next night. **Three separate defects in this one session had the same shape:** the 0-byte dedup list; `load_staging.py` writing NULL over 6,596 populated `duration_sec` values because staging carried no value for that column; and `extract_corpus.py` emitting a hardcoded `None` that the loader then treated as authoritative.
+
+**Mitigation / pattern:** Any input that represents "what is already done" — a done-set, a dedup key list, a ledger of processed items — must be **asserted non-empty and fail loud** before use, because an empty one does not read as *broken*, it reads as *nothing has been done yet*, which is the most destructive possible interpretation. Separately: when a column is populated by one pass and rewritten by another, the second must COALESCE rather than blindly overwrite (`load_staging.py`'s `preserve` tuple exists for exactly this and had to be extended). Shipped: `build-refeed-pool-v2.sh` asserts every dedup input non-empty and plausible before building.
+
+**Promoted to:** `tools/content/load_staging.py` (preserve fix), `ML-triage/fleet/build-refeed-pool-v2.sh`
+
+**Tags:** `defect` `data-loss` `silent-failure`
+
+---
+
+## If you repair a column a loader also writes, the repair belongs INSIDE that loader
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-02
+
+**Context:** 3,750 exact-duplicate `generation=1` segments were doubling every line of any cut taken from 178 recordings. They were demoted to `generation=99`, and the audit confirmed zero remaining.
+
+**What happened:** A later check found **1,719 duplicates back**, and `generation=1` risen from 909,815 to 913,228. The cause was `load_whisper_segments.py`'s variant-ranking step, which rewrites `generation` for every row of the winning transcription pass — deliberately, and its comment says so: *"rank 1 is set EXPLICITLY … must be able to demote/promote rows that already carry a value."* Correct for variant selection, but it also **re-promotes any exact duplicates a previous dedup had demoted**. The loader runs on a 6-hour cadence, so a manual repair could never survive more than one cycle, and nothing reported that it had been undone. The fix was moving the dedup **inside** the loader, in the same transaction as the ranking, so it re-runs whenever the ranking does. It then fired twice unattended overnight (`exact-duplicate rows demoted to generation=99: 1,714`), which is the only reason it is known to work.
+
+**Mitigation / pattern:** Before repairing data by hand, ask **which process also writes this column, and on what cadence.** If any scheduled job rewrites it, a manual repair has a half-life measured in that cadence and will revert silently — the worst outcome, because the fix appears to have worked. Put the repair inside the writer, and verify it survives a real scheduled run rather than only a unit test.
+
+**Promoted to:** `tools/content/load_whisper_segments.py`
+
+**Tags:** `defect` `durability` `silent-failure`
+
+---
+
+## Sample randomly, or your test measures your sampling
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-02
+
+**Context:** Building a session-type classifier to enforce the rule that 1:1 client material is never publishable while group Mastermind material is. It would decide which recordings could be mined.
+
+**What happened:** The first accuracy sample was drawn with `ORDER BY word_count DESC LIMIT 40` — the longest recordings, which are almost by definition masterminds. It returned 34/40 "group" and looked highly accurate. That measured the sampling, not the classifier. A **random, seed-fixed** sample of 60 told a different story: three "group" verdicts were **audiobook tracks**, one was labelled group while the model's own stated reason read *"Speaker addresses Leslie"* (a 1:1), and one was a personal name. The biased sample would have shipped a gate that treated `group` as a grant — and published private client material. The design changed as a direct result: the classifier may only ever **RESTRICT, never GRANT**.
+
+**Mitigation / pattern:** When sampling to validate a classifier or a gate, sample **randomly with a fixed seed** and inspect the class that would cause harm if wrong — not the aggregate accuracy. Convenience orderings (longest, newest, largest, first-N) correlate with content type and will flatter the result in exactly the direction that hides the dangerous failure mode. Ask specifically: *which verdict, if wrong, causes the damage?* — then sample for that one.
+
+**Promoted to:** `working/handoffs/2026-08-02-m2-content-mining-gate-design.md`
+
+**Tags:** `discovery` `evaluation` `firewall`
+
+---
+
+## Check a stated diagnosis before executing it
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-02
+
+**Context:** Two commissions arrived with confident, specific diagnoses and instructions to act on them.
+
+**What happened:** Roughly six stated premises were stale. *"Fix the ingest script first so the defect stops recurring"* — already fixed three days earlier. *"All 14,444 transcripts are untimed and only SS is cuttable"* — the segment table already held 1,016,568 rows across 7,439 recordings. *"Expect Google Drive 403 quota throttling"* — no Drive access was needed at all; every source file was local. *"The 191 dl-failed rows are a DNS outage"* — they were a local drive unmount, which changes the fix entirely. *"transcript-vault-ingest coverage is ~0.4%"* — it was ~99.8%, stale by about 280×. Executing the commissions as written would have consumed the window re-fixing fixed things and building backoff for a remote that was never contacted.
+
+**Mitigation / pattern:** A commission's *goal* is authoritative; its *diagnosis* is a hypothesis with a timestamp. Spend the first minutes measuring the stated premises against live state, and say plainly which ones did not hold — that is not insubordination, it is the difference between doing the work and performing it. Where the diagnosis is wrong, the real defect is usually adjacent and more serious.
+
+**Promoted to:** —
+
+**Tags:** `process` `discovery`
+
+---
+
+## "Not restricted" is not "cleared"
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-02
+
+**Context:** A mining gate was built to enforce Adrian's Chatham House rule across 2,736 recordings, producing WITHHOLD (232), DEIDENTIFY (155) and unflagged (2,349) buckets.
+
+**What happened:** The unflagged 86% is the dangerous number, because it is trivially misread as "cleared for use." It means only *this filter did not catch it* — the speaker, clearance and firewall gates all still stand in front, and 911,509 segments carry `verdict='pending'`. The gate was therefore written to grant nothing at all: `1to1-client` blocks, `identifies_client` blocks, an unparseable verdict blocks (fail closed), and `group` — the one signal that would have unlocked volume — grants **nothing**, because testing showed it labelled audiobook tracks and a probable 1:1 as group. Every artefact carries an explicit `_semantics` field saying absence from the restrict list is not clearance.
+
+**Mitigation / pattern:** Any safety filter should be built so that its *output vocabulary cannot be misread as permission*. Name the buckets for what they authorise, not what they exclude; make the permissive interpretation impossible to reach by accident; and state the semantics inside the artefact itself, because the artefact will outlive the conversation that produced it. A filter that can only ever remove items is auditable; one that can add them requires trust.
+
+**Promoted to:** `working/state/mining-gate-2026-08-02.json`, `canonical/concepts/client-material-usage-rule.md`
+
+**Tags:** `firewall` `process` `safety`
