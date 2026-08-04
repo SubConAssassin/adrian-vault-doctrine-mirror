@@ -2,6 +2,8 @@
 **Status:** Tier-1. The full architecture behind the standing system prompt in `delegation-first-operating-doctrine.md §1a`. Synthesised from the codex + grok + agy panel, fused with tonight's empirical findings.
 **Accountant: CALIBRATED 2026-06-06** — 5h cap 291M / weekly 5.12B → reads ~62%/~50%, matching the Claude UI (any in-text 'under-reads ~2.3x' note below is the pre-calibration history).
 
+> **⚠️ CORRECTED 2026-08-04 — every "30M+ tokens/day", "agy Ultra grind (practically unlimited)", or "unlimited tokens" reference to agy/Antigravity below describes the **Gemini Ultra** subscription this doc was written against. Adrian downgraded it to a ~$20-30 basic tier on 2026-07-29 (memory: `gemini-subscription-downgraded-from-ultra`) — agy is now a small, scarce pool, not the unlimited/largest one. This doc also predates the current fleet topology (M2 Mac Studio replaced the M3 discussed below; see `multi-machine-infrastructure` memory) and is kept as historical reference, not a live capacity target. Current routing law: `canonical/concepts/delegation-first-operating-doctrine.md` §15.**
+
 **A. NODE JOB-ROLE MATRIX**
 
 **Claude (Opus / CEO-orchestrator)**  

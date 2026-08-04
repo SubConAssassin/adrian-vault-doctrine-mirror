@@ -22,7 +22,7 @@ Grok failed 3× to audit a 116 KB source bundle, then succeeded on a 22 KB cross
 ## Per-engine cheat-sheet (verified 2026-07-18)
 - **grok (grok-4.5, Grok Build TUI)** — `--single/-p` (small), `--prompt-file` (small→medium), `--prompt-json`, `--json-schema` (structured out), `--max-turns`, `--permission-mode {default,acceptEdits,auto,dontAsk,bypassPermissions,plan}`, `--tools`, `--disable-web-search`. **Context 500 K (regressed from 4.3's 1 M).** Large content → **file-read idiom** (now automated in cli-ask, see below). Confident-hallucinator → never promote grok facts without a different-family cross-check.
 - **codex (GPT-5.6 sol/terra/luna)** — `codex exec -m …`, prompt as argv. ~1.05 M ctx / 128 K out. Handled the 116 KB bundle inline in one shot this session (strongest single audit). Smallest pool → sparing on sol.
-- **agy (Gemini 3.5 Flash High)** — `agy-ask.py`, prompt as argv (PTY). 1 M ctx. Biggest pool / default grind + $0 vision. Reads serials/images.
+- **agy (Gemini 3.5 Flash High)** — `agy-ask.py`, prompt as argv (PTY). 1 M ctx. ⚠️ **Small pool since the 2026-07-29 Ultra→base downgrade** (was "biggest pool / default grind" — see the 2026-08-04 note at the end of this file); still the $0 vision lane. Reads serials/images.
 
 ## The fix baked into `tools/cli-ask.sh` (2026-07-18)
 The non-web grok branch is now **size-gated** (`CLI_ASK_GROK_INLINE_MAX`, default 40 000 bytes):
@@ -70,3 +70,6 @@ now 16/16. Knobs: `CLI_ASK_BIG_MAX` (default 100000), `CLI_ASK_LEGACY_GROK_REROU
 
 ## Grok 4.5 context window — the live-verified fact (settles a recurring confusion)
 **500 000 tokens.** Confirmed 2026-07-18 via WebSearch across xAI docs + OpenRouter + LLMReference + DataNorth + Kingy. This is a **regression from Grok 4.3's 1 M**. Released 2026-07-08. Pricing $2/$6 per M (tiered ×2 above 200 K prompt). Adrian's recollection of "4.5 went to 1 M" is incorrect — it was 4.3 that was 1 M. Sources filed in `working/_research/2026-07-18-cli-prompting-research/`.
+
+## ⚠️ CORRECTED 2026-08-04 — agy is no longer "biggest pool"
+**Adrian-direct, 2026-07-29** (memory: `gemini-subscription-downgraded-from-ultra`): the Google/Antigravity subscription was downgraded from Ultra to a ~$20-30 basic tier — *"predominantly because you failed to use it when I had the Ultra account."* Every "biggest pool / default grind" reference to agy in this file described the Ultra plan and is now stale; agy is a small, scarce pool, not the largest in the team. This does not change the delivery-mechanics guidance above (file-read idioms, concurrency gates, context-window figures), which remain per-engine technical facts independent of pool size. Full correction and operational consequence: `canonical/concepts/delegation-first-operating-doctrine.md` §15.

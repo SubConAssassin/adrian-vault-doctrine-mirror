@@ -14,7 +14,7 @@ related:
   - canonical/ecosystem/overview.md
   - canonical/concepts/business-intelligence-operating-layer-2026-04-24.md
 sources:
-  - canonical/projects/osb/business-intelligence-2026-04-24.md
+  - canonical/projects/_archive/osb-pre-reconciliation-2026-05-04/intelligence/business-intelligence-2026-04-24.md
   - companies/subconscious-surgery/business-intelligence-2026-04-24.md
   - companies/aga-bali/business-intelligence-2026-04-24.md
   - companies/ashta/business-intelligence-2026-04-24.md

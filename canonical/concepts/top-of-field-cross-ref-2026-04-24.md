@@ -22,7 +22,7 @@ sources_per_section:
 related:
   - working/_loop-state/businessman-principles.md
   - canonical/concepts/cross-pollination-map.md
-  - canonical/projects/osb/business-intelligence-2026-04-24.md
+  - canonical/projects/_archive/osb-pre-reconciliation-2026-05-04/intelligence/business-intelligence-2026-04-24.md
   - companies/subconscious-surgery/business-intelligence-2026-04-24.md
   - companies/aga-bali/business-intelligence-2026-04-24.md
   - canonical/projects/aya/business-intelligence-2026-04-24.md
@@ -337,7 +337,7 @@ Across the 5 sub-iterations, several of the surfaced next-actions are **canonica
 3. **`companies/subconscious-surgery/script-tree.md`** (T10.2) — codified SS methodology that AYA also licenses (Combo 3).
 4. **`companies/ashta/research-program-2026-04-30.md`** (T10.5) — research-program framing for Marcus Schmieke pitch + investor-facing collateral.
 5. **`canonical/projects/aya/session-shape-protocol.md`** + **refusal-policy.md** (T10.4) — locks AYA's product shape against drift.
-6. **`canonical/projects/osb/symbol-library-glossary.md`** + **provenance-card.md** (T10.1) — productises OSB's narrative and physical-collateral layer.
+6. **`canonical/projects/_archive/osb-pre-reconciliation-2026-05-04/intelligence/symbol-library-glossary.md`** + **provenance-card.md** (same directory) (T10.1) — productises OSB's narrative and physical-collateral layer.
 
 When Adrian has time, the order of execution that produces compounding effect across the stack is: 6.7.1 (biometric backbone) → 6.7.3 (SS script-tree) → 6.7.4 (Ashta research-program) → 6.7.6 (OSB symbol+provenance) → 6.7.2 (AGA cadence) → 6.7.5 (AYA session+refusal). That ordering serves Phase B (this-week) → Phase C (output templates) sequencing in `hive-mind-implementation-plan-2026-04-24.md`.
 

@@ -43,7 +43,7 @@ Every canonical file edit takes a lock at:
 Examples:
 
 - Edit to `canonical/concepts/bridge-protocols.md` → lock at `.leases/canonical/concepts/bridge-protocols.md.lock`
-- Edit to `canonical/projects/osb/business-intelligence-2026-04-24.md` → lock at `.leases/canonical/projects/osb/business-intelligence-2026-04-24.md.lock`
+- Edit to `companies/original-siberian-blue/ledger.md` → lock at `.leases/companies/original-siberian-blue/ledger.md.lock`
 
 The `.leases/` directory mirrors the vault structure exactly. This makes lock collisions impossible (one file, one lock path).
 

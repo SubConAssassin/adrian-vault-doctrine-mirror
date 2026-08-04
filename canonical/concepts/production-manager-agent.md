@@ -9,7 +9,7 @@ created: 2026-04-30
 last_updated: 2026-04-30
 authored_by: claude
 related:
-  - canonical/projects/osb/production-cost-architecture.md
+  - canonical/projects/_archive/osb-pre-reconciliation-2026-05-04/intelligence/production-cost-architecture.md
   - canonical/concepts/agent-team-cvs.md
   - canonical/concepts/four-room-stack-architecture.md
   - canonical/concepts/frictionless-operator-doctrine.md
@@ -61,7 +61,7 @@ Substrates the role can run on:
 | Gem wholesale prices (sapphire, tanzanite, ruby, fire opal, topaz) | Manual update on each new wholesale buy | Per-batch | Text |
 | Yoga's labour invoice (per piece by metal type) | Manual update from invoice screenshots | Monthly | OCR + manual entry |
 | Current Wix retail (per SKU) | Wix API (when wired) or manual paste | Weekly | CSV |
-| Markup rules R1, R2 | `canonical/projects/osb/production-cost-architecture.md` §3 | On change only | Markdown |
+| Markup rules R1, R2 | `canonical/projects/_archive/osb-pre-reconciliation-2026-05-04/intelligence/production-cost-architecture.md` §3 | On change only | Markdown |
 | `silver_baseline_at_write` and last reset date | `working/extraction/_pricing-state/silver-spot.json` | Updated after Adrian-confirmed reprice | JSON |
 
 # 4. State files
@@ -123,7 +123,7 @@ Same bands apply to **gold drift** (affects gold-plate uplift and solid-gold quo
 | `auto_inside_band` | If drift is 1.00–1.25 and the proposed new retail differs from current Wix retail by ≤ 8%, the agent applies it directly to Wix (when API access is wired) and notifies Adrian post-fact. Outside the band, fallback to `auto_off`. |
 | `auto_full` (not recommended) | Agent always pushes its computed retail. Used only after several months of confirmed clean operation. |
 
-Adrian's choice goes in `canonical/projects/osb/production-cost-architecture.md` §9 item 4.
+Adrian's choice goes in `canonical/projects/_archive/osb-pre-reconciliation-2026-05-04/intelligence/production-cost-architecture.md` §9 item 4.
 
 # 7. Tools the agent calls
 
@@ -213,6 +213,6 @@ Doctrine for how the OSB pricing engine is run is doctrine, not project-state. I
 - `agent-team-cvs.md` (the team this agent joins)
 - `four-room-stack-architecture.md` (the substrate ladder this agent runs across)
 
-Project-state about specific SKUs lives in `canonical/projects/osb/`.
+Project-state about specific SKUs lives in `companies/original-siberian-blue/` (see its `pricing/` and `inventory/` subdirs) — the pre-reconciliation `canonical/projects/osb/` tree this used to point to was archived to `canonical/projects/_archive/osb-pre-reconciliation-2026-05-04/` on 2026-05-04 and superseded by the live venture tree AGENTS.md §6 now names as canonical.
 
 End of agent spec v0.1.

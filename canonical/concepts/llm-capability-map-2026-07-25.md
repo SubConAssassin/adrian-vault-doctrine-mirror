@@ -321,15 +321,15 @@ under `AGENTS.md` §8 and needs Adrian's explicit go-ahead. See §8.
 | Hours-long autonomous run | **Fable 5** @ `xhigh` | Lead grows with task length |
 | Builder subagent | **Sonnet 5** @ `medium` | Beats Opus 4.8 on Terminal-Bench at ⅕ price |
 | Scribe subagent | **Haiku 4.5** | $1/$5; no effort param needed for this work |
-| Batch grind / vision / multimodal | **agy** (3.6 Flash) | Biggest pool, $0 vision, 17% leaner |
+| Batch grind / vision / multimodal | **agy** (3.6 Flash) | ⚠️ Small pool since 2026-07-29 Ultra→base downgrade (was "biggest pool" — see §7.3 correction below); still the $0 vision lane, 17% leaner |
 | Cheapest bulk classification | Gemini 3.5 Flash-Lite | $0.30/$2.50 |
 | Live-web research | **grok-web** | Cites in-CLI; best return in today's fan-out |
 | Hard arbitration / council tiebreak | **codex-sol** @ xhigh | T-Bench 88.8%; smallest pool, use sparingly |
 | Mechanical coding | `composer` | Keeps premium tokens out of mechanical edits |
 | >400K payload | agy or codex | Grok is 500K only |
 
-### 7.3 Unchanged
-6:3:1 batch proportions (agy:grok:codex) — agy still has the biggest pool. Council-ask stays 1:1:1.
+### 7.3 ⚠️ CORRECTED 2026-08-04 — no longer unchanged
+~~6:3:1 batch proportions (agy:grok:codex) — agy still has the biggest pool.~~ **WRONG as of 2026-07-29**: the Google/Antigravity subscription was downgraded from Ultra to a ~$20-30 basic tier (Adrian-direct; memory `gemini-subscription-downgraded-from-ultra`) — agy no longer has the biggest pool and the 6:3:1 split has no governing basis until re-measured. Full correction: `canonical/concepts/delegation-first-operating-doctrine.md` §15. Council-ask stays 1:1:1 (unaffected — that mode never depended on pool size).
 AG weekly-quota protection (§11.4) stands: 4–7 day lockout confirmed again today.
 
 ---
@@ -346,6 +346,7 @@ AG weekly-quota protection (§11.4) stands: 4–7 day lockout confirmed again to
 ---
 
 revision_history:
+- 2026-08-04 — **§7.3 + the batch-grind table row corrected** (Adrian-direct, live in-conversation: *"Make sure everything is fully handled and saved into the prompt architecture to make it reliable moving forward."*, following his 2026-07-29 downgrade decision, memory `gemini-subscription-downgraded-from-ultra`). §8 classification: FACTUAL CORRECTION, no rule weakened. agy/Gemini was downgraded from Ultra to a ~$20-30 basic tier on 2026-07-29 — the "biggest pool" / "6:3:1, agy still has the biggest pool" claims this file made 10 days later (07-25) were already stale by the time they'd be read today. Corrected in place, historical text struck-through not deleted. Full correction: `canonical/concepts/delegation-first-operating-doctrine.md` §15.
 - 2026-07-25 — created (Adrian-direct: "updated LLM map for all the new models… so we can reconfigure
   the Team Utilization Architecture… and learn how to prompt them as well"). Live-sourced from vendor
   primary docs + multi-engine fan-out; codex lane down vendor-side so its two legs were rerouted to
