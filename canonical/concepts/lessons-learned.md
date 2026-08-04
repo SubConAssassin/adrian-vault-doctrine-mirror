@@ -2240,3 +2240,37 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** `~/.claude/projects/-Users-subconm2-untitled-folder/memory/frictionless-protocol.md` (the completion-standard hardening explicitly scopes this distinction)
 
 **Tags:** `discovery` `process-change`
+
+---
+
+## Scope a repair to the invariant, not to the loader you happened to be editing
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-04
+
+**Context:** A self-healing dedup was added inside `load_whisper_segments.py` to stop duplicate `generation=1` segments doubling every line of a cut. It was verified working — fired 7 times unattended, gdrive duplicates at zero.
+
+**What happened:** A later check found **106 excess duplicates still present** — 93 within `footage-catalogue.db` and 13 cross-source. The dedup could not see them: it had inherited the host file's `source_db = 'gdrive-whisper-json'` filter, which was correct for that loader's own work but wrong for the guard. **The invariant being protected — no duplicate rows on the cut path — is defined by `generation=1`, which spans every `source_db`.** The repair was scoped to the code it lived in rather than to the property it defended. Not patched on discovery: those are the 3,956 clearance-bearing rows, and choosing which copy survives in a cross-source pair is a judgment call that could demote a segment carrying a `clear` verdict.
+
+**Mitigation / pattern:** When adding a guard, **write down the invariant first and then check the scope actually covers it** — "no duplicates at `generation=1`" is a different statement from "no duplicates among the rows this loader wrote", and the second silently masquerades as the first. Placing a repair inside a loader is right for durability (it survives that loader's rewrites) but the loader's own filters are then inherited by default, so they must be re-examined rather than assumed appropriate.
+
+**Promoted to:** Secretary action `dedup-scoped-too-narrowly-source-db`
+
+**Tags:** `defect` `process`
+
+---
+
+## A constant repair count is a signal, not comfort
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-04
+
+**Context:** A self-healing dedup logs how many duplicate rows it demotes on each scheduled run. Across seven unattended runs it reported the identical figure every time: `exact-duplicate rows demoted to generation=99: 1,714`.
+
+**What happened:** Read casually, a repeating number looks like the repair holding. It actually means the same 1,714 rows are re-promoted by the variant ranking and re-demoted every cycle, forever. In this case that is **benign** — the ranking and the dedup run in one transaction, so the net state at end-of-run is correct — but the number is not evidence of health, it is evidence of an equilibrium, and the two are easy to confuse. A repair count that trended to zero would mean convergence; one that is pinned means something upstream keeps undoing the work.
+
+**Mitigation / pattern:** For any self-healing repair, ask what its counter should do **over time**. If it should converge, a flat non-zero count is a defect. If it legitimately oscillates (because another pass keeps recreating the condition), say so explicitly in the log line or the code comment — otherwise the next reader will either panic at a stable number or, worse, take it as proof the system is fine without checking the end state.
+
+**Promoted to:** `tools/content/load_whisper_segments.py`
+
+**Tags:** `discovery` `observability`
