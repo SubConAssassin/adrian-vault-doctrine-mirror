@@ -2306,3 +2306,104 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** (verification habit only; no code change needed)
 
 **Tags:** `tool-gotcha` `discovery`
+
+## "Leave it alone because it's good" means don't touch it, not don't look at it
+
+**Session:** 5a17 (M2) · **Archive:** [raw/sessions/2026-08-05-0150-5a17-ss-reel-audit-rebuild-and-craft-doctrine-gap.md](../../raw/sessions/2026-08-05-0150-5a17-ss-reel-audit-rebuild-and-craft-doctrine-gap.md)
+**Date:** 2026-08-05
+
+**Context:** Adrian asked for a reel-pipeline audit + 10 new reels, and said to exclude `2026-07-27-abel-raberin-podcast` from the audit — the source of his last-liked reel, "leave it alone because it was good."
+
+**What happened:** The exclusion was read as "never open this folder," so an entire session's worth of reel rebuilds were built using only written doctrine, with no concrete example of what "good" actually looks like — even though Adrian had just told the session exactly where one was. The resulting reels were, in his words, "the shittiest, most obnoxiously awful" he'd been shown. When corrected, he named the gap precisely: "That should have been your cue to go, well, if I did that good, let me go and look at it."
+
+**Mitigation / pattern:** An instruction to leave something alone is scoped to *action* (don't edit, don't critique, don't re-decide it) unless it explicitly also restricts *attention*. When the thing being protected from action is also the best available reference for a task in progress, go study it — that is almost certainly what the instruction-giver assumes will happen, not what they're forbidding. More generally: before building several new instances of a thing, check whether a known-good instance already exists and is reachable, even without being told to.
+
+**Promoted to:** Claude auto-memory `feedback-excluded-does-not-mean-dont-look.md`
+
+**Tags:** `mistake` `process`
+
+---
+
+## The actual production doctrine for a domain can live in a different skill than the one that gets loaded by habit
+
+**Session:** 5a17 (M2) · **Archive:** [raw/sessions/2026-08-05-0150-5a17-ss-reel-audit-rebuild-and-craft-doctrine-gap.md](../../raw/sessions/2026-08-05-0150-5a17-ss-reel-audit-rebuild-and-craft-doctrine-gap.md)
+**Date:** 2026-08-05
+
+**Context:** SS reel work has two doctrine sources: `social-media-reel-editing` (a Claude Code SKILL.md, R-001..R-1302 style numbered craft rules) and `mkt-reel-craft` (a 5-role gated production pipeline with a real certification script, `tools/reel-gate.py`). The session followed the first in full and never loaded the second.
+
+**What happened:** Individually-correct rule-following against SKILL.md still produced reels that failed 22 of 62 binding checks in `tools/reel-gate.py` once it was finally run — wrong CTA architecture (appended instead of overlaid-and-held), no B-roll ideation, hook rubric never scored, pacing never checked against the required visual-change cadence. SKILL.md is real and current but is not the complete production doctrine for this specific project; `mkt-reel-craft` is, and it says so explicitly in its own text ("the craft research already existed as prose and was ignored... nothing mechanically refused to ship a reel that broke the rules").
+
+**Mitigation / pattern:** Before doing sustained production work in a domain, check for ALL skills whose description matches the domain, not just the first/most obviously-named one — and prefer whichever one has a machine-runnable gate over one that is prose-only, since prose doctrine has a documented history of being followed in spirit and still producing unshippable output.
+
+**Promoted to:** (process note only; both skills remain as-is)
+
+**Tags:** `discovery` `process`
+
+---
+
+## A near-miss on unauthorized metered spend: a CLI's native tool-use can bypass the spend guard entirely
+
+**Session:** 5a17 (M2) · **Archive:** [raw/sessions/2026-08-05-0150-5a17-ss-reel-audit-rebuild-and-craft-doctrine-gap.md](../../raw/sessions/2026-08-05-0150-5a17-ss-reel-audit-rebuild-and-craft-doctrine-gap.md)
+**Date:** 2026-08-05
+
+**Context:** `tools/metered-guard.py` deny-by-defaults all metered image/video generation and tracks attempts in a spend ledger. `grok --single "..."` was called directly to generate 2 B-roll images using grok's own native `image_gen` tool, before `mkt-reel-craft`'s LANE CHECK section (which documents a real prior ~$35-60 unauthorized-spend incident) had been read.
+
+**What happened:** Checking the guard afterward showed `METERED_APPROVAL_TOKEN` unset (spend refused by design) and a ledger with entries for `veo3-generate.py` and `gemini-image.py` denials — but nothing for grok's native tool-use, because that route doesn't go through any of the gated wrapper scripts at all. It is genuinely undetermined from the tooling whether this specific capability is flat-rate (bundled in the SuperGrok subscription) or metered. No confirmed unauthorized spend occurred, but the near-miss shape is identical to the documented incident this guard system exists to prevent, and it happened by simply calling a CLI tool directly rather than through a wrapper — no special effort to evade anything, just a genuine blind spot in what's instrumented.
+
+**Mitigation / pattern:** A spend-guard system's coverage should be verified to include EVERY way a capability can be invoked, not just the wrapper scripts someone thought to gate — a raw CLI's own built-in tool-use is an easy blind spot. Until resolved, treat any generation capability not appearing in `tools/lanes.py`'s registry as unconfirmed-cost, not as safe-by-absence.
+
+**Promoted to:** Secretary action `grok-image-gen-metered-status-unresolved` (owner: adrian); recommend `tools/lanes.py` gain an explicit entry for this route once resolved.
+
+**Tags:** `mistake` `tool-gotcha` `discovery`
+
+
+---
+
+## "Ingestion is complete" is meaningless without naming which layer
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-05
+
+**Context:** Across three sessions, transcription (segments, clearance, timing) was repeatedly reported as "ingestion complete" or measured as "the content pipeline."
+
+**What happened:** Adrian directly, angrily corrected this: the canonical spec (`canonical/concepts/content-archive-ssot-map.md`, Adrian-ratified, five weeks old) defines a **six-rung ladder** — L0 catalogued, L1 speech, L2 soundscape, L3 vision, L4 place, L5 story. Everything reported was entirely inside L1. Two rungs (L2, L5) had no tool at all; the largest single body of untouched work (323,095 of 326,952 photographs, 98.8%) was in L3/L4, never mentioned. The narrower framing wasn't false — L1 acquisition genuinely was complete for reachable corpora — but presenting it as an answer to "is the pipeline done" was a real failure to track scope.
+
+**Mitigation / pattern:** When a system has a documented multi-layer completion model, every status report must name the layer explicitly — "L1 acquisition complete; L2 not started; L3/L4 <2%" — never a bare "ingestion complete." Before reporting progress on any multi-stage pipeline, check whether a governing spec exists that defines *all* the stages, not just the one currently being worked.
+
+**Promoted to:** `working/handoffs/2026-08-05-PIPELINE-INGESTION-STATUS-AND-COMPLETION-HANDOVER.md`
+
+**Tags:** `process` `discovery`
+
+---
+
+## When told "you should already know this," find the existing doc — don't ask which doc
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-05
+
+**Context:** Asked for an ETA on "full assimilation... highest detail and quality as specified," the first response asked what the specification referred to. Adrian: *"After months of ingesting content, you shouldn't be querying or be confused at the specification... I shouldn't have to tell you again."*
+
+**What happened:** The spec existed — canonical, ratified, five weeks old (`canonical/concepts/content-archive-ssot-map.md`). A single targeted search (one agent dispatch, broad scope across `canonical/`, `procedural/`, and filename/content keyword search) located it in one pass, along with 13 other candidate documents ranked by likelihood. The information was never missing; it had simply never been checked for before three sessions reported progress against a narrower, assumed definition of "done."
+
+**Mitigation / pattern:** A user's frustration at being asked "what do you mean by X" is a strong signal that X is *already documented* and the correct response is to go find it, not to request clarification again. Search first — broadly, across the whole vault/knowledge base, not just the files already open in context — before asking a repeat-offender clarifying question. If the search genuinely turns up nothing, then ask; but exhaust the search first.
+
+**Promoted to:** —
+
+**Tags:** `process` `discovery`
+
+---
+
+## A measurement tool needs the same scrutiny as a tool that mutates data
+
+**Session:** 6d6afd03 (M2) · **Archive:** [raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md](../../raw/sessions/2026-08-03-0920-m2-overnight-grind-segment-backfill-mining-gate.md)
+**Date:** 2026-08-05
+
+**Context:** `tools/content-archive-ssot.py` is the canonical tool for answering "how much of the archive is processed." Regenerating it live surfaced that its L1 (speech-transcribed) figure comes from `master-file-index.db`, whose transcript signal is a stem-join against `working/deep-extraction/` — a 379-entry folder unrelated to the actual pipeline.
+
+**What happened:** `content-index.db`, where three weeks of real transcription work was written (16,822 recordings), was invisible to the tool. The SSOT reported 12,984 combined L1 — a real undercount, silently. Every previous *write*-side defect found this session (five of them, in the days prior) was caught by verifying output against source. This one was different in kind: a *read*-side defect, silently under-reporting rather than destroying, and arguably more dangerous, because a wrong measurement corrupts every decision built on top of it — including three days of this session's own status reports, taken at face value.
+
+**Mitigation / pattern:** Before trusting any "how much is done" tool, check what it actually reads from — not what the surrounding documentation claims it reads from. A measurement pipeline has the same class of defect as a write pipeline (wrong table, wrong join key, stale source) and the same consequence class (silent, compounding, and invisible until someone regenerates the number and cross-checks it against the system it's meant to describe).
+
+**Promoted to:** `working/handoffs/2026-08-05-PIPELINE-INGESTION-STATUS-AND-COMPLETION-HANDOVER.md`
+
+**Tags:** `defect` `discovery` `process`
