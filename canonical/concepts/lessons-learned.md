@@ -2274,3 +2274,35 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** `tools/content/load_whisper_segments.py`
 
 **Tags:** `discovery` `observability`
+
+## EDEADLK on iCloud files is disk pressure, not an mmap fault -- and no copy tool avoids it
+
+**Session:** d5cbed12 · **Archive:** [raw/sessions/2026-08-05-0140-d5cbed12-canonicalisation-audit-and-doctrine-promotion.md](../../raw/sessions/2026-08-05-0140-d5cbed12-canonicalisation-audit-and-doctrine-promotion.md)
+**Date:** 2026-08-05
+
+**Context:** For weeks this vault's own memory (`icloud-documents-sync-breaks-rsync-mmap.md`) held that `OSError: [Errno 11] Resource deadlock avoided` on iCloud-synced paths was an mmap fault, fixable by choosing a copy tool that doesn't mmap. Several fixes attempted across multiple sessions on that basis, including this one initially, kept failing.
+
+**What happened:** Disproved by direct test: `dd`, which uses `read()` and never `mmap()`, still returned EDEADLK on 4,000 of 4,000 attempts against a real target. The actual mechanism (confirmed against [anthropics/claude-code#40783](https://github.com/anthropics/claude-code/issues/40783), which describes the identical symptom) is that the iCloud FileProvider extension requires coordinated access via `NSFileCoordinator` for dataless/evicted files; a synchronous read that bypasses it collides with the FileProvider's own locking domain and genuinely deadlocks. Separately, `rsync` was not failing on evicted files -- it was silently force-downloading them, which fills an already-near-full boot volume. The deadlock was a symptom of disk pressure, not its cause.
+
+**Mitigation / pattern:** Classify every file via `lstat` block-count (0 blocks + nonzero size = dataless) *before* any read, skip dataless files rather than force-fetching them, and stream only materialised files. No copy tool -- rsync, cp, tar, dd -- is immune to EDEADLK on a dataless file; choosing a "safer" one is not a fix. A real kernel-level `SF_DATALESS` stat flag (`0x40000000`) is a better detection signal than the block-count heuristic (restic merged exactly this in 2025, PR #5370); Apple's own authoritative API is `NSURLUbiquitousItemDownloadingStatusKey`.
+
+**Promoted to:** `icloud-edeadlk-is-disk-pressure-not-mmap.md` (Claude auto-memory), `tools/vault-backup.py`-family scripts
+
+**Tags:** `mistake` `discovery` `tool-gotcha`
+
+---
+
+## sqlite3 CLI: `changes()` in a separate invocation reports nothing about the prior UPDATE
+
+**Session:** d5cbed12 · **Archive:** [raw/sessions/2026-08-05-0140-d5cbed12-canonicalisation-audit-and-doctrine-promotion.md](../../raw/sessions/2026-08-05-0140-d5cbed12-canonicalisation-audit-and-doctrine-promotion.md)
+**Date:** 2026-08-05
+
+**Context:** Running `sqlite3 db "UPDATE ..."` followed by a separate `sqlite3 db "select changes()"` call to verify a write, twice in a row, both times reported `changes: 0` on updates that had, in fact, applied correctly (confirmed by a fresh `SELECT`).
+
+**What happened:** Each `sqlite3 <db> "<sql>"` invocation from the shell opens its own connection, runs the one statement, and exits. `changes()` is scoped to the connection that performed the write -- a fresh connection's `changes()` reports its own (zero) writes, not the prior process's. This produced a false alarm that briefly looked like a live concurrent session was interfering with the database, and burned real time chasing a phantom race condition before the mundane explanation was found.
+
+**Mitigation / pattern:** Never trust `changes()` from a separate `sqlite3` CLI invocation. Either combine the UPDATE and the `changes()` check into ONE invocation (`sqlite3 db "UPDATE ...; select changes();"`), or -- more robustly -- verify with a fresh, independent `SELECT` of the actual state, which is what should be trusted regardless.
+
+**Promoted to:** (verification habit only; no code change needed)
+
+**Tags:** `tool-gotcha` `discovery`

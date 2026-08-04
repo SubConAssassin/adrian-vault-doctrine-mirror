@@ -87,6 +87,7 @@ If you need a rule, go to its home. If you find the same rule stated somewhere e
 | Council-ask default | **delegation §12** | — |
 | **Model routing / which engine / effort / prompting law** | **delegation §14** | §1b and §13 are historical layers under it |
 | Engine specs, prices, benchmarks, per-engine prompting | **llm-capability-map-2026-07-25.md** | (read on demand) |
+| Cross-venture short-form editing/content-strategy doctrine (evidence-graded universal floor + per-venture craft divergence, all 6 ventures) | **editing-doctrine-2026-07-29.md** | `companies/subconscious-surgery/content/*` (SS-specific hook/reel playbooks — narrower, cross-link up to this file, don't duplicate) |
 | Claude's role; anti-patterns; tentative-posture ban | **ceo §1 + §4** | AGENTS §3, §12.3 |
 | **The single-question protocol (format template)** | **ceo §8** | AGENTS §11.3, global CLAUDE.md |
 | Production cadence / watchdog ladder | **ceo §6** | — |
