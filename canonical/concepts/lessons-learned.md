@@ -2407,3 +2407,173 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** `working/handoffs/2026-08-05-PIPELINE-INGESTION-STATUS-AND-COMPLETION-HANDOVER.md`
 
 **Tags:** `defect` `discovery` `process`
+
+---
+
+## `du` reports logical size for dataless iCloud files — check block count, not `du`, before blaming disk usage on a cloud-synced folder
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** Spent hours blaming a 67GB iCloud Drive folder ("Siberian blue promo") for a disk-space crisis, including running `brctl evict` on it based on that theory.
+
+**What happened:** `stat -f %b` (real block count) proved those files were already dataless placeholders occupying zero real disk — `du` reports the LOGICAL size of a dataless file, not its physical footprint, and there is no visual cue in normal `du -sh` output to warn you the number is fictional. The evict succeeded and freed nothing, because there was nothing to free. Confessed the error directly rather than let a wrong theory stand.
+
+**Mitigation / pattern:** Before attributing disk pressure to any iCloud-Drive-synced folder, check `stat -f %b` on a sample of its files (0 = dataless/already evicted, real disk use elsewhere) rather than trusting `du -sh` alone. This applies to any dataless/sparse-file-aware filesystem feature, not just iCloud specifically.
+
+**Promoted to:** —
+
+**Tags:** `mistake` `tool-gotcha`
+
+---
+
+## A polling script's "do X once per episode" logic needs an explicit sentinel — prose in a log message is not idempotency
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** A watchdog's restart branch logged "restarting once" but carried no state between invocations of the polling script.
+
+**What happened:** Between the script's own 1-hour and 3-hour thresholds, the branch fired on every 5-minute polling tick — 12+ restarts in 70 minutes, each one re-enumerating a 9,800-item work queue, while the actual cause of the stall (disk pressure) went completely untouched by any of the restarts.
+
+**Mitigation / pattern:** Any "only do this once" behavior inside a script that re-runs on a timer (cron/launchd polling) needs an explicit sentinel file or persisted state checked at the top of the run — never rely on the log message's wording to imply the behavior actually only happens once.
+
+**Promoted to:** —
+
+**Tags:** `mistake` `process-change`
+
+---
+
+## A claim/dedup set inside a loop must be mutated at assignment time, not read once before the loop starts
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** A recovery script matched orphaned records to unique live targets, tracking "already claimed" targets to prevent double-assignment.
+
+**What happened:** The claimed set was computed once before the loop and never updated as matches were assigned within the same run, so two different orphans could each see the same "last remaining" candidate as their sole option and both map to it — the second write silently overwrote the first. Confirmed on 9 real collision groups; the collision doesn't surface in any obvious way because the operation "succeeds" for both writers.
+
+**Mitigation / pattern:** In any loop that assigns items from a shared pool of unique resources, the claimed/taken set must be updated the instant an item is assigned, not just read from a start-of-run snapshot. Verify this specifically by checking the actual output for duplicate assignments to the same target, not just checking that the loop "completed."
+
+**Promoted to:** —
+
+**Tags:** `mistake` `process-change`
+
+---
+
+## A uniquely-matched result still needs a corroborating sanity check when tier-1 narrowing already produced exactly one candidate
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** A multi-tier matching script (filename, then duration, then date) only ran its duration/date disambiguation tiers when tier-1 (filename) narrowing still left more than one candidate.
+
+**What happened:** When filename matching alone produced exactly one candidate, the script accepted it immediately with zero corroboration — even though camera filenames recycle over years and a "unique" filename match spanning years apart is a real, non-hypothetical failure mode. Confirmed: 36 of 1,285 matches were wrong, attached to footage months to six years away from the correct date.
+
+**Mitigation / pattern:** Uniqueness of a match within one signal is not the same as confidence in the match. When orthogonal corroborating evidence (duration, date, etc.) is available, check it even when the primary signal already narrowed to one candidate — especially when the primary signal is known to be reusable/non-unique in the domain (camera filenames, generic IDs, etc.).
+
+**Promoted to:** —
+
+**Tags:** `mistake` `process-change`
+
+---
+
+## A diagnostic shell's process ancestry may not be the app you think is "the terminal"
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** Repeatedly advised granting Full Disk Access to Terminal.app to fix a Claude session's inability to read protected files.
+
+**What happened:** Tracing the actual process ancestry (`ps -o pid,ppid,comm`, walked to PID 1) showed the Bash tool ran as a child of `/Applications/Claude.app`, not Terminal.app at all — Terminal.app is correctly relevant to the separate matter of what launches the pipeline's own subprocess via AppleScript, but had nothing to do with the Claude session's own file-read permissions.
+
+**Mitigation / pattern:** Before advising a permission grant "for the terminal" or "for the app," trace the actual process chain of the specific tool/session in question (`ps -o pid,ppid,comm -p $$`, walk to PID 1) — do not assume based on which application window is visibly in front, since a background agent's process tree can differ entirely from what's on screen.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `tool-gotcha`
+
+---
+
+## 65% system CPU / near-zero user CPU / zero swap is the signature of thread-pool contention, not memory pressure
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** A worker process appeared to hang indefinitely loading a second ML model after a first was already resident, on an old, RAM-constrained machine.
+
+**What happened:** The natural assumption ("old machine, must be swap-thrashing") was checked and ruled out directly: `vm_stat` showed zero pageouts/swapins throughout, and 4GB+ RAM remained unused. `top` showed 65% system time against ~2% user time — a signature that pointed instead at heavy syscall/lock activity, which correctly predicted a thread-pool livelock between two ML libraries (`ctranslate2` and `torch`) each maintaining their own OpenMP thread pool and fighting over the same physical cores.
+
+**Mitigation / pattern:** When a process appears hung on an old/constrained machine, check `vm_stat` (swap activity) and `top`'s user/sys CPU split before assuming memory pressure. High sys / low user / zero swap points at lock or syscall contention (often multiple libraries' own thread pools), not RAM — and the fix (constrain thread counts) is different from the fix for genuine memory pressure (reduce concurrent model residency).
+
+**Promoted to:** —
+
+**Tags:** `discovery` `tool-gotcha`
+
+---
+
+## An AppleScript-driven automation needs its own liveness check of the target app — the automating tool's exit code can lie
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** A CLI tool (`osxphotos --use-photos-export`) drives Photos.app over AppleScript. Photos.app wedged (alive, 0% CPU, answering no AppleEvents) for 77 hours before this was found.
+
+**What happened:** Every automated export against the wedged app timed out silently inside Photos, and the CLI tool STILL returned exit code 0 — so any error-handling keyed on the tool's own return code was structurally blind to this failure mode for the entire 77 hours.
+
+**Mitigation / pattern:** Any pipeline that automates a GUI app via AppleScript/Accessibility APIs needs an independent liveness probe of the target app itself (e.g. a trivial AppleEvent round-trip with a timeout) — never trust the automating CLI tool's own exit code as proof the target app is actually responsive.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
+
+---
+
+## `huggingface_hub` can leave a stale download lock behind a killed process, and a later call hangs indefinitely on it — looks identical to a slow download
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** A worker process appeared permanently stuck loading a model from a `snapshot_download()` call, for over 3 hours, despite the model files already being fully cached locally.
+
+**What happened:** A prior process (killed via `kill -9`, which does not allow lock cleanup) had left `.lock` files behind in `~/.cache/huggingface/hub/.locks/<model>/`. `snapshot_download()` waits to acquire these locks before proceeding, and waits forever if the original holder is dead — with zero timeout and zero error, indistinguishable from a genuinely slow network download.
+
+**Mitigation / pattern:** If a `huggingface_hub`-based download/load appears to hang for longer than the model size could plausibly justify, check `~/.cache/huggingface/hub/.locks/<model>/` for stale lock files before assuming a network problem — clear them and retry.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+## `ctranslate2` + `torch` in one process can livelock on thread-pool contention even after the documented duplicate-OpenMP abort is silenced
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** Loading `faster-whisper` (uses `ctranslate2`) and then a `torch`-based model (speechbrain ECAPA) in the same process, after fixing the documented `OMP: Error #15` duplicate-runtime abort.
+
+**What happened:** `KMP_DUPLICATE_LIB_OK=TRUE` silences the abort, but does not fix the underlying cause — the two libraries each maintain their own OpenMP thread pool and can livelock fighting over the same physical cores, hanging indefinitely with no error. Fixed by also constraining both to single-threaded execution: `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CT2_NUM_THREADS=1`.
+
+**Mitigation / pattern:** When combining `ctranslate2` and `torch` in one process, set `KMP_DUPLICATE_LIB_OK=TRUE` AND constrain both libraries' thread counts to 1 — the env var alone only silences the crash, it does not resolve the thread-pool contention underneath it.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+## macOS Full Disk Access is evaluated at process launch, not live — and a full app restart is not always sufficient to pick up a new grant
+
+**Session:** 9207 (M2) · **Archive:** [raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md](../../raw/sessions/2026-08-06-0115-icloud-video-pipeline-recovery-fleet-repair.md)
+**Date:** 2026-08-06
+
+**Context:** Toggling Full Disk Access on for an app does not retroactively apply to that app's already-running processes.
+
+**What happened:** Confirmed the standard case first (Terminal.app needed a full quit+reopen after being granted FDA, and that resolved it for the pipeline's own subprocess). But the SAME pattern applied to `Claude.app` did NOT resolve access for the Claude session's own Bash tool, even after a verified fresh process restart (confirmed via process start timestamps) — root cause unresolved at session close.
+
+**Mitigation / pattern:** Expect a full app restart to be necessary after any FDA grant, but do not assume it is SUFFICIENT — verify the grant actually took effect with a live read test immediately after restart, and if it still fails, escalate to checking the exact TCC client identifier rather than repeating the restart.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha` `discovery`

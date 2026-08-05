@@ -93,6 +93,7 @@ fi
 # ---- end gate ----
 
 TIMEOUT=360; RETRIES="${CLI_ASK_RETRIES:-1}"; MIN_BYTES="${CLI_ASK_MIN_BYTES:-20}"; USE_STDIN=0
+PROMPT_ARG=""; PROMPT_CAPTURED=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --timeout) TIMEOUT="${2:?--timeout needs a value}"; shift 2;;
@@ -103,10 +104,25 @@ while [ $# -gt 0 ]; do
     --web) GROK_WEB=1; shift;;
     --stdin) USE_STDIN=1; shift;;
     --) shift; break;;
-    *) break;;
+    *)
+      # 2026-08-03 FIX: flags placed AFTER the prompt used to be silently dropped —
+      # this loop broke on the first non-flag token (the prompt) and never looked at
+      # anything past it. `cli-ask.sh codex "$P" --timeout 840` therefore silently
+      # reverted to the 360s default with NO warning: a codex build that legitimately
+      # needed 840s hard-timed-out at 360s instead. Root-caused after the same call
+      # failed twice in one session. Fix: capture the first non-flag token as the
+      # prompt but KEEP SCANNING remaining tokens for recognised flags, so flag order
+      # relative to the prompt no longer matters. `--` above is unchanged: it still
+      # means "stop parsing entirely, everything after is literal."
+      if [ "$USE_STDIN" != 1 ] && [ "$PROMPT_CAPTURED" = 0 ]; then
+        PROMPT_ARG="$1"; PROMPT_CAPTURED=1; shift
+      else
+        break
+      fi
+      ;;
   esac
 done
-if [ "$USE_STDIN" = 1 ]; then PROMPT="$(cat)"; else PROMPT="${1:-}"; fi
+if [ "$USE_STDIN" = 1 ]; then PROMPT="$(cat)"; else PROMPT="$PROMPT_ARG"; fi
 # Non-empty check MUST be pipe-free: `printf "$PROMPT" | grep -q` breaks on large
 # prompts — grep -q closes the pipe on first match, printf dies SIGPIPE(141), and
 # `set -o pipefail` turns that into a false "empty prompt" (only for big --stdin
