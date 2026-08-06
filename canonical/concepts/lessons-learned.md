@@ -2577,3 +2577,88 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** —
 
 **Tags:** `tool-gotcha` `discovery`
+
+---
+
+## UPDATE (session 374e92e9, M1) — the FDA grant itself checked out clean; narrows the open question above rather than resolving it
+
+**Session:** 374e92e9 (M1) · **Archive:** [raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md](../../raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md)
+**Date:** 2026-08-06
+
+**Context:** Follow-up on the entry immediately above — Adrian asked directly what's blocking the ~243GB unaccounted disk usage this FDA issue gates.
+
+**What happened:** Checked the system TCC.db directly (`/Library/Application Support/com.apple.TCC/TCC.db`, world-readable on this machine, no sudo needed) rather than re-guess. The grant for `com.anthropic.claude-code` genuinely exists with `auth_value=2`, and the running binary's bundle identifier and code signature both match it cleanly. This rules out the two most common causes of "toggle is on but still doesn't work" — wrong app granted, and a stale signature after an app update — leaving the launch-time-caching hypothesis from the entry above as the live one, now with the easier explanations eliminated. **Also worth noting as its own small lesson:** should have scanned this file for `FDA`/TCC-tagged entries before starting the investigation (per the shutdown protocol's own Restart Recovery Checklist, step 5) and would have found the entry above immediately instead of re-deriving its central hypothesis from scratch.
+
+**Mitigation / pattern:** When a TCC/FDA grant "isn't working," check the grant's existence and identity match FIRST (system TCC.db, `codesign -dv` on the actual running binary) before assuming the grant itself is broken — it usually isn't. And: grep `lessons-learned.md` for the tool/domain before starting a fresh investigation, not just at official session-start.
+
+**Promoted to:** `working/handoffs/_claude-bridge/m1-to-m2-2026-08-06-fda-cold-start-test.md`
+
+**Tags:** `discovery` `process`
+
+---
+
+## A physically impossible processing rate in a log is the tell that a loop is failing before it reaches the real work, not evidence of speed
+
+**Session:** 374e92e9 (M1) · **Archive:** [raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md](../../raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md)
+**Date:** 2026-08-06
+
+**Context:** Two separate pipeline scripts this session logged throughput in the thousands-of-items-per-second range for tasks that genuinely require a network round-trip or model inference call (which take on the order of a second each).
+
+**What happened:** In both cases the number was real but meant the opposite of what it looked like — the loop was failing (file-not-found, dataless-placeholder, unhandled exception) before it ever reached the network/GPU call, so "items/s" was measuring how fast a local exception could be raised and caught, not real throughput. One case: `enrich_descriptions.py` retrying the same 182-row batch at 15,000-22,000 items/s, 76.7M times over two days. The other: an earlier relaunch of the same tool class before its prompt bug was fixed.
+
+**Mitigation / pattern:** Any per-item throughput figure above what the slowest real dependency in the chain could plausibly sustain (a network call, a model inference, a disk materialize) is not a performance win — it's the loop skipping the expensive part entirely. Check the raw per-item log for what's actually happening before trusting an aggregate rate.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process`
+
+---
+
+## Windows `Start-Process`, even with `-PassThru`, does not survive the parent SSH/PowerShell session ending — no error, the child is just gone
+
+**Session:** 374e92e9 (M1) · **Archive:** [raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md](../../raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md)
+**Date:** 2026-08-06
+
+**Context:** Tried to launch a long-running `rclone` sync on the PC (Windows) that needed to outlive the SSH session that started it — the same `nohup ... & disown` pattern that reliably backgrounds work on the macOS fleet nodes.
+
+**What happened:** `Start-Process -FilePath rclone -ArgumentList ... -WindowStyle Hidden -PassThru` reported success and returned a real PID both times it was tried (once inline, once via a `.ps1` file), but the child process was silently killed the moment the SSH connection closed — no error, no log file ever created, `Get-Process` on the reported PID came back empty on the next check. Windows does not detach a `Start-Process` child from its parent's session the way `nohup`+`disown` does on macOS by default.
+
+**Mitigation / pattern:** On this fleet's Windows PC node, don't try to detach a background job on the Windows side. Instead run the command synchronously *inside* the SSH connection itself, and background the SSH call from the calling (macOS) side (`run_in_background` / equivalent) — the connection staying open is what keeps the remote process alive, not anything done in PowerShell.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+## `rclone`'s periodic `--stats` throughput line is a cumulative average since job start, not a live rate — early slow phases make it look like ongoing throttling
+
+**Session:** 374e92e9 (M1) · **Archive:** [raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md](../../raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md)
+**Date:** 2026-08-06
+
+**Context:** Watching a bulk `rclone copy` job's `--stats 30s` output, the reported KiB/s dropped tick over tick (624→147→74→25) and the projected ETA climbed from under 10 hours to over a week, in the first few minutes of a real, healthy transfer.
+
+**What happened:** Reacted to the falling number as evidence of active throttling before checking the raw log. The raw log showed continuous, clean `Copied (new)` lines with zero errors the entire time — the `--stats` figure is an average over the job's whole elapsed life, so a slow initial file-enumeration/checking phase (many small API calls, little real transfer) drags the average down hard early on, recovering only as real transfer time accumulates. Confirmed by hand-computing real throughput from file-count deltas between ticks, which tracked the later-recovered average, not the alarming early dip.
+
+**Mitigation / pattern:** For any tool reporting a cumulative/rolling average rather than an instantaneous rate, judge early-job health from the raw event log (real successes, real errors) or from a manually-computed delta over a fixed window — not from the summary average, which is structurally misleading in a job's first few minutes.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha` `mistake`
+
+---
+
+## `brctl download`/`brctl evict` are effectively legacy on current macOS — confirmed from two independent angles the same day
+
+**Session:** 374e92e9 (M1) + 9207/same-day (M2) · **Archive:** [raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md](../../raw/sessions/2026-08-06-1842-m2-reel-skills-pipeline-and-fda-diagnosis.md)
+**Date:** 2026-08-06
+
+**Context:** Related to, but distinct from, the `du`-reports-logical-size entry above (that one is about measuring dataless files correctly; this one is about the eviction/download tool itself). Both directions were tested for real on the same day: `brctl download` against a dataless Google Drive placeholder, and `brctl evict` against a dataless iCloud placeholder.
+
+**What happened:** `brctl download` on the Google Drive path failed immediately with a clear, specific error — `Path is outside of any CloudDocs app library, will never sync` — because `brctl` only ever understood iCloud's own CloudDocs system, never Google Drive's separate file-provider extension. Separately, `brctl evict` run against an already-dataless iCloud file "succeeded" but froze nothing (there was nothing to free) — and macOS's own current mechanism for this class of file management is FileProvider, not `brctl`, which is legacy. Net effect: `brctl` should not be assumed to be the live, correct tool for either evicting or materializing cloud-placeholder files on current macOS, for either provider.
+
+**Mitigation / pattern:** For Google Drive placeholders specifically, a plain `open(path, 'rb').read()` reliably materializes the file (proven: 854KB in 2.3s, `st_blocks` 0→1672) — use that, not `brctl`. For iCloud, treat `brctl` as unreliable/legacy and verify any claimed effect with a direct `stat -f %b` check rather than trusting the command's own exit status.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha` `discovery`
