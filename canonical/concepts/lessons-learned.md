@@ -2662,3 +2662,150 @@ the 85 MB ECAPA model on every call rather than caching it.
 **Promoted to:** —
 
 **Tags:** `tool-gotcha` `discovery`
+
+---
+
+## When diagnosis is clear and the fix is within standing authority, fix it — don't ask
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md](../../raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md)
+**Date:** 2026-08-06
+
+**Context:** Adrian asked "what is the team doing right now." Live-checking found the iCloud pipeline's
+producer stuck 1h23m on a single oversized video, starving two otherwise-healthy worker nodes.
+
+**What happened:** I reported the finding accurately — and then asked Adrian what he wanted to do about
+disk space, instead of just fixing the bug (a bounded, reversible, well-inside-the-standing-restart-
+authority code change). He responded, justifiably furious: monitoring/restart authority for this exact
+class of problem had already been established; pausing to ask turned a 5-minute fix into another hour
+of lost overnight throughput, and repeated a pattern he'd already had to correct once this same night.
+
+**Mitigation / pattern:** A live finding with an obvious, reversible, in-authority fix does not need a
+"what do you want me to do" turn — that turn IS the delay the standing "never pause mid-task" rule
+exists to prevent. Reserve genuine questions for choices that are irreversible, outside the authority
+already granted, or where two reasonable people could land in different places. "Should I fix a bug I
+already know how to fix" is not one of those.
+
+**Promoted to:** —
+
+**Tags:** `mistake`
+
+---
+
+## A single-threaded, strictly-ordered work queue needs a SKIP for items that don't currently fit — a WAIT starves everything behind them
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md](../../raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md)
+**Date:** 2026-08-06
+
+**Context:** `icloud-video-orchestrator-v2.py`'s producer is deliberately single-threaded (the download
+tool cannot run concurrently) and processes videos in strict newest-first order. Its disk-headroom
+guard blocked in an unbounded `while ... sleep(60)` loop.
+
+**What happened:** One 106-minute video that didn't currently fit available disk headroom parked the
+**entire remaining backlog — 7,816 videos, almost all short clips that fit fine** — for over an hour,
+with two otherwise-idle worker nodes starved the whole time. This exact pattern had fired 80 times in
+the pipeline's history; every one was a full fleet stall silently misread by an earlier session as
+"expected/self-clearing behaviour."
+
+**Mitigation / pattern:** In any single-worker (or otherwise strictly-ordered) queue with a resource
+gate, the gate must be able to say "not this item, try the next one" rather than "wait here." Convert
+the block into a defer-and-continue: skip items that don't currently fit, leave them completely
+untouched (not failed, not attempted) so they're retried on the natural next pass, and only hold the
+whole queue if a full pass places literally zero items (and even then, bound the hold — don't spin).
+Critically: the defer path must return *before* any attempt-counter increment, or a resource-starved
+item will eventually be charged failures it didn't actually have and get marked permanently done.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
+
+---
+
+## Verify what a subprocess actually writes, and whether a file is really materialized, before concluding a resource guard is "checking the wrong thing"
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md](../../raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md)
+**Date:** 2026-08-06
+
+**Context:** Investigating boot-disk pressure on the iCloud pipeline. Staging was known to be on the
+SSD, and a 68GB folder (`Siberian blue promo`, iCloud Drive) showed up under `du` on the boot volume.
+
+**What happened:** Two wrong conclusions, both stated to Adrian before being caught and corrected in
+the same reply. (1) Read `du`'s 68GB as real boot-disk usage — it wasn't; `stat -f %b` showed
+`physical_blocks=0` with `dataless` flags, i.e. an un-materialized iCloud placeholder, and `du` reports
+*logical* size for these regardless of real disk footprint. (2) Concluded the disk guard was "simply
+pointed at the wrong volume" because staging had moved to the SSD — but the download tool
+(`osxphotos --download-missing`) materialises originals *inside the Photos library*, which lives on the
+boot volume, so the guard was measuring the right thing all along; moving it to the SSD would have
+removed the only defense against actually filling the boot disk.
+
+**Mitigation / pattern:** Before asserting a file is "really" consuming disk, check `stat -f %b`
+(physical blocks) or the file's dataless/cloud-placeholder flags, not `du`'s logical size, on any
+iCloud/Drive-synced path. Before concluding a resource guard checks the "wrong" location, trace where
+the actual write happens end-to-end — a guard on volume A can be entirely correct even when the
+user-facing symptom is "but I moved the big files to volume B."
+
+**Promoted to:** —
+
+**Tags:** `mistake` `tool-gotcha`
+
+---
+
+## When a content-loss bug's real fix is risky on a live system, ship an independent reconciliation as an immediate mitigation — don't wait for the root-cause patch
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md](../../raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md)
+**Date:** 2026-08-06
+
+**Context:** Found a live bug where a worker error still marks a video "permanently done" with nothing
+saved anywhere (`mark_done()` called outside the success/failure branch in the collector), plus the
+mirror bug losing the ledger entry for already-completed work. The permanent fix requires reordering
+and restructuring the collector on a pipeline that's actively running.
+
+**What happened:** Rather than rush the risky live patch, built `fleet-reconcile.sh`: an independent,
+read-only-against-Drive, hourly job that treats Google Drive as ground truth and repairs the local
+ledger in both directions — healing lost-but-actually-done entries, restoring falsely-done-but-actually-
+lost ones. First run recovered 111 videos of duplicated work immediately. It then caught and repaired a
+real live occurrence of the bug, unattended, about two hours after being shipped — before the actual
+code fix had even been scoped, let alone written.
+
+**Mitigation / pattern:** When a destructive bug's proper fix touches live, order-sensitive code, look
+first for an independent, idempotent, ground-truth-based reconciliation that can ship immediately and
+run on a schedule. It converts "irreversible until we patch the code" into "self-healing within one
+cycle," buys real time to do the harder fix carefully, and — done right — becomes a permanent second
+layer of defense even after the root cause is patched. Always fail closed on an unreliable ground-truth
+read (an empty or failed listing must abort without touching anything) — this exact fleet has been
+stalled for days before by a script trusting an empty listing as "nothing is done."
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
+
+---
+
+## An alert is only "sent" if delivery is verified — never trust an exit code alone, and never let a failed send silence future retries
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md](../../raw/sessions/2026-08-06-1849-overnight-pipeline-headofline-and-ledger-fix.md)
+**Date:** 2026-08-06
+
+**Context:** In 13 days, the iCloud pipeline's watchdog fired exactly two stall alerts. Both were
+written to a local M2 path passed to `ssh m1max "open -R '$PATH'"` — but `$PATH` only existed on M2, not
+on M1 (different home directory structure), so both alerts silently went nowhere. The watchdog then
+touched its cooldown sentinel unconditionally, permanently disabling further alerts for that stall
+episode regardless of whether delivery actually happened.
+
+**What happened:** Rebuilt the notify path with an explicit verification contract: copy the alert body
+to M1, then read the byte count back off M1 and compare to the local byte count — only exit 0 (and only
+then advance the alert-cooldown/ladder state) if they match. `open -R` over ssh can exit 0 even with no
+WindowServer session on the remote end, so it is fired only *after* verification succeeds, as a bonus
+action, never as the delivery test itself. Also replaced "escalate once then stay silent forever" with
+a re-firing ladder (15m/30m/1h/2h/4h, then hourly) so a still-unresolved stall keeps surfacing. Verified
+in production the same session: three real stall alerts, all independently byte-confirmed landed on M1
+at the exact ladder cadence, zero human involvement.
+
+**Mitigation / pattern:** For any alert/notification path whose entire purpose is "tell a human when
+something is silently wrong," the notify function's success signal must be an independent read-back
+proving the payload landed where a human will actually see it — not the sender's own exit code, and
+never a fire-and-forget `ssh`/API call. And any "don't repeat this alert" cooldown/sentinel must only
+ever be set on confirmed delivery, or a broken channel silences itself exactly when it's needed most.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
