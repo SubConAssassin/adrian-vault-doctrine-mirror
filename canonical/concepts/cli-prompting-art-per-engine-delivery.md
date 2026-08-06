@@ -22,7 +22,7 @@ Grok failed 3× to audit a 116 KB source bundle, then succeeded on a 22 KB cross
 ## Per-engine cheat-sheet (verified 2026-07-18)
 - **grok (grok-4.5, Grok Build TUI)** — `--single/-p` (small), `--prompt-file` (small→medium), `--prompt-json`, `--json-schema` (structured out), `--max-turns`, `--permission-mode {default,acceptEdits,auto,dontAsk,bypassPermissions,plan}`, `--tools`, `--disable-web-search`. **Context 500 K (regressed from 4.3's 1 M).** Large content → **file-read idiom** (now automated in cli-ask, see below). Confident-hallucinator → never promote grok facts without a different-family cross-check.
 - **codex (GPT-5.6 sol/terra/luna)** — `codex exec -m …`, prompt as argv. ~1.05 M ctx / 128 K out. Handled the 116 KB bundle inline in one shot this session (strongest single audit). Smallest pool → sparing on sol.
-- **agy (Gemini 3.5 Flash High)** — `agy-ask.py`, prompt as argv (PTY). 1 M ctx. ⚠️ **Small pool since the 2026-07-29 Ultra→base downgrade** (was "biggest pool / default grind" — see the 2026-08-04 note at the end of this file); still the $0 vision lane. Reads serials/images.
+- **agy (Gemini 3.6 Flash High)** — `agy-ask.py`, prompt as argv (PTY). 1 M ctx. ⚠️ **Small pool since the 2026-07-29 Ultra→base downgrade** (was "biggest pool / default grind" — see the 2026-08-04 note at the end of this file); still the $0 vision lane. Reads serials/images.
 
 ## The fix baked into `tools/cli-ask.sh` (2026-07-18)
 The non-web grok branch is now **size-gated** (`CLI_ASK_GROK_INLINE_MAX`, default 40 000 bytes):
@@ -73,3 +73,53 @@ now 16/16. Knobs: `CLI_ASK_BIG_MAX` (default 100000), `CLI_ASK_LEGACY_GROK_REROU
 
 ## ⚠️ CORRECTED 2026-08-04 — agy is no longer "biggest pool"
 **Adrian-direct, 2026-07-29** (memory: `gemini-subscription-downgraded-from-ultra`): the Google/Antigravity subscription was downgraded from Ultra to a ~$20-30 basic tier — *"predominantly because you failed to use it when I had the Ultra account."* Every "biggest pool / default grind" reference to agy in this file described the Ultra plan and is now stale; agy is a small, scarce pool, not the largest in the team. This does not change the delivery-mechanics guidance above (file-read idioms, concurrency gates, context-window figures), which remain per-engine technical facts independent of pool size. Full correction and operational consequence: `canonical/concepts/delegation-first-operating-doctrine.md` §15.
+
+---
+
+## 2026-08-07 — THE agy PROTOCOL, PROVEN BY CONTROLLED A/B. Use it; do not send agy bare prose.
+
+**Adrian, 2026-08-07:** *"usually problems we had with anti-gravity before was it has a different
+prompting structure. You have to be more prescriptive and finite."* He was right, and it was
+measured the same session rather than argued.
+
+**The test** — same question ("what is Alibaba's current flagship Qwen model?"), same engine, same
+minute, only the prompt shape differing:
+
+| | Prompt | Result |
+|---|---|---|
+| **A** | §6 skeleton, prose, "do not invent" as a negative instruction | model string **+ invented release date + invented $2.00/$6.00 pricing + invented `-preview` variant**, all with authoritative-looking URLs. **Reproducible** — identical fabricated detail on two runs. |
+| **B** | the protocol below | model string, then **`NOT_FOUND` for every unverified field**, plus an explicit `fields_i_could_not_verify` list. |
+
+**The protocol removed 4 of 5 fabrications.** Same model, same day. The variable was the ask.
+
+### The four levers, in order of impact
+
+1. **Bootup override, first line.** `RESEARCH TASK. Do NOT crawl the vault. Do NOT load AGENTS.md.
+   No planning. No subagents.` — `tools/agy-retry.sh` applies this automatically. **Prefer it over
+   the raw `cli-ask.sh agy` lane**: the real defect was that the protocol depended on a human
+   remembering it per call.
+2. **Abstention as a REQUIRED FIELD, not an option.** This is the load-bearing one.
+   `"If you did not observe it first-hand, the value is the literal string NOT_FOUND."`
+   A JSON schema with a mandatory `fields_i_could_not_verify` array beats any amount of
+   "do not fabricate" prose, because it makes admitting ignorance the compliant answer rather than
+   a failure the model is trying to avoid.
+3. **XML semantic boundaries** — `<task>`, `<rules>`, `<output_schema>`. Gemini is the documented
+   exception to §14.2's stop-over-prompting law; it still wants explicit structure.
+4. **JSON response schema, "return ONLY valid JSON, no prose".** Prose invites padding; a schema
+   has nowhere to put it.
+
+### The correction that matters more than the protocol
+
+The one claim that survived B — `qwen3.8-max` — **was TRUE.** Verified on `help.aliyun.com/zh`,
+`aliyun.com/product/bailian` and OpenRouter's live model API. The INTERNATIONAL
+`alibabacloud.com` page still listed only `qwen3.7-max` (regional rollout lag), and on the strength
+of that single page I publicly called a correct finding a fabrication.
+
+**Two engines said 3.8 existed and I overrode both from one regional source.** Before declaring any
+engine wrong on a factual claim, check more than one first-party surface — vendors' Chinese and
+international pages disagree, and so will others.
+
+**So the honest read of agy is not "it fabricates".** It is: *asked loosely, it pads a real finding
+with invented specifics; asked properly, it keeps the finding and admits what it could not verify.*
+Qualify any citation of `memory/agy-fabricates-citations-in-research.md` accordingly — that rate is
+prompt-dependent, not a fixed property of the model.
