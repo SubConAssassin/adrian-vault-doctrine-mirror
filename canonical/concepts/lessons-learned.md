@@ -5,8 +5,8 @@ status: canonical
 tier: 2
 firewall_class: working-internal
 created: 2026-05-04
-updated: 2026-08-01
-last_updated: 2026-08-01
+updated: 2026-08-07
+last_updated: 2026-08-07
 tags: [adrian-os, learning, mitigations, infrastructure]
 related:
   - canonical/concepts/shutdown-protocol.md
@@ -2809,3 +2809,180 @@ ever be set on confirmed delivery, or a broken channel silences itself exactly w
 **Promoted to:** —
 
 **Tags:** `discovery` `process-change`
+
+---
+
+## When you find one "permanent failure retried forever" bug, assume there are more of the same shape in the same loop — don't fix one and relaunch
+
+**Session:** ea7bab41 (M2) · **Archive:** [raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md](../../raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md)
+**Date:** 2026-08-06/07
+
+**Context:** M1's handoff correctly diagnosed `pc_feeder.sh`'s runaway loop as dataless-placeholder
+files never being excluded from retry — cited as "182 rows, retried every ~5s for 2 days." Fixing
+that one exclusion and relaunching would have looked complete: the report tool showed the count drop
+from thousands to a small number.
+
+**What happened:** The real scale was 19,506 rows (not 182), and after the dataless fix the feeder
+still didn't reach an idle state — it kept cycling a shrinking-but-nonzero set. Four more instances
+of the *identical bug shape* were hiding behind the first: unsupported file formats (`.pages`/`.doc`/
+`.key`, no extractor ever existed, 29,352 attempts on one row), a corrupted Word lock file
+(`~$....docx`, not a real document, ever), a `.webp` that sniffs as valid but has corrupt image data
+inside (29,418 attempts), and a whole deleted reel-build folder not covered by the one existing
+path-exclusion. Each was found only by checking why the loop *still* hadn't gone idle after the
+previous fix, not by assuming the first fix was sufficient.
+
+**Mitigation / pattern:** In any "X keeps getting retried forever" bug, treat the named cause as one
+instance of a bug *class* (permanently-failing input, no exclusion, no terminal state), not the whole
+bug. After the fix, verify the loop actually reaches its true idle/drained state — if it's still
+cycling at all, even on a much smaller set, there's another instance of the same shape underneath.
+Stop only when the loop genuinely sleeps/idles, not when the numbers look better.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
+
+---
+
+## A path-prefix bug fixed in one file can have an unnoticed twin in a second file that reimplements the same logic
+
+**Session:** ea7bab41 (M2) · **Archive:** [raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md](../../raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md)
+**Date:** 2026-08-06/07
+
+**Context:** `enrich_descriptions.py` has a well-documented comment (added 2026-08-04) explaining that
+`gdrive-subconassassin`/`gdrive-ukphoton` paths are already absolute and must NOT be prefixed —
+doing so doubles the path and produces `file-not-found` on every row, a bug that was already found
+and fixed once. `tools/content/hydrate_cloud.py`, written 2026-08-04 (same day), reimplemented its
+own separate `PREFIX`/`resolve()` logic and silently reintroduced the exact same bug.
+
+**What happened:** Ran `hydrate_cloud.py` for real against 931 gdrive-subconassassin candidates —
+100% `absent`, 0 hydrated. Confirmed the cause directly (constructed the doubled path by hand,
+matched the failure). The existing comment in the *other* file described the exact mechanism; nobody
+had cross-checked the new file against it.
+
+**Mitigation / pattern:** When a tool resolves paths for a source that has ever had a
+prefix/resolution bug, grep the codebase for other files doing similar path resolution for the same
+`source_id` before trusting a new implementation — a documented gotcha in file A does not
+automatically get read by whoever writes file B's version of the same logic, even same-day.
+
+**Promoted to:** —
+
+**Tags:** `mistake` `tool-gotcha`
+
+---
+
+## Two coordination channels on one node means two sessions can work the identical bug in parallel, invisible to each other
+
+**Session:** ea7bab41 (M2) · **Archive:** [raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md](../../raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md)
+**Date:** 2026-08-06/07
+
+**Context:** This machine's own `CLAUDE.md` bootup order names only `working/handoffs/_claude-bridge/
+NODE-STATUS.md` as the live heartbeat to check. `working/claude-coordination/` (a pre-2026-06-19
+location, explicitly documented elsewhere as superseded) was, in practice, still being actively
+written to same-day by a separate M2 session — its own `m2-state.md` had a same-day entry from
+roughly the same ~40-minute window this session was working the identical `pc_feeder.sh`/
+`gdrive-subconassassin` bug, using a different strategy (bulk rclone-to-PC-disk staging vs.
+on-M1-disk hydration).
+
+**What happened:** Neither session knew the other existed until this session was told to check
+`m2-state.md` directly. No real harm resulted (the two approaches didn't conflict), but ~40 minutes
+of duplicate diagnostic work happened, and the concurrent session was left blocked waiting on a
+`resolve_path()` decision that this session's fix made moot.
+
+**Mitigation / pattern:** A stated single read-order (`_claude-bridge/` only) is not sufficient when
+a second, older coordination surface is still receiving real writes — sessions following the stated
+order will miss it. Either fully retire the old surface (move it out of the live vault path
+entirely) or add it to the stated read order explicitly. Until fixed, any M2 session starting
+pipeline/infrastructure work should check `working/claude-coordination/m2-state.md` for a same-day
+timestamp, not just `_claude-bridge/NODE-STATUS.md`.
+
+**Promoted to:** —
+
+**Tags:** `process-change` `discovery`
+
+---
+
+## macOS Full Disk Access (TCC) and root-owned system directories are two completely different permission layers — FDA does not unlock the second one
+
+**Session:** ea7bab41 (M2) · **Archive:** [raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md](../../raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md)
+**Date:** 2026-08-06/07
+
+**Context:** Investigating a ~243GB unaccounted disk gap, after directly verifying FDA was granted
+and working (a live process successfully read `~/Library/Application Support/AddressBook/` and
+`~/Library/Mail/`, both genuinely TCC-gated), the same process still got `Permission denied` on
+`.Spotlight-V100`, `.fseventsd`, and `.DocumentRevisions-V100` at the top of the Data volume.
+
+**What happened:** These three paths (and, found later the same investigation by a different
+session, `/Library/Application Support/Apple/AssetCache`) are owned by `root` at the Unix
+permission level — a completely separate gate from TCC's per-app FDA grant. An app can have full,
+correctly-working FDA and still be unable to read these without actual `sudo`. Conflating "FDA is
+broken" with "this specific path needs root" wastes time re-testing/re-granting FDA when the real
+blocker is a different permission system entirely.
+
+**Mitigation / pattern:** If a process with confirmed-working FDA still gets `Permission denied` on
+a path, check who OWNS that path (`ls -la`/`stat`) before assuming FDA itself is misconfigured —
+root-owned system-service directories (Spotlight index, fsevents, document versions, Content
+Caching's AssetCache store, and similar) need `sudo`, not a TCC grant, no matter how the grant is
+configured.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `tool-gotcha`
+
+---
+
+## When several distinct root-owned directories are candidates for missing disk space, get all of their real sizes in one pass — don't test the most familiar one first and stop
+
+**Session:** ea7bab41 (M2) · **Archive:** [raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md](../../raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md)
+**Date:** 2026-08-06/07
+
+**Context:** Investigating the same ~243GB gap, correctly identified that the answer was hiding in
+root-owned, non-FDA-coverable territory, and handed Adrian one `sudo du` command scoped to the three
+most commonly-large culprits (`.Spotlight-V100`, `.fseventsd`, `.DocumentRevisions-V100` — Spotlight
+being the most familiar/famous offender). That guess was wrong: those three totaled only ~2.1GB. The
+real answer, found by a later session running a broader `sudo du -x -d 2` sweep of the whole Data
+volume rather than a pre-selected shortlist, was `/Library/Application Support/Apple/AssetCache`
+(macOS Content Caching) at 198GB — a directory not even considered in the first pass.
+
+**What happened:** No harm done (the hedge was honest — "almost certainly," not asserted as fact —
+and the follow-up session verified before touching anything), but it cost a round-trip: Adrian ran
+one `sudo du` for a guess that turned out wrong, then had to run a second, broader one.
+
+**Mitigation / pattern:** When the culprit is confirmed to be in root-owned territory but the
+specific directory isn't yet known, ask for a broad, one-level-deep `sudo du -x -d 2 <path>` sweep of
+the whole volume rather than a hand-picked shortlist of famous candidates — it costs the same one
+round-trip with a human, and it can't miss a candidate nobody thought to name.
+
+**Promoted to:** —
+
+**Tags:** `mistake` `discovery`
+
+---
+
+## An isolated unit test passing does not prove a function is actually wired into the real call path
+
+**Session:** ea7bab41 (M2), reporting a finding from a concurrent same-day M2 session ·
+**Archive:** [raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md](../../raw/sessions/2026-08-07-0327-ea7bab41-m2-daytime-utilization-shutdown.md);
+original finding logged in `working/handoffs/_claude-bridge/NODE-STATUS.md`'s 2026-08-07 02:44 WITA
+M2 entry
+**Date:** 2026-08-07
+
+**Context:** A PC-staging fetch bridge (`fetch_from_pc_gdrive()`) was built into
+`enrich_descriptions.py` and tested in isolation — the isolated test passed, calling the function
+directly and confirming it fetched a real file correctly. The first full production run against
+12,118 real rows then burned all of them in ~1 second at 100% error.
+
+**What happened:** The function worked perfectly on its own; it had never actually been wired into
+`_process()`'s real call path, so production traffic never reached it at all. The physically
+impossible processing rate (thousands of rows/second, matching the same "impossible speed" tell
+documented elsewhere in this file) was what surfaced it — caught, fixed, and re-verified against the
+real path with actual model output landing on disk, not just a second passing isolated test.
+
+**Mitigation / pattern:** Testing a function in isolation only proves the function works; it proves
+nothing about whether production code actually calls it. After wiring a new code path into an
+existing call chain, the verification step must exercise the REAL entry point end-to-end (the actual
+CLI invocation, the actual queue, the actual scheduled job) — not just the new function directly —
+before treating the integration as done.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `tool-gotcha`
