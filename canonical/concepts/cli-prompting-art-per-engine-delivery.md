@@ -123,3 +123,22 @@ international pages disagree, and so will others.
 with invented specifics; asked properly, it keeps the finding and admits what it could not verify.*
 Qualify any citation of `memory/agy-fabricates-citations-in-research.md` accordingly — that rate is
 prompt-dependent, not a fixed property of the model.
+
+### 2026-08-07 second controlled test — ENUMERATE THE ENTITIES, 66% → 0%
+
+A site-audit brief was sent to agy twice, same night, same question. Only variable: whether the
+brief listed the site's 47 real page filenames.
+
+| agy | cited | invented | rate |
+|---|---|---|---|
+| brief WITHOUT filename list | 15 | **10** | **66%** |
+| brief WITH all 47 filenames | 37 | **0** | **0%** |
+
+DeepSeek on the corrected brief: 0 invented. codex-sol scored 6% even without the list — so engine
+quality matters, but **the prompt dominates**.
+
+**RULE: whenever an engine must cite specific entities — filenames, model strings, URLs, columns,
+SKUs — enumerate them IN the prompt.** Describing the domain and leaving the model to supply
+identifiers is what manufactures confident, plausible, wrong specifics. It is not lying; it is
+filling a gap you left. This is the same mechanism that produced the invented `arXiv:2403.04619`
+and the invented `qwen3.8-max` release date and pricing earlier the same session.
