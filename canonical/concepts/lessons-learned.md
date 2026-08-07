@@ -3192,3 +3192,80 @@ irreplaceable content, not wasted disk space.
 **Promoted to:** —
 
 **Tags:** `discovery` `process-change`
+
+---
+
+## macOS TCC (Removable Volumes) grants are per-binary, not per-script — a subprocess can write where the parent interpreter can't delete, and the gap only shows up under launchd
+
+**Session:** M2 continuation, 2026-08-07 ~15:00 WITA (picked up add2a518's handoff via NODE-STATUS)
+**Date:** 2026-08-07
+
+**Context:** `transcribe-priority.py` (launchd job `com.adrianvault.priority-transcribe`, runs
+`/usr/bin/python3`) had been crashing on every pass that reached a real file: `os.remove(wav)` on a
+temp file staged under `/Volumes/M2-Storage/...` threw `PermissionError: [Errno 1] Operation not
+permitted`, uncaught, killing the whole pass after exactly one item. Extraction (ffmpeg) and upload
+(rclone) into/from the same directory worked fine, which made the failure look inexplicable at first —
+same directory, same volume, so it looked like it should be all-or-nothing.
+
+**What happened:** Queried `TCC.db` directly instead of guessing: `ffmpeg`, `ffprobe`, `rclone`, and
+`Terminal.app` all hold an explicit `kTCCServiceSystemPolicyRemovableVolumes` grant. `/usr/bin/python3`
+holds none. TCC evaluates the *responsible process* for a filesystem call, and for a bare interpreter
+launched directly by launchd (no Terminal/app parent to inherit responsibility from), that's the
+interpreter itself — so ffmpeg's own write succeeded under its own grant, rclone's own upload succeeded
+under its own grant, and python3's own `os.remove()` was silently denied under its own (missing) grant.
+Testing the "same" call interactively (Bash tool / Terminal-equivalent) gave a false negative — it
+succeeded, because responsibility resolved to the already-granted terminal parent instead of to python3
+directly, masking the exact context (launchd, no parent) where the real job actually runs.
+
+**Mitigation / pattern:** Don't assume a directory-level permission is uniform across every process
+touching it — each binary's TCC grant is independent, and a script that only ever writes via
+already-granted subprocesses (ffmpeg, rclone) can still be denied the moment *it itself* touches the
+same path directly (os.remove, open, os.rename, etc.). When a permission error looks inexplicable
+because "it wrote there fine a second ago," check which process actually performed each specific call,
+and verify TCC state directly (`sqlite3 ~/Library/Application\ Support/com.apple.TCC/TCC.db "SELECT
+service, client, auth_value FROM access WHERE client LIKE '%pattern%'"`) rather than reasoning about it
+in the abstract. Cheapest real fix when granting the missing permission requires a System Settings
+prompt Claude cannot perform: keep the process's own direct filesystem calls on an already-unrestricted
+path (internal boot disk, `/tmp`) instead of the gated volume — ephemeral staging rarely needs to live
+on the gated path at all.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `mistake-prevention` `process-change`
+
+---
+
+## A launchd job that backgrounds-and-disowns a child process needs `AbandonProcessGroup=true`, or the child dies the instant the job exits
+
+**Session:** M2 continuation, 2026-08-07 ~15:00 WITA (picked up add2a518's handoff via NODE-STATUS)
+**Date:** 2026-08-07
+
+**Context:** `pc-triage-watchdog.sh` (launchd job `com.adrianvault.pc-triage-watchdog`, `StartInterval`
+300s) exists to keep PC's overflow-triage lane alive across a plain SSH link by checking a remote
+console log's mtime and relaunching via a backgrounded, disowned `ssh ... & disown`. It had been firing
+every 5 minutes for over an hour, logging "relaunch issued" every time, while the remote console log
+stayed frozen at a timestamp from ~11 hours earlier — every relaunch attempt looked like it ran, and
+none of them actually produced anything.
+
+**What happened:** The script backgrounds the ssh call and then has nothing left to do, so it exits
+almost immediately after `disown`. The job's plist had no `AbandonProcessGroup` key, which left launchd
+free to apply its default behaviour of reaping the whole process group when the main job process exits
+— almost certainly killing the just-backgrounded ssh child before it finished establishing the remote
+session, every single cycle. `disown` only detaches the child from the *local shell's* job control; it
+does nothing about launchd's own group-level cleanup on process exit. Fixed by adding
+`AbandonProcessGroup=true` to the plist and reloading; confirmed live afterward — the very next cycle's
+relaunch produced real fresh output on the remote console log for the first time in over an hour.
+(Separately, the script's own PowerShell kill-step had a live WQL syntax bug too — a bash `''` pair
+between adjacent single-quoted segments doesn't escape a quote, it just closes and reopens the string
+with nothing in between, so the filter value was shipping unquoted and PowerShell was rejecting it as
+"Invalid query." Both bugs were masking each other's symptoms in the same log.)
+
+**Mitigation / pattern:** Any launchd job whose script backgrounds a child and then exits (the standard
+"fire a detached remote/background command from a periodic watchdog" pattern) needs
+`AbandonProcessGroup=true` in its plist — without it, "backgrounded and disowned" is not actually
+detached from launchd's perspective, only from the shell's. A relaunch mechanism that logs success on
+every attempt while producing zero downstream effect, indefinitely, is the signature to watch for.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `mistake-prevention` `process-change`
