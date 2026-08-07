@@ -3269,3 +3269,79 @@ every attempt while producing zero downstream effect, indefinitely, is the signa
 **Promoted to:** —
 
 **Tags:** `discovery` `mistake-prevention` `process-change`
+
+---
+
+## `concurrent.futures.ThreadPoolExecutor` used as a context manager does NOT give you a bounded operation, even with `fut.result(timeout=N)`
+
+**Session:** a39a420a (M2) · **Archive:** [raw/sessions/2026-08-07-2000-a39a420a-fleet-pickup-content-audit-photos-migration.md](../../raw/sessions/2026-08-07-2000-a39a420a-fleet-pickup-content-audit-photos-migration.md)
+**Date:** 2026-08-07
+
+**Context:** Fixing `executive_secretary_briefing.py`'s chronic EDEADLK crashes surfaced a worse failure
+mode underneath — a completely silent indefinite hang with no exception at all (reproduced live: a bare
+`open()`+`json.load()` on a real file still hadn't returned after 15+ seconds under genuine SMB
+contention). Plain Python file I/O has no native timeout, so a retry-on-error loop can't help — it never
+regains control to retry. Built a `ThreadPoolExecutor`-based wrapper: submit the read to a worker thread,
+bound it with `fut.result(timeout=hang_timeout)`, retry a fixed number of times.
+
+**What happened:** A live verification run stalled for **43 minutes** at 0.1% CPU against a designed
+worst case of ~48 seconds per file. Root cause: the wrapper used `with concurrent.futures.
+ThreadPoolExecutor(max_workers=1) as ex:` — a context manager. `__exit__` calls `shutdown(wait=True)`
+unconditionally, which blocks until the submitted task's thread actually finishes. Python cannot
+force-kill a thread. So even though `fut.result(timeout=N)` correctly gives up waiting and raises
+`TimeoutError`, the surrounding `with` block then blocks AGAIN on `shutdown(wait=True)`, waiting for
+that same abandoned thread to finish — and if the underlying blocking call never returns on its own, the
+`with` block never exits, and the next retry attempt never starts. The `timeout=` parameter created the
+appearance of a bound without actually enforcing one.
+
+**Mitigation / pattern:** A `ThreadPoolExecutor` created fresh per attempt and used as a context manager
+is not a bounded-timeout primitive, no matter what timeout is passed to `.result()` — the enclosing
+`with` block's implicit teardown re-introduces the exact unbounded wait the timeout was meant to avoid.
+Either keep one long-lived executor across attempts and call `shutdown(wait=False)` on the way out
+(accepting that abandoned threads leak until process exit, and designing around that explicitly), or use
+a different bounding primitive entirely (a subprocess with a real OS-level timeout, which CAN be killed).
+Never assume a `with ThreadPoolExecutor(...) as ex: fut.result(timeout=N)` pattern is actually bounded —
+verify it under the real contention it's meant to survive, not just a clean-path test. (This tool's fix
+was NOT uniformly broken by this — it completed at least one full successful run in between rounds of
+fixes — which is precisely what makes this failure mode dangerous: intermittent, not reliably reproduced,
+easy to declare "fixed" on the strength of one clean run.)
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha` `mistake-prevention`
+
+---
+
+## Two independent audits of the same question, reconciled explicitly rather than merged, surface findings neither side would reach alone
+
+**Session:** a39a420a (M2) · **Archive:** [raw/sessions/2026-08-07-2000-a39a420a-fleet-pickup-content-audit-photos-migration.md](../../raw/sessions/2026-08-07-2000-a39a420a-fleet-pickup-content-audit-photos-migration.md)
+**Date:** 2026-08-07
+
+**Context:** Adrian asked M1 and M2 to each independently audit the same question — SS/Mastermind
+content-pipeline coverage — then compare notes via bridge handoffs rather than one node simply reading
+the other's conclusion.
+
+**What happened:** The two audits diverged in exactly the ways worth catching. M1 concluded "content is
+not the constraint — reachability is" from a 33-clip sample checked against `content-index.db`; M2's own
+audit had independently found that DB held zero rows for a 699-file/263GB priority pull that was, in
+fact, ~96% transcribed and physically local — so M1's conclusion was accurate against its own evidence
+and simultaneously wrong about the real bottleneck, because its evidence base couldn't see the pull at
+all. Separately, M1's mastermind-footage audit listed 5 subfolders on a drive it could not itself
+reach (mounted only on M2); M2 verified the claim directly on the physical drive and found the real
+count was 12 — the 7 M1 never saw included a 12GB folder of already-finished, human-edited,
+hook-named platform content (paired Instagram + YouTube cuts) that was arguably the single most useful
+find of the day. Neither gap would have surfaced from either audit read alone or from one node
+summarising the other's report — it took independently deriving an answer and then diffing.
+
+**Mitigation / pattern:** When two agents (or two sessions) can each reach evidence the other cannot —
+different mounted drives, different databases, different live state — running the same audit
+independently and reconciling explicitly (stating agreements, disagreements, and what was verified vs.
+merely trusted) is worth the doubled cost. The value isn't redundancy for its own sake; it's that each
+side's blind spots are exactly the terrain the other can check. Explicitly declining to rubber-stamp the
+other side's unverified claims (marking them "unverified, not agreed" rather than silently trusting a
+plausible-sounding report) is what makes the reconciliation catch real gaps instead of just doubling
+confidence in whichever conclusion sounded more authoritative.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
