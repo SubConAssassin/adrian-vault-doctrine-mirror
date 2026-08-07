@@ -3072,3 +3072,123 @@ a live SSH heredoc-to-python3 pipe or an interactive editor.
 **Promoted to:** —
 
 **Tags:** `discovery` `process-change`
+
+---
+
+## When a safety gate starts costing real throughput, find the bug in the gate — never relax the underlying hard rule to make the symptom go away
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-07-1331-overnight-fleet-handover-and-priority-scope.md](../../raw/sessions/2026-08-07-1331-overnight-fleet-handover-and-priority-scope.md)
+**Date:** 2026-08-07
+
+**Context:** A new transcription pipeline checked Ollama's loaded-model state before running
+`mlx_whisper`, per the standing hard rule (confirmed SIGABRT history, both claiming the Metal GPU).
+The check fired once at startup and bailed for 15 minutes on any hit. Measured: ~6.5 hours, only 3
+transcripts completed, because the iCloud pipeline's own vision-captioning routes through the same
+Ollama instance from every worker node, so a single point-in-time check almost never landed in a real
+gap — not because the two were actually colliding at that instant, but because the check gave up too
+easily instead of watching for the gaps that genuinely exist between individual caption calls.
+
+**What happened:** The tempting fix under real throughput pressure would have been to loosen the
+rule — check less strictly, or allow transcription to proceed if the loaded model "looks small."
+Didn't do that. Found the actual defect instead: the gate was a single snapshot, not a real
+observation of the system's behaviour over time. Rewrote it to poll for up to 4 minutes before giving
+up, leaving the PER-ITEM check (the one that actually prevents the crash, re-verified before every
+individual transcription) completely untouched. Verified live: caught a real gap, transcribed
+successfully, and correctly backed off on a later pass when Ollama was genuinely busy the whole
+polling window — the safety property held throughout, only the detection quality improved.
+
+**Mitigation / pattern:** When a hard safety rule appears to be costing real throughput, the fix is
+almost always a better OBSERVATION of the condition the rule cares about, not a weaker rule. A rule
+with a documented crash history exists because looking at the system for 4 minutes is cheap and being
+wrong about GPU contention is not — never trade that asymmetry away to relieve pressure on a deadline.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
+
+---
+
+## Duplicate-instance collisions need a real lock, not repeated carefulness — the third near-miss is the signal to stop being careful and start being structurally safe
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-07-1331-overnight-fleet-handover-and-priority-scope.md](../../raw/sessions/2026-08-07-1331-overnight-fleet-handover-and-priority-scope.md)
+**Date:** 2026-08-07
+
+**Context:** A transcription script could be launched either manually or by a recurring launchd job.
+Widening its own startup wait (to fix the gate-too-blunt issue above) widened the window in which both
+could end up running at once — a real risk, since two `mlx_whisper` processes fighting the Metal GPU
+is exactly the crash class the whole design exists to avoid.
+
+**What happened:** Caught this THREE separate times in one session — once from launching a manual
+retry before confirming the first attempt had actually failed (it hadn't; it was just slow to log),
+twice from the recurring job firing on top of an existing run. Each time, caught it via
+`Get-CimInstance`/`pgrep` before real damage and killed the duplicate. After the third time, stopped
+treating it as "be more careful next time" and added a real `fcntl.flock` lockfile: a second launch,
+manual or scheduled, detects the held lock and exits immediately rather than starting a competing
+process. Tested directly — launched two at once, confirmed only one survives, every time.
+
+**Mitigation / pattern:** The second time the same collision class is caught by vigilance, that's a
+warning. The third time is proof vigilance alone doesn't scale to unattended, multi-trigger execution.
+A file lock tied to the process's own lifetime (releases automatically even on a crash) is a few lines
+of code and makes the entire class of bug structurally impossible, regardless of how the process gets
+launched in the future — cheaper than continuing to rely on remembering to check.
+
+**Promoted to:** —
+
+**Tags:** `mistake` `process-change`
+
+---
+
+## Investigate a suspicious number with ground truth before reporting it either way — don't alarm on it and don't wave it off
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-07-1331-overnight-fleet-handover-and-priority-scope.md](../../raw/sessions/2026-08-07-1331-overnight-fleet-handover-and-priority-scope.md)
+**Date:** 2026-08-07
+
+**Context:** A PC-side triage pass over 623 priority video files reported 622 as "no audio track" —
+99.8%. Asked to report fleet status honestly, this number could have gone two wrong ways: alarm the
+owner about an apparent near-total tool failure, or silently trust the tool and report it as fine
+without checking.
+
+**What happened:** Neither. Pulled one actual file (`Jack canfield.m4v`, from a folder plausibly
+containing real dialogue) and ran `ffprobe` directly against it — genuinely zero audio streams,
+video-only container. The verdict was correct, not a bug: that subset of the priority corpus is
+mostly B-roll and short visual clips, because the files WITH real speech had already been routed to a
+different lane earlier in the same session for an unrelated reason (a filename-collision safety
+split). The surprising number had an explainable, checkable cause.
+
+**Mitigation / pattern:** A statistic that looks wrong is a hypothesis, not a fact, until checked
+against the actual data it's summarizing — one real, spot-checked sample against ground truth (here,
+a direct `ffprobe` call) settles it either way in under a minute. Reporting an unverified alarming
+number and reporting an unverified reassuring number are the same mistake in opposite directions.
+
+**Promoted to:** —
+
+**Tags:** `discovery`
+
+---
+
+## A second camera angle of the same event is visually and structurally indistinguishable from a duplicate to naive similarity-based deduplication — never let dedup delete, only annotate
+
+**Session:** add2a518 (M2) · **Archive:** [raw/sessions/2026-08-07-1331-overnight-fleet-handover-and-priority-scope.md](../../raw/sessions/2026-08-07-1331-overnight-fleet-handover-and-priority-scope.md)
+**Date:** 2026-08-07
+
+**Context:** Adrian described routinely filming events with multiple cameras and wanting synchronised
+multi-angle editing as a real capability. The estate's content database already has a `dup_profile`
+table and dedup has repeatedly come up elsewhere as a desirable cleanup step.
+
+**What happened:** Recognised the collision before it caused damage: same date, same location, same
+audio, near-identical visual content, similar duration and file size — every signal a similarity-based
+deduplicator would use to flag "duplicate" is also exactly what a second camera angle of one event
+looks like. A live near-miss followed almost immediately: two folders with near-identical names were
+about to be treated as duplicate footage of one event, until checking each folder's own embedded
+Zoom-recorder file numbering showed they were genuinely two different events four months apart — the
+literal case this rule exists to prevent, caught one level away from destroying real content.
+
+**Mitigation / pattern:** Standing rule, filed as a hard constraint rather than a preference: no
+automated process may delete, quarantine, or deprioritise a media file on similarity/duplicate
+grounds. Detection may only ever annotate a candidate group for human review. Byte-identical is a
+duplicate; anything short of that may be a second angle, and the cost of guessing wrong is
+irreplaceable content, not wasted disk space.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
