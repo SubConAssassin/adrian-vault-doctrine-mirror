@@ -3413,3 +3413,175 @@ cleanly) deserves a distinct, reversible failure class from a genuine content pr
 **Promoted to:** —
 
 **Tags:** `mistake` `discovery` `process-change`
+
+---
+
+### LL-2026-08-08-001 [mistake] — Killed a worker process on one stale memory-pressure snapshot
+
+**Session:** opus-5-ultracode-1430 (M2) · **Archive:** `raw/sessions/2026-08-08-1430-content-engine-diagnose-and-rebuild.md`
+**Date:** 2026-08-08
+
+**Context:** Ran a self-healing transcription job on a memory-starved box (8 concurrent Claude
+sessions, sustained EMERGENCY-level pressure). Checked the worker's process stats and saw 0% CPU,
+35MB RSS — looked stalled.
+
+**What happened:** Killed the process based on that single reading. The very next check, taken
+moments earlier in a parallel investigation, had actually shown it at 311% CPU and 1.5GB RSS —
+genuinely mid-transcription, not stalled. Under heavy swap, a process can be paged almost entirely
+to disk between scheduler ticks; a single snapshot can look starved when it is fine a moment
+either side of it.
+
+**Root cause:** Acted on one process-stat reading without re-checking immediately before the
+irreversible action (the kill), despite already knowing the box was under sustained, noisy memory
+pressure that specifically causes this kind of misleading snapshot.
+
+**Mitigation / pattern:** Before killing anything presumed-stalled on a memory-pressured box,
+take a second reading immediately before acting, not minutes before. A self-healing job design
+(skip-existing + atomic writes) limits the damage of a wrong kill to one unit of work, but doesn't
+excuse causing it.
+
+**Promoted to:** —
+
+**Tags:** `mistake`
+
+---
+
+### LL-2026-08-08-002 [discovery] — `mem-guardian`'s `avail_cons_gib` is trustworthy; `vm_stat`'s naive sum is not, under swap pressure
+
+**Session:** opus-5-ultracode-1430 (M2) · **Archive:** `raw/sessions/2026-08-08-1430-content-engine-diagnose-and-rebuild.md`
+**Date:** 2026-08-08
+
+**Context:** Needed to know real available memory before scheduling ffmpeg-heavy work on a box
+already showing signs of pressure (8 concurrent Claude sessions).
+
+**What happened:** `vm_stat`'s free+inactive+speculative sum read ~7–13 GiB "available" at moments
+when `mem-guardian`'s own `avail_cons_gib` correctly read 0.14–0.29 GiB and was actively sending
+SIGTERM to processes. The gap widens specifically once swap is heavily engaged (observed 11.7–18.4
+GiB of swap capacity in play this session) — `vm_stat`'s categories don't account for pages that
+are technically "free" but only because they were just evicted to swap under pressure.
+
+**Mitigation / pattern:** On this fleet, trust `mem-guardian`'s `avail_cons_gib` over any
+`vm_stat`-derived calculation once swap usage is non-trivial. Treat a large gap between the two as
+itself a signal that the box is in a volatile, heavily-swapping state, not a measurement error to
+average away.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `tool-gotcha`
+
+---
+
+### LL-2026-08-08-003 [discovery, process-change] — Self-healing job pattern for memory-starved boxes: skip-existing + atomic write + bounded-wait-then-proceed
+
+**Session:** opus-5-ultracode-1430 (M2) · **Archive:** `raw/sessions/2026-08-08-1430-content-engine-diagnose-and-rebuild.md`
+**Date:** 2026-08-08
+
+**Context:** Needed to run a 20-file transcription backlog and later an 8-reel rebuild batch on a
+box in sustained EMERGENCY-level memory pressure all session (confirmed: mem-guardian SIGTERMed
+ffmpeg 5 times in one 6-minute window earlier the same day, per an independent audit finding).
+
+**What happened:** A first version of the transcription job used a fixed 3.0 GiB "wait until free"
+memory floor before starting each file. That floor was never reached in a 12-minute observed
+window — the job produced zero output and would have run indefinitely. Rewritten with: (a)
+skip-existing + atomic rename per unit of work, so a SIGTERM mid-file costs at most that one file;
+(b) a bounded wait (a handful of short retries) that PROCEEDS anyway once exhausted rather than
+blocking forever; (c) a thin bash wrapper that restarts the whole job on any exit and only gives up
+after two consecutive passes add zero new output. This pattern, plus sorting the work
+shortest-first so many small wins land before any long outlier, cleared both the 20-file backlog
+and the 8-reel rebuild batch unattended through sustained pressure with only one process lost to a
+mistaken kill (see LL-2026-08-08-001).
+
+**Mitigation / pattern:** On any box with a known, standing memory-pressure daemon, a job that
+WAITS for a clear floor before proceeding is a design bug, not caution — the correct behaviour is
+to make each unit of work small, idempotent, and resumable, and to proceed under pressure rather
+than block on a threshold that may never be met while other sessions are live.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`
+
+---
+
+### LL-2026-08-08-004 [tool-gotcha] — `reel-gate.py` beat `in_beat_events[].t` must be reel-absolute, not beat-relative
+
+**Session:** opus-5-ultracode-1430 (M2) · **Archive:** `raw/sessions/2026-08-08-1430-content-engine-diagnose-and-rebuild.md`
+**Date:** 2026-08-08
+
+**Context:** Wrote a new manifest generator (`make_manifest_v2.py`) for a rebuilt reel-cutting
+engine, feeding `tools/reel-gate.py`'s pacing checks (A1-SCENE-CHANGE-6S, P2-VISUAL-CHANGE-CADENCE).
+
+**What happened:** The gate's `visual_change_times()` adds each beat's `in_beat_events[].t`
+directly as an absolute reel-relative timestamp. The first version of the new generator computed
+`t` relative to each beat's OWN start (matching a plausible reading of "event inside this beat"),
+which silently collapsed every beat's caption-change events into the first ~2 seconds of the reel
+regardless of the beat's real position — producing nonsense pacing results ("50 changes in window
+0, none anywhere past 15s") that read as genuine craft failures rather than a manifest bug.
+
+**Root cause:** The gate's own reference generator (`make_manifest.py`) computes this field as
+`w["s"] - t0` with `t0` = the REEL's start (0), not the beat's start — a convention not obvious
+from the field name alone, and not documented anywhere except by reading that source directly.
+
+**Mitigation / pattern:** When feeding a new manifest into an existing gate/validator, diff a
+generated manifest's field semantics against the CANONICAL reference generator's actual code, not
+against the field's name or a plausible guess — especially for any per-event timestamp field.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-08-08-005 [tool-gotcha] — `reel-gate.py`'s B6-MOTIVATED-CUT checks a fixed motivation-string whitelist, not "does a reason exist"
+
+**Session:** opus-5-ultracode-1430 (M2) · **Archive:** `raw/sessions/2026-08-08-1430-content-engine-diagnose-and-rebuild.md`
+**Date:** 2026-08-08
+
+**Context:** Same manifest-generator work as LL-2026-08-08-004. Labelled each cut's motivation with
+descriptive strings (`emphasis_anchor`, `baseline_hold`) reflecting the new engine's real,
+principled cut logic.
+
+**What happened:** Every cut failed B6-MOTIVATED-CUT — not because the reasons were bad, but
+because `VALID_MOTIVATIONS` is a fixed, closed whitelist (`action`, `sound`, `completed_thought`,
+`emotional_turn`, `matched_motion`, `gesture_start`, `breath`, `clause_first_word`,
+`illustrates_named_concept`, `third_party_reference`, `bridges_jump_cut`) and neither custom label
+was in it. Remapped to `clause_first_word` (punch-in landing on a detected emphasis word) and
+`completed_thought` (return to baseline once that word's point is made) — both accurate and both
+in the whitelist — which fixed B6 across all 8 reels via a manifest-only regenerate, no video
+rebuild needed.
+
+**Mitigation / pattern:** Before inventing a new descriptive label for any enum-like field a gate
+validates, grep the gate source for the actual accepted value set first — a genuinely well-reasoned
+cut can still fail a check for using the wrong SPELLING of a reason, not for lacking one.
+
+**Promoted to:** —
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-08-08-006 [discovery, process-change] — `working/_secretary/open-actions.md` cannot currently be safely regenerated from `action-register.ndjson` alone
+
+**Session:** opus-5-ultracode-1430 (M2) · **Archive:** `raw/sessions/2026-08-08-1430-content-engine-diagnose-and-rebuild.md`
+**Date:** 2026-08-08
+
+**Context:** Shutdown protocol Step 3 calls for regenerating `open-actions.md` from the full
+register after appending new actions. Wrote a replay script (latest event per `action_id` wins;
+`complete` closes, everything else stays open) and dry-ran it before touching the real file.
+
+**What happened:** The dry-run produced 235 open actions (5 overdue, 0 dated) against the live
+file's own header claim of 259 open (4 overdue, 1 dated) — a real, unreconciled discrepancy,
+not a rounding difference. At least one dated entry (`ag-burn-gaming-c3`, due 2026-05-07) present
+in the live file has no corresponding event in the register that a straightforward replay can
+find. This means the register is not (or is no longer) a complete source of truth for this file —
+some entries were likely seeded directly, or by a process that doesn't append to the ndjson log the
+way current sessions do.
+
+**Mitigation / pattern:** Did NOT perform the full regeneration this shutdown — appended new
+entries directly to `open-actions.md` alongside the existing content instead, and left an explicit
+note in the file's own header describing the gap, rather than risk silently deleting real tracked
+actions via an incomplete replay. **A dedicated audit session should reconcile the register against
+the live file before anyone trusts a full automated regeneration of this file again.**
+
+**Promoted to:** —
+
+**Tags:** `discovery` `process-change`

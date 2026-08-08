@@ -151,6 +151,36 @@ reason past. **This clause therefore ships with a mechanism, not just a rule.**
   not a fourth option. Full capability map: `tools/lanes.py`.
 - **Before planning any job that might spend: `python3 tools/metered-guard.py preflight`.**
 
+#### 7.2.a — STANDING TRIAL TOKENS (added 2026-08-07, Adrian-direct). §8 classification: NARROW CARVE-OUT. The deny-by-default rule above is UNCHANGED for everything not named here.
+
+**Adrian, 2026-08-07, invoking the Frictionless Operator Doctrine:** *"why can't you do these terminal
+prompts to get new tokens as no passwords anymore?"* and *"frictionless protocol is that you reduce
+human tokens by doing something yourself if you can do it."* Asked twice; his decision, recorded.
+
+**Why this is safe now and was not before.** §7.2 was written when metered spend had NO ceiling — the
+per-job token was the only thing between an agent and an unbounded card. That is no longer true.
+`tools/ask-trial.py` enforces a **hard per-engine monthly cap**, computed from each API's OWN returned
+billing counts (never an estimate), and refuses the call BEFORE it is made. **The cap is the real
+protection; the per-call token had become a second lock on an already-bolted door.**
+
+**THE CARVE-OUT — an agent MAY mint its own approval token, but ONLY when ALL FOUR hold:**
+- **(a)** The provider is one Adrian has already funded and approved for a named trial. As of
+  2026-08-07 that is exactly: **`deepseek`, `qwen`, `moonshot`** — each with an Adrian-authorised
+  $20/month evaluation budget ("lets fund them all and see what they do with the same budget").
+- **(b)** The spend stays inside that already-approved monthly cap, enforced in code, not by judgement.
+- **(c)** Every call is logged to `working/_logs/council-trial.jsonl` with its REAL cost, and every
+  token issuance to `working/_logs/metered-spend.jsonl`. Both remain append-only and auditable.
+- **(d)** `--adrian-said` records the authorisation above verbatim. An agent may never invent one.
+
+**UNCHANGED, AND STILL ABSOLUTELY GATED — do not read this carve-out as general licence:**
+- **Every other metered provider** (openai, gemini, anthropic, xai, perplexity, gcp-vertex, fal,
+  runway, kling, higgsfield, replicate, elevenlabs) stays deny-by-default and needs Adrian in chat.
+- **Image and video GENERATION remains banned without per-job approval**, at any price. That is the
+  category that caused the original $35-60 incident.
+- **Raising a cap, adding a provider, or starting a new trial** all still require Adrian-direct
+  authorisation. An agent adding itself a new funded lane is the violation this section exists to stop.
+- If ANY condition above is ambiguous, the answer is the original rule: **ask.**
+
 ### 7.1 The ONLY exception to §7's personal-apps ban: the Requested-Notification Registry
 **The ban above is not weakened by this section. Every word of it still stands.** §7.1 does not
 create a category of "automation Adrian would probably want"; it creates a **closed, countable list**
