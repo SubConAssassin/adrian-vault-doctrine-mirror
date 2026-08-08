@@ -3345,3 +3345,71 @@ confidence in whichever conclusion sounded more authoritative.
 **Promoted to:** —
 
 **Tags:** `discovery` `process-change`
+
+---
+
+## Over SMB, `st_blocks` cannot distinguish a resident file from a cloud stub — the kernel synthesises it from `st_size`, so a stat-based residency probe silently overstates local availability
+
+**Session:** M2, 2026-08-07/08 ~21:30–22:00 WITA (content-machine Commit 1 build)
+**Date:** 2026-08-07
+
+**Context:** `where-is.py`'s reachability probe used `st.st_blocks * 512 > 0` to distinguish a genuinely
+resident file from a cloud placeholder — correct on local APFS, where an evicted/dataless file
+reports `st_blocks=0`. First full-corpus scan reported 925.2 GB resident on M2, a number about to be
+published.
+
+**What happened:** Checked it before shipping it, rather than after. Over the SMB-mounted vault mount,
+`st_blocks * 512 == st_size` exactly, on every file tested — including a Google-Drive stub living on
+the remote host. The kernel synthesises `st_blocks` from the logical size for the network filesystem
+instead of reporting real allocation, so the probe was reading every SMB-reachable path — resident or
+not — as `BYTES_PRESENT`. Reading three by hand proved it both ways: two took 5–6 seconds for an
+84–94 MB file (on-demand hydration through the remote host's cloud client, not a local read), one took
+0.02 s (genuinely local). The correct figure was 196.9 GB, not 925.2 GB — the SMB paths accounted for
+the entire 728 GB gap.
+
+**Mitigation / pattern:** Add a fourth reachability state distinct from present/absent/stub —
+`REMOTE`, with residency explicitly `unknown` rather than inferred — for any path whose real location
+is a network mount. Promote `REMOTE → BYTES_PRESENT` only by actually reading bytes (`--verify-read`
+in this tool), never by stat alone. Any tool that stats across a network filesystem to answer "is this
+local" needs this distinction, not just this one script — `du`/`ls` were already known to lie the same
+way on cloud-evicted local files; SMB adds a second, opposite-direction failure mode on the same
+metric.
+
+**Promoted to:** `where-is.py` (`_smb_backed()` + the `REMOTE` state + `--verify-read`)
+
+**Tags:** `discovery` `tool-gotcha` `mistake-prevention`
+
+---
+
+## A shared downstream sink's recency is not proof of a specific upstream service's health — verify against that service's own log, not a folder every producer writes into
+
+**Session:** M2, 2026-08-08 ~12:05–12:20 WITA (mini pipeline pivot)
+**Date:** 2026-08-08
+
+**Context:** Repurposed the mini (`m4`) from a cancelled Slack bot into `node-cloud-pipeline.py`
+shard 1/3. To confirm it was actually working, checked `gdrive:Transcripts/` (the shared output
+folder every fleet node's shard writes into) sorted by modification time and saw a file written
+minutes earlier — reported the mini as "confirmed producing real transcripts."
+
+**What happened:** That was wrong, and self-corrected roughly 15 minutes later. A recent write to a
+shared multi-producer sink proves *something* on the fleet is working, not that the specific service
+just started is. Checking the mini's own `node-cloud-pipeline.log` directly showed 100% ffmpeg
+failure on every file, back to back, for the entire runtime — the "confirmed producing" transcript
+had almost certainly come from a different node's shard landing in the same folder at a coincidentally
+close timestamp. Worse than the wrong claim itself: every one of those ffmpeg failures was silently
+and permanently skip-listing the source file as bad content, via an `add_skip()` call that had no way
+to distinguish an environmental failure from a genuine content problem.
+
+**Mitigation / pattern:** When verifying that a specific service/node just started is actually
+working, check that service's own log for a matching success line — never a shared downstream sink's
+recency alone, however tempting the shortcut. This generalises beyond transcription pipelines: any
+fleet architecture where N producers write into one shared folder/table/queue makes "I saw a recent
+write" categorically insufficient evidence for "producer X specifically is healthy." Separately: any
+retry/skip-list mechanism that fires on a tool failure (here, `ffmpeg-fail`) should not treat that
+failure as proof-of-bad-content and permanently blacklist the item — an environmental failure
+(confirmed here: ffmpeg itself was healthy, a fresh direct download of the identical file converted
+cleanly) deserves a distinct, reversible failure class from a genuine content problem.
+
+**Promoted to:** —
+
+**Tags:** `mistake` `discovery` `process-change`
