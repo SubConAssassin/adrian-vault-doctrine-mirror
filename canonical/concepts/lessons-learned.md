@@ -3585,3 +3585,31 @@ the live file before anyone trusts a full automated regeneration of this file ag
 **Promoted to:** —
 
 **Tags:** `discovery` `process-change`
+
+---
+
+## When a GUI-permission dialog times out, use equally strong non-visual evidence instead of waiting on it
+
+**Session:** 6d6afd03 (M2) · **Date:** 2026-08-09
+
+**Context:** Verifying a repointed Photos library was genuinely working before an irreversible 212GB deletion. A `request_access` call for screen access timed out after 300s.
+
+**What happened:** Rather than retry or wait, verified via `lsof` (16 real open file handles into the target library's live SQLite database, including active WAL writes) plus a system-log check for crashes/errors since relaunch. This is arguably stronger evidence than a screenshot would have been — a screenshot only proves the UI isn't showing an error dialog, not that the underlying data access is real; open database handles with active writes prove the app is genuinely using that data right now.
+
+**Mitigation / pattern:** Before an irreversible action, ask what would actually constitute proof, not just what's the obvious/first-reached-for check. A blocked visual check doesn't mean verification is blocked — non-visual technical signals (open file handles, process logs, database file activity) are often more direct evidence than a screenshot, and don't depend on a permission dialog someone may not be watching for.
+
+**Tags:** `process` `verification`
+
+---
+
+## Folder mtimes are not a content-divergence signal — do a real per-file diff
+
+**Session:** 6d6afd03 (M2) · **Date:** 2026-08-09
+
+**Context:** Comparing two candidate Photos libraries (one active/growing, one from an apparently-stalled migration) to decide whether switching to the migrated copy would lose recent content.
+
+**What happened:** Folder mtimes suggested the migrated copy was stale — its last-modified date was days behind the active library's. A real file-level diff (comparing sorted basenames of each library's `originals/` folder) showed the opposite: the "stale" copy actually had 90 MORE files than the "current" one, missing only a single negligible file. The mtime signal was misleading because an app's own housekeeping (thumbnail generation, indexing, database writes) continuously touches folder mtimes regardless of whether new user content was added.
+
+**Mitigation / pattern:** Never infer "which copy is more complete/current" from directory or file modification timestamps alone when the two copies are managed by an application with its own background write activity. Do a real content-level diff (file lists, hashes, or record counts) before making an irreversible decision based on apparent staleness.
+
+**Tags:** `discovery` `verification`
