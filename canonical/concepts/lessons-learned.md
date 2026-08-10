@@ -3613,3 +3613,73 @@ the live file before anyone trusts a full automated regeneration of this file ag
 **Mitigation / pattern:** Never infer "which copy is more complete/current" from directory or file modification timestamps alone when the two copies are managed by an application with its own background write activity. Do a real content-level diff (file lists, hashes, or record counts) before making an irreversible decision based on apparent staleness.
 
 **Tags:** `discovery` `verification`
+
+---
+
+## Concurrent SQLite writers can starve each other even under a generous busy_timeout — batch commits, don't just retry
+
+**Session:** eeadfc28 (M2) · **Date:** 2026-08-10
+
+**Context:** Two hashing jobs (M1-bin, M1-vault) writing to the same local `reachability.db`, both using WAL mode with `busy_timeout=30000`ms and committing after every row.
+
+**What happened:** M1-bin's job hit many small/fast files and committed at very high frequency, winning the write lock often enough that M1-vault's writer hit `database is locked` even past a 30s (later 60s) busy_timeout. `busy_timeout` bounds a *single* retry's wait, not cumulative starvation across thousands of rapid competing commits.
+
+**Mitigation / pattern:** For two local processes writing the same SQLite file concurrently, batch commits (e.g. every 20 rows instead of every row) to reduce lock-acquisition frequency, and add app-level exponential-backoff retry around both `execute` and `commit` as a second layer under `busy_timeout`. If both fixes still show contention, the more reliable answer is often simpler: don't race them — sequence the jobs instead of running them concurrently.
+
+**Tags:** `tool-gotcha` `discovery`
+
+---
+
+## A background job "just reading files" can still degrade a different machine — measure the remote side, not your own
+
+**Session:** eeadfc28 (M2) · **Date:** 2026-08-10
+
+**Context:** An overnight hashing job on M2 read hundreds of thousands of small files from M1 over its SMB share. Looked safe — no writes to M1, low CPU on M2's own side.
+
+**What happened:** M1's `smbd` process was pushed to 210%+ CPU and the machine's system load to 78+ (should be single digits), making it briefly unable to reliably serve even a 2MB local file read to its own SSH session. The read volume itself, not any write, was the load.
+
+**Mitigation / pattern:** Before launching a long-running remote-filesystem-heavy job, and periodically while it runs, check the *other* machine's load (`ssh <host> uptime`), not just local resource usage. "It's only reading" is not evidence of safety for a job doing hundreds of thousands of small round-trips against another machine's file server.
+
+**Tags:** `mistake` `discovery`
+
+---
+
+## macOS TCC permissions bind to the requesting process's identity, not just the binary being run — the same script can be blocked or allowed depending on how it's launched
+
+**Session:** eeadfc28 (M2) · **Date:** 2026-08-10
+
+**Context:** Diagnosing why an iCloud photo/video download pipeline (`osxphotos export --use-photos-export`) had stopped working after being relaunched via a plain `python3 script.py` background process.
+
+**What happened:** Every export attempt failed with "could not get authorization... Click 'Allow Access to All Photos'" — looked like a revoked or never-granted permission needing a fresh human click. It wasn't: the pipeline's own (pre-existing, well-commented) restart logic launches via `osascript -e 'tell application "Terminal" to do script ...'` specifically because **Terminal.app holds the Photos TCC grant, not a bare python process**. Relaunching the exact same script through Terminal's identity instead of a raw background process resolved it immediately, with zero new permission grant needed.
+
+**Mitigation / pattern:** When a script that previously worked now hits a permission wall, check *how it was being launched before* (grep its own restart/watchdog logic for `osascript`/app-identity tricks) before assuming the fix requires a new human grant. TCC in this environment is bound to the launching application's identity, and a script run a different way is not the same requester even with byte-identical code.
+
+**Tags:** `tool-gotcha` `discovery`
+
+---
+
+## A `git apply` failure on the real target branch can be the useful signal, not just an obstacle — check what's already there before forcing it through
+
+**Session:** eeadfc28 (M2) · **Date:** 2026-08-10
+
+**Context:** Diagnosed a real gap (no code path ever sets `members.status = 'active'`), wrote a fix, then found the local working tree it was drafted against was the wrong git branch. Tried to move the fix to the real target branch/worktree and `git apply` failed with a context mismatch.
+
+**What happened:** Instead of resolving the conflict and forcing the patch through, checked why the context didn't match — a different session had already built a materially better version of the exact same fix (idempotent, race-safe, explicit outcome states) on that branch. Dropped the draft rather than ship a worse duplicate.
+
+**Mitigation / pattern:** A patch/merge conflict against the *actual* target isn't just friction to route around — it can mean the target has moved in a way that matters. Before resolving a `git apply`/merge conflict by force, read what's already at that location; it may already solve the problem, sometimes better.
+
+**Tags:** `discovery` `process-change`
+
+---
+
+## "Ready" in a scheduled-task/launchd listing means never-triggered, not currently-idle — check this explicitly, it recurred twice in one session
+
+**Session:** eeadfc28 (M2) · **Date:** 2026-08-10
+
+**Context:** Diagnosing two unrelated "why isn't X working" questions in the same session — a PC vision-captioning failure, and later an iCloud-video-worker queue that wasn't draining.
+
+**What happened:** Both times, the root cause was a Windows Scheduled Task sitting in state `Ready` rather than `Running` — a dependency (`LlamaServerPC`) never re-armed after being deliberately disabled weeks earlier for an unrelated reason, and a consumer worker (`ICloudVideoWorker`) that had simply never been triggered this session. `Ready` looks superficially healthy in a task listing (the task exists, is enabled, no error shown) and is easy to read past when scanning for "is anything broken here."
+
+**Mitigation / pattern:** When diagnosing "why isn't this happening" on a machine with scheduled services, explicitly check task/job *state* (Running vs Ready vs Disabled), not just existence. A task that's `Ready` and has capacity waiting (a full queue, a blocked dependent) is a real, fixable finding — `Start-ScheduledTask` (or the launchd equivalent) — not something to explain away as "it'll pick up eventually."
+
+**Tags:** `discovery` `process-change`
