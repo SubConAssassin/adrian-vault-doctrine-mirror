@@ -36,6 +36,18 @@ Three, and only three, routes out:
 
 ---
 
+## Clarification 2026-08-11 (Adrian-direct) — Route 2 applies to Adrian's own facilitator statements, not only client statements
+
+**§8 classification: clarification/extension, no existing rule weakened, removed, or reinterpreted.**
+
+Raised on a live case: `ss-language-signature.md` (classified `strictly-private-mastermind`) was the source for public-facing copy in a CLI review. The file's own classification was being read as making every phrase extracted from it presumptively secret, which over-restricts — a file-level classification protects the aggregated corpus document itself, not necessarily every individual sentence within it, especially Adrian's own recorded words.
+
+Adrian, verbatim: *"anything that I say can be used in isolation as long as it doesn't identify the client."*
+
+This is the same Route 2 test already in this document (**"stands on its own," "does not identify the client"**), stated explicitly to cover statements Adrian himself makes during a session, not only things a client says. The underlying concern is identical either way: does the specific extracted content, standing alone, reveal or identify who the client was. A generic facilitation line Adrian used with a client (a diagnostic question, a sovereignty-framing statement, a technique name) does not identify that client merely by having been said in their session — the same self-standing test applies.
+
+**Worked example from the live case:** "Did that decision take your peace of mind, or did you hand it over?" and "You're the one who makes the call" — both adapted from `ss-language-signature.md`, both Adrian's own words, neither containing a name or any client-identifying detail. Cleared under Route 2 as extended here. Contrast: if the same file had recorded Adrian saying "so when you told me about your custody situation with your ex..." — that utterance, even though it's Adrian speaking, would fail the test, because it only makes sense once you know whose session it was and carries an identifying detail. **The test is about the content of the specific extracted line, not about which party in the room said it.**
+
 ## What this does NOT authorise
 
 - It does **not** make client material publishable by default once ingested. Ingestion into the vault and eligibility for output are separate questions; this rule governs the second.
