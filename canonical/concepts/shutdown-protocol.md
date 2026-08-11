@@ -4,13 +4,14 @@ type: protocol
 status: canonical
 tier: 2
 firewall_class: working-internal
-version: 2.3
+version: 2.4
 applies_to: [claude, antigravity]
 created: 2026-04-21
-updated: 2026-05-04
-last_updated: 2026-05-04
+updated: 2026-08-11
+last_updated: 2026-08-11
 supersedes:
   - canonical/concepts/session-shutdown-protocol.md
+  - procedural/workflows/session-shutdown.md
 tags: [adrian-os, concurrency, session-management, hivemind, infrastructure, antigravity]
 related:
   - canonical/concepts/dispatcher-protocol.md
@@ -34,6 +35,18 @@ Three specific failure modes the Shutdown Protocol prevents:
 4. **Lessons evaporate** — a mistake is made and fixed mid-session; the fix lives in chat memory and dies with the chat. Next session repeats the same mistake.
 
 Shutdown fires explicitly (Adrian triggers it) or implicitly (Claude detects conversation is ending). Either way, it cleans up.
+
+## Step 0 — EXECUTE-DON'T-DIARIZE (added 2026-08-11, merged from `procedural/workflows/session-shutdown.md` v1.1) — RUN FIRST, BLOCKING
+
+**Standing directive (Adrian-direct, 2026-06-15):** *"Sometimes we talk about a lot of stuff but it never gets fully executed — you find the answer but you don't actually fix it. The shutdown protocol must, where we've found solutions that haven't been actioned, EXECUTE them (frictionless protocol) to complete what we set out to do. Get ALL actions done until a genuine human-intervention point."*
+
+No shutdown is complete until this has run. A solution discovered this session and merely recorded is a **failed shutdown**.
+
+1. Audit the session for found-but-unactioned solutions (fixes, answers, decisions, edits identified but not carried out or only half-done).
+2. Execute every doable item now, reversible-first, verifying each before moving on. Chain through the whole list — do not stop at item one and ask whether to continue.
+3. Decide through Adrian's lens when the answer is intuitive from canon/ledgers/his known voice — don't pose a question for its own sake. Reserve the single-question protocol for genuinely underdetermined material decisions.
+4. Halt only at true human-only gates: irreversible/high-blast-radius actions, metered spend beyond standing authorisation, genuinely underdetermined taste/strategy calls, missing credentials only Adrian holds, firewall judgment calls.
+5. Report what was executed, not what was found — "found but not actioned" should not appear in a completed shutdown except at an explicit gate.
 
 ## Hard rules (cannot be overridden)
 
@@ -122,6 +135,8 @@ Final shutdown line MUST include Secretary status: `Secretary captured N actions
 See: `canonical/team/personas/lior-ben-david-secretary.md`
 
 ### Step 4 — Sweep own leases
+
+**Correction, 2026-08-11 (verified, not assumed):** `working/_locks/` has looked dormant since May 2026. The intended successor is `tools/fleet.py` (`claim`/`release`/`leases` subcommands, backed by `working/state/events.jsonl` via `tools/eventlog.py`) — check leases there first. `working/_locks/` may still hold real advisory files from older sessions (verified present as of 2026-08-11: various `.lock`/`.stop`/`.pause` files, some still load-bearing, e.g. `ag-automation.pause`), so don't delete the directory, just don't treat it as the primary lease mechanism going forward. **Known defect (open, tracked in `working/_secretary/action-register.ndjson` as `fleetpy-smb-lock-hang-m2-side`):** `fleet.py` calls, and even a bare `lsof`/`git status`, hang in kernel-level uninterruptible I/O when invoked from M2 over the SMB mount. From M2, route through `ssh m1max` instead (confirmed reliable workaround) rather than calling fleet.py directly.
 
 List `working/_locks/` filtered to `session_id == <this session's id>`. Any found are this session's responsibility.
 
@@ -231,13 +246,17 @@ This makes shutdown activity visible to the launchd watcher and to future `u` sw
 
 ### Step 10 — save-vault
 
-After ALL writes are complete, fire save-vault to commit + push:
+**Correction, 2026-08-11 (verified, not assumed — two sessions read this differently on the same day, resolved by direct test).** `save-vault` (`~/bin/save-vault`) is real and works — confirmed live via direct test. It was independently reported as "not found" the same day from an M2-side check; root cause is almost certainly that `~/bin` is only on PATH in a shell that sources `~/.zshrc`, which a bare/non-interactive check (e.g. over `ssh`) will not do by default. **This is exactly why the osascript wrapper below explicitly sources `.zshrc` first — always invoke it that way, never as a bare command**, and don't conclude the script is missing from a `which`/`type` check run outside that context.
+
+**What it actually does, and what it doesn't.** This repo (`~/Documents/Adrian-Vault/.git`) is a narrow, deny-by-default **public mirror** — `.gitignore` whitelists only `canonical/concepts/**` plus a handful of root files (`AGENTS.md`, `CLAUDE.md`, `.gitignore`, `raw/.gitkeep`, a few `wiki/` files). It pushes to a **public GitHub remote, hourly**, via a separate auto-sync job that already runs independently of this protocol. `save-vault` commits and pushes that same whitelisted scope. It is **not** a general vault backup — `working/`, `companies/`, `episodic/`, and everything else outside the whitelist is untouched by it and has no git-tracked copy at all (verified: `working/drafts-pending/`, `working/handoffs/`, and this protocol's own archive/handoff/Secretary writes are all gitignored). Vault-wide backup is a separate, non-git layer — see `vault-backup-architecture` in memory/lessons if this matters for what's being closed out.
+
+**Practical consequence for this step:** if the only canonical change this session made is inside `canonical/concepts/`, the hourly auto-sync job may already have captured it (check `git status --short` — clean means it's already synced) and running `save-vault` manually is a "force it now" convenience, not a requirement. Still run it at shutdown regardless, to avoid depending on auto-sync timing:
 
 ```bash
 osascript -e '"/bin/zsh -c \"source $HOME/.zshrc; cd ~/Documents/Adrian-Vault && save-vault\""'
 ```
 
-Per memory directive: every vault edit triggers save-vault. Shutdown bundles them into one final commit.
+**M1/M2 split:** M2 sessions cannot write `canonical/` directly (established boundary, not a bug) and should not attempt `save-vault` — stage session-archive/lessons/decisions to `working/_m2-staging/{date}-{slug}/` with a manifest for an M1 session to review and promote instead. See a real worked example: `working/_m2-staging/2026-08-11-mastermind-overnight-shutdown/`.
 
 ---
 
@@ -416,6 +435,7 @@ Commit f3a2c19 pushed.
 - **2026-05-04 (v2)** — Merged `session-shutdown-protocol.md` into this file. Added: Step 1 process audit, Step 9 Apple Note, Step 10 save-vault, Restart Recovery Checklist appendix, Anti-patterns section, Safety confirmation line. Renumbered cleanly 1–10. File B marked superseded.
 - **2026-05-04 (v2.1)** — Added Step 8 Lessons & Mitigations (mandatory). Bumped Log/Apple Note/save-vault to 9/10/11. Created `canonical/concepts/lessons-learned.md` as rolling canonical. Final shutdown line gains `Lessons: N extracted, M promoted`. Driven by Adrian's gap analysis: actions and decisions were captured, but mistakes/discoveries/tool-gotchas/process-changes were not extracted as a forward-readable record.
 - **2026-05-04 (v2.2)** — Extended `applies_to` to `[claude, antigravity]`. Added Antigravity adaptations section (AG-specific triggers, step deltas, final-line format, cross-surface coordination). System goal: AG runs the protocol on its own windows so AG's runtime learning is captured, not lost. Same pattern as u-protocol — one doctrine, two surfaces.
+- **2026-08-11 (v2.4)** — Reconciled against `procedural/workflows/session-shutdown.md` v1.1, which had drifted into a parallel, unreconciled shutdown doc since 2026-06-15 (confirmed in practice: the 2026-08-11 11:35 WITA shutdown blended both without either doc saying so). Merged that doc's valuable **Step 0 EXECUTE-DON'T-DIARIZE** in as the new lead step; marked it superseded, pointing here. Corrected two stale claims found by a concurrent M2 session the same day and independently verified before writing: `save-vault` is real (requires a profile-sourcing shell — a bare check reports false-not-found) and this repo is a narrow public-mirror whitelist (`canonical/concepts/` + a few root files, hourly auto-push to a public GitHub remote), not a general vault backup; `working/_locks/` lease-tracking is dormant, superseded by `tools/fleet.py`, itself carrying a known M2-side SMB hang defect (tracked separately). Added the M1/M2 canonical-write-split (M2 stages to `working/_m2-staging/`, M1 promotes) since it's an established, load-bearing pattern this doc never documented. Two sessions nearly got the `save-vault` fact wrong the same day for the same reason (untested assumption from a bare check) — resolved by direct verification, not by trusting either report.
 - **2026-05-05 (v2.3)** — Removed Apple Note step entirely. Adrian's Apple Notes folder is reserved for client and personal use; system closeouts must never write there. Renumbered Log/save-vault from 9/11 to 9/10. Now ten steps total. Lesson promoted: notification channels owned by the user must not be co-opted for system status — system status stays queryable in vault, not pushed into personal channels.
 
 ## Session references

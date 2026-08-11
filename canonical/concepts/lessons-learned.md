@@ -3742,3 +3742,79 @@ the live file before anyone trusts a full automated regeneration of this file ag
 **Mitigation / pattern:** When diagnosing "why isn't this happening" on a machine with scheduled services, explicitly check task/job *state* (Running vs Ready vs Disabled), not just existence. A task that's `Ready` and has capacity waiting (a full queue, a blocked dependent) is a real, fixable finding — `Start-ScheduledTask` (or the launchd equivalent) — not something to explain away as "it'll pick up eventually."
 
 **Tags:** `discovery` `process-change`
+
+---
+
+## Recent entries (2026-08-11 sessions: M2 overnight mastermind, M1 Ben Killen CLI review + shutdown)
+
+### LL-2026-08-11-001 [discovery, tool-gotcha] — Any lock/scan on the SMB-mounted vault hangs in kernel-uninterruptible I/O from M2; route through ssh instead
+
+**Session:** m2-2026-08-11-mastermind-overnight · **Archive:** [raw/sessions/2026-08-11-0033-m2-mastermind-overnight.md](../../raw/sessions/2026-08-11-0033-m2-mastermind-overnight.md)
+**Date:** 2026-08-11
+
+**Context:** M2 session running the overnight content-pipeline grind needed to check fleet.py leases and inbox state.
+
+**What happened:** `fleet.py inbox`/`leases`, and even a bare `lsof` on `events.jsonl`, hung in kernel-level uninterruptible I/O (`ps` state `U`, zero CPU) against the SMB mount — one stuck 9+ minutes, unkillable by SIGTERM. Three workarounds tried and failed (missing sibling script, zipimport-over-SMB errors, local copies still hitting the same file-I/O hang). A sibling M2 session's own final shutdown event-log append was caught mid-hang by the same defect. Separately, `python3 <script-on-SMB>.py` can hang at Python's own `zipimport` bootstrap before the script's code even runs, independent of any lock issue — copying the script local only helps if its internal paths are hardcoded absolute (verify per-script: `fleet.py`'s path is derived from `__file__` and breaks if relocated without a matching symlink; `attribute_ventures.py` uses a hardcoded absolute path, so relocating it is safe).
+
+**Root cause:** SMB-mount file locking/scanning from M2 does not degrade gracefully — it hangs rather than erroring, and the hang cannot be killed short of forcing the process.
+
+**Mitigation / pattern:** From M2, route fleet.py/eventlog.py calls and any vault-wide git operation through `ssh m1max` (native local disk on the target) rather than calling them directly over the SMB mount. Confirmed reliable every time it was tried.
+
+**Promoted to:** open action `fleetpy-smb-lock-hang-m2-side` in `working/_secretary/action-register.ndjson` (real fix — ssh-routing or a lock-free append protocol — still needs an M1 design pass, not solved by this lesson alone).
+
+**Tags:** `discovery` `tool-gotcha`
+
+---
+
+### LL-2026-08-11-002 [tool-gotcha, process-change] — `save-vault` and this repo's real scope: two sessions nearly got the same fact wrong the same day
+
+**Session:** 7a73... (M1, Ben Killen CLI review + shutdown) · **Archive:** [raw/sessions/2026-08-11-cli-review-and-shutdown.md](../../raw/sessions/2026-08-11-cli-review-and-shutdown.md)
+**Date:** 2026-08-11
+
+**Context:** A concurrent M2 session reported `save-vault` (`canonical/concepts/shutdown-protocol.md` Step 10) as "not found," staged as an action for M1 to review. This session independently ran `which save-vault` before trusting the report and got exit 0.
+
+**What happened:** `save-vault` is real (`~/bin/save-vault`) and works — but only from a shell that sources `~/.zshrc`, which `~/bin` depends on being on PATH. A bare/non-interactive check (e.g. over `ssh`, or `type`/`which` outside a profile-sourcing shell) reports false-not-found. Separately, and more consequentially: this git repo is not a general vault backup at all — `.gitignore` is a deny-by-default whitelist covering only `canonical/concepts/**` plus a few root files, pushed to a **public** GitHub remote hourly by a separate auto-sync job. `working/`, `companies/`, `episodic/` etc. have no git-tracked copy regardless of whether `save-vault` runs.
+
+**Root cause:** Neither session's individual check was crazy — one tested from a context without the profile sourced, the other tested from one that had it. Trusting either single test result without cross-checking against the other, or against what the script's own wrapper already implies (the doc's existing invocation explicitly sources `.zshrc` first — that requirement was already documented, just not connected to why a naive check would fail), would have promoted a wrong fact to canonical.
+
+**Mitigation / pattern:** When two sessions report contradictory results for the same command/fact on the same infrastructure, that's a signal to verify directly rather than pick one report to trust — the disagreement itself is usually informative (here: environment-dependent PATH, not a real inconsistency).
+
+**Promoted to:** `canonical/concepts/shutdown-protocol.md` v2.4, Step 10 (full correction + M1/M2 split documented there).
+
+**Tags:** `tool-gotcha` `process-change`
+
+---
+
+### LL-2026-08-11-003 [discovery] — A stuck DOM/accessibility-tree read can be bypassed by fetching the source site's own data-sync API response directly
+
+**Session:** 7a73... (M1) · **Archive:** [raw/sessions/2026-08-11-cli-review-and-shutdown.md](../../raw/sessions/2026-08-11-cli-review-and-shutdown.md)
+**Date:** 2026-08-11
+
+**Context:** A Notion page's code block kept rendering "Loading Plain Text code..." across repeated reload/click/triple-click — genuinely stuck, confirmed by screenshot, not a rendering delay.
+
+**What happened:** `get_page_text`/`read_page` (DOM/accessibility-tree reads) kept returning the stale placeholder even after the underlying block had real content, and long text values also get truncated at the accessibility-name layer regardless (a separate limitation from the stuck-render bug). Fetching the raw response body of the site's own internal data-sync API call (`read_network_requests` with an explicit `requestId`, not just the request list) exposed the actual stored content directly from the site's data layer, bypassing the client-side render bug and the truncation both.
+
+**Mitigation / pattern:** When a page element is confirmed stuck (not just slow) and DOM-level reads won't surface it, check whether the site's own network calls already carry the real data in a response body — fetching that directly is often more reliable than any amount of retrying UI-level reads, and works even when the specific rendering bug is never diagnosed.
+
+**Promoted to:** —
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-08-11-004 [mistake, process-change] — Declaring third-party content unrecoverable and substituting own work is worse than stalling, because it hides the failure
+
+**Session:** 7a73... (M1) · **Archive:** [raw/sessions/2026-08-11-cli-review-and-shutdown.md](../../raw/sessions/2026-08-11-cli-review-and-shutdown.md)
+**Date:** 2026-08-11
+
+**Context:** Reviewing a collaborator's VSL script pasted into a live, actively-edited Notion doc. The relevant code block wasn't rendering. One shallow retrieval attempt (a request *list*, not a body fetch) was tried before concluding the content was inaccessible.
+
+**What happened:** The task was completed by writing an independently-authored substitute, with the gap disclosed in the deliverable's own preamble. Adrian: *"How could you do a report without it? You should be either getting it yourself or finding out a way for me to get it for you."* On retry, the same tool already in use (`read_network_requests`) had an untried parameter (`requestId`, fetching a response body instead of a list) that solved it in about three tries.
+
+**Root cause:** A disclosed limitation was treated as equivalent to a resolved one. It isn't — a prominent disclaimer on a plausible-looking substitute deliverable is easier to miss than an obviously incomplete one, which makes this failure mode worse than simply stalling, not better.
+
+**Mitigation / pattern:** When a tool call returns nothing useful, that's a prompt to go one level deeper with the *same* tool (an explicit ID, a body fetch, a different parameter) before concluding the data isn't reachable — not a stopping point. Full behavioral detail already lives in this assistant's own cross-session memory (`feedback-frictionless-no-permission-to-finish-task.md`, 2026-08-11 recurrence); this entry exists so the pattern is visible vault-wide, not only to one assistant's private memory.
+
+**Promoted to:** —
+
+**Tags:** `mistake` `process-change`
