@@ -256,6 +256,15 @@ This makes shutdown activity visible to the launchd watcher and to future `u` sw
 osascript -e '"/bin/zsh -c \"source $HOME/.zshrc; cd ~/Documents/Adrian-Vault && save-vault\""'
 ```
 
+**2026-08-11: this exact osascript invocation did not actually execute when tested** (it echoed the
+command string back rather than running it — no commit resulted). Direct invocation worked cleanly
+in the same session (`save-vault` run straight from a Bash-tool shell, which already sources the
+profile): committed, pushed, and verified against the remote in one pass. Prefer direct invocation
+when the calling context already has a profile-sourcing shell (true for a Claude Code Bash tool);
+the osascript wrapper's actual purpose is triggering from a context that does *not* already have
+one (e.g. an outside-of-terminal automation) — if using it, verify the commit landed (`git log -1`)
+rather than trusting the osascript return value, which does not reliably reflect success or failure.
+
 **M1/M2 split:** M2 sessions cannot write `canonical/` directly (established boundary, not a bug) and should not attempt `save-vault` — stage session-archive/lessons/decisions to `working/_m2-staging/{date}-{slug}/` with a manifest for an M1 session to review and promote instead. See a real worked example: `working/_m2-staging/2026-08-11-mastermind-overnight-shutdown/`.
 
 ---
