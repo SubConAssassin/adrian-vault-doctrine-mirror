@@ -3837,3 +3837,60 @@ the live file before anyone trusts a full automated regeneration of this file ag
 **Promoted to:** —
 
 **Tags:** `discovery` `tool-gotcha`
+
+---
+
+### LL-2026-08-12-002 [tool-gotcha] — A literal " OR " inside an Algolia `query` param is indexed as noise words, not a boolean operator, and can silently collapse a search to near-zero real coverage
+
+**Session:** a657 (M1) · **Archive:** [raw/sessions/2026-08-12-1805-spanda-positioning-and-morning-brief-fixes.md](../../raw/sessions/2026-08-12-1805-spanda-positioning-and-morning-brief-fixes.md)
+**Date:** 2026-08-12
+
+**Context:** `tools/model-intel-harvest.sh`'s weekly-harvest HN queries (`hn "LLM OR GPT OR Claude OR Gemini OR Grok OR model" 7`), used since the file's creation, had produced a `raw-signal.md` byte-identical (bar the date line) for 12 straight days (2026-08-01 through 2026-08-12) — three prior model-intel DELTAS handoffs described this as a "stale-mtime not content" freeze without finding why.
+
+**What happened:** Ran the exact live curl call. The query returned `nbHits: 10` — ten matches across HN's entire history for that search string — with the top-2-by-points results dated 2025-10-23 and 2024-12-13. The same terms space-separated (no literal `OR`, matching the file's own already-working `--sniff` function) returned `nbHits: 25` with normal, current-dated results.
+
+**Root cause:** Algolia's full-text `query` param has no boolean-OR syntax. The literal word "OR" is indexed like any other search term, so a query built as `A OR B OR C` is actually searched as the five-word phrase-ish bag `{A, OR, B, OR, C}` — drastically narrowing real matches rather than broadening them the way the author intended. With a candidate pool that small (~10 all-time), "top 8 by points among the most recent 25" almost never changes day to day, which produced the appearance of a caching/freshness bug when the real defect was query construction.
+
+**Mitigation / pattern:** Never put a literal `OR`/`AND` token inside an Algolia (or similarly free-text-only) search query expecting boolean semantics. Use space-separated terms for an implicit OR-like relevance match, or the engine's actual structured filter syntax if real boolean logic is needed. When a "why is this stale" investigation turns up byte-identical output across many runs, check the query construction before assuming a caching/mtime/scheduling problem — a symptom that looks exactly like a freshness bug can be a silently-narrowed search instead.
+
+**Promoted to:** `tools/model-intel-harvest.sh` (fixed in place, in-code comment added explaining the bug for future editors).
+
+**Tags:** `tool-gotcha`
+
+---
+
+### LL-2026-08-12-003 [discovery] — Claude Code's native scheduled-tasks mechanism has no independent daemon; every enabled cron task shares the same "app must be open" exposure
+
+**Session:** a657 (M1) · **Archive:** [raw/sessions/2026-08-12-1805-spanda-positioning-and-morning-brief-fixes.md](../../raw/sessions/2026-08-12-1805-spanda-positioning-and-morning-brief-fixes.md)
+**Date:** 2026-08-12
+
+**Context:** The 2026-08-12 OSB sales-audit entry in STATE-OF-STACK noted no audit ran on 2026-08-11 — flagged as "a scheduler question, outside this task's scope" and left uninvestigated. Several manual searches for a LaunchAgent or crontab job behind `osb-order-monitor` correctly found nothing, because neither exists.
+
+**What happened:** Delegated an Explore agent, which found the actual mechanism: a Claude Code native scheduled task registered via `mcp__scheduled-tasks` (taskId `osb-order-monitor`, cron `0 8 * * *`, prompt at `~/.claude/scheduled-tasks/osb-order-monitor/SKILL.md`). Its own tool description states plainly: "Scheduled tasks run while this app is open. If the app is closed when a task is due, it runs on next launch." There is no independent daemon — self-healing on next launch is the only recovery mechanism.
+
+**Root cause:** This vault has at least three currently-enabled scheduled tasks of this type (`osb-order-monitor`, `m2-ultra-192gb-watch`, `ss-mastermind-growth-monitor`), all sharing the same structural exposure: any of them can silently skip a day if the laptop is asleep or the app is closed right at the cron minute, and the only symptom is a delayed rather than missing notification (the 2026-08-08-dated Etsy receipt that surfaced on 2026-08-12 is consistent with this).
+
+**Mitigation / pattern:** Before assuming a "missing scheduled run" is a bug in the task's own logic, check whether it's implemented as a `launchd`/`cron` job (system-level, independent of any app) or a Claude Code native `mcp__scheduled-tasks` entry (app-dependent, self-healing only on next launch). Surfaced to Adrian as a single protocol question (build a redundant system-level backstop for revenue-critical tasks, or accept the existing self-healing) — **Adrian's decision: accept it, no backstop built.** Future sessions should not re-propose this fix without a new triggering event; it's a settled tradeoff, not an open bug.
+
+**Promoted to:** —
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-08-12-004 [mistake] — Fixing one flagged item while making a fresh unverified claim about a different, adjacent one
+
+**Session:** a657 (M1) · **Archive:** [raw/sessions/2026-08-12-1805-spanda-positioning-and-morning-brief-fixes.md](../../raw/sessions/2026-08-12-1805-spanda-positioning-and-morning-brief-fixes.md)
+**Date:** 2026-08-12
+
+**Context:** Fixing `tools/lanes.py`'s stale label for `tools/gemini-image.py`, which had been mislabeled as an Imagen-4-dependent lane for three consecutive model-intel runs without being corrected.
+
+**What happened:** The first edit added a new claim — that the lane "goes dead" after the 17 Aug 2026 Imagen 4 API shutdown — without checking whether that was actually true. It wasn't: a memory search immediately after (triggered by an unrelated system reminder surfacing a relevant prior observation) found a 2026-08-10 finding that `gemini-image.py` calls Gemini's `generate_content()` with Gemini model IDs and never touches the Imagen API at all, so it is unaffected by the shutdown. The edit was corrected before being reported as done.
+
+**Root cause:** Momentum from correctly identifying and fixing one real defect (a stale label) led to writing a second, adjacent, unverified claim (a shutdown-exposure date) in the same edit, without applying the same verify-before-asserting discipline that caught the first issue.
+
+**Mitigation / pattern:** A fix that touches a claim about system behavior (not just a name/date correction) needs the same verification pass as a fresh assertion would, even when it's bundled inside an otherwise-correct edit. Reinforces the existing verify-before-asserting cluster (`feedback-*` memory files) rather than introducing a new pattern — worth logging as a recurrence, not a novel finding.
+
+**Promoted to:** —
+
+**Tags:** `mistake`
