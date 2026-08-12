@@ -3894,3 +3894,39 @@ the live file before anyone trusts a full automated regeneration of this file ag
 **Promoted to:** —
 
 **Tags:** `mistake`
+
+---
+
+### LL-2026-08-12-005 [discovery] — Verify a fleet "is X still on node Y" claim against the actual mechanism (script + log + live remote check), never against a report's label alone
+
+**Session:** e65e (M1) · **Archive:** [raw/sessions/2026-08-12-1952-m1bin-disk-cleanup-and-bridge-notify-protocol.md](../../raw/sessions/2026-08-12-1952-m1bin-disk-cleanup-and-bridge-notify-protocol.md)
+**Date:** 2026-08-12
+
+**Context:** M2's ingestion-pipeline bridge described active "m1-bin false-done files" recovery. Adrian needed to know, before emptying M1's `~/.Trash`, whether that meant live ingestion content was actually sitting there.
+
+**What happened:** Rather than trust the "M2 local recovery" label at face value, traced the real mechanism: found `tools/bin-free-m1-after-verify.sh`, read its log (one completed run, 2026-06-29, 778GB parity-verified, M1 Trash emptied as the script's own last step, nothing since), then independently SSH-verified the destination directory on M2's SSD directly (777GB, intact). Cross-checked against M1's actual current Trash contents. The three-point chain (script logic → its own log → live remote confirmation) gave certainty a label alone couldn't. M2 later confirmed the same conclusion independently from its own side.
+
+**Mitigation / pattern:** For any "is content X still on node Y" question in this fleet, don't reason from a report's phrasing — find the script/mechanism that would have moved or verified it, read its log for the actual event, and where possible confirm live against the remote node directly. Reusable pattern for the next cross-node content-location question, not specific to m1-bin.
+
+**Promoted to:** —
+
+**Tags:** `discovery`
+
+---
+
+### LL-2026-08-12-006 [discovery, process-change] — Before shipping a cross-node notification fix, verify what the receiving node can actually receive
+
+**Session:** e65e (M1) · **Archive:** [raw/sessions/2026-08-12-1952-m1bin-disk-cleanup-and-bridge-notify-protocol.md](../../raw/sessions/2026-08-12-1952-m1bin-disk-cleanup-and-bridge-notify-protocol.md)
+**Date:** 2026-08-12
+
+**Context:** Adrian flagged a real coordination gap — M2 didn't notice an in-place update to a shared coordination file, because every M1↔M2 mechanism in the vault is pull-based (read at session start), nothing pushes. Asked for the actual system to be fixed and documented durably, not just patched once.
+
+**What happened:** Built and shipped `tools/bridge-notify.sh` (ntfy push to the existing `adrianvault-fleet` topic) on the assumption that a push would let "the other side know now." M2 adopted it, tested it successfully, then corrected the framing: M2 has no ntfy client, no phone, nothing subscribed to that topic — the mechanism can only ever reach Adrian's own device, not M1 or M2 directly. The fix is still real (it turns "Adrian notices by chance" into "Adrian is pinged instantly"), but the design question "can the target actually receive this signal" should have been asked before building, not answered by the other side's testing after.
+
+**Root cause:** Assumed symmetry between "I can send a push" and "the other party can receive one" without checking the receiving side's actual client/subscription state first.
+
+**Mitigation / pattern:** When designing any cross-session or cross-node notification mechanism, confirm the receiving end's actual capability to receive that specific channel (client installed, subscribed, reachable) as the first design question — before building, not as a finding reported back after. Deliberately chose a one-shot CLI call over a standing LaunchAgent/WatchPaths daemon for this fix specifically because the same class of unauthorized standing automation had just been caught and reverted elsewhere in the fleet the same night — worth remembering as the reasoning next time "just make it a daemon" looks tempting.
+
+**Promoted to:** `canonical/concepts/claude-ceo-operating-doctrine.md` §5.5
+
+**Tags:** `discovery`, `process-change`
