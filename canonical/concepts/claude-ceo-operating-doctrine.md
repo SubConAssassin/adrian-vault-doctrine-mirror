@@ -144,6 +144,35 @@ When ANY agent (any Claude session, AG, future agent) needs to know the current 
 3. Check recent handoffs — was there a state change in the last 7 days?
 4. Only THEN reason from session memory or general knowledge.
 
+### 5.5 Push notification on every bridge-file write (added 2026-08-12)
+
+**The gap this closes:** the whole cross-session model above (§5.1-§5.4) is pull-based —
+"read this at session start." That's fine for slow-moving state but fails exactly when two
+sessions are live *simultaneously* and one needs the other to notice *now*. Confirmed live
+2026-08-12: M1 updated an existing coordination file in place; M2 was watching for a brand-new
+file, never diffed the existing one, and never found out — Adrian had to relay by hand. The file
+being correct and complete was not enough; nothing signalled that it had changed.
+
+**The fix — `tools/bridge-notify.sh <M1|M2> "<one-line summary>" <file-path>`.** Run this
+immediately after ANY write (new file OR in-place edit) to `working/claude-coordination/` or
+`working/handoffs/_claude-bridge/`. It pushes one ntfy alert to the existing `adrianvault-fleet`
+topic (same topic already used by `bin-free-m1-after-verify.sh` and other fleet ops — no new
+subscription needed) with a `🔔 <NODE> bridge update` title, the one-line summary, and the file
+path. Logs every attempt (success or failure) to `~/Library/Logs/bridge-notify.log`.
+
+**Deliberately NOT a LaunchAgent, NOT a WatchPaths daemon, nothing that survives a reboot on its
+own.** A passive file-watcher was considered and rejected for now — this exact class of standing
+automation is what got caught and reverted elsewhere in the fleet this same night (an
+unauthorized `RunAtLoad+KeepAlive` install, §7.2/CLAUDE.md's "never via unauthorized launchd"
+rule). A one-shot CLI call a session runs as part of its own write is zero standing footprint and
+needs no separate authorization; a daemon would.
+
+**The rule, binding on both M1 and M2 sessions:** an M1↔M2 coordination write without a matching
+`bridge-notify.sh` call is an incomplete write — same class of gap as writing STATE-OF-STACK
+without discharging the write-gate. If the push itself fails (network, ntfy outage), the script
+says so loudly on exit 1 — say so in the file/chat too, so Adrian (the human backstop) still
+knows to relay, rather than the failure being silent on top of being unnoticed.
+
 ## 6. The production cadence
 
 Daily, weekly, monthly rhythm Claude maintains as CEO.
@@ -241,5 +270,17 @@ This file is doctrine, not law. Doctrine evolves with operating experience.
 ---
 
 revision_history:
+- 2026-08-12 — **§5.5 added: PUSH NOTIFICATION ON EVERY BRIDGE-FILE WRITE** (Adrian-direct, live
+  in-conversation, after M2 failed to notice an in-place update to an existing coordination file
+  during tonight's disk-cleanup coordination: *"we need an efficient way of you knowing when each
+  other has communicated so can you sort out the system between you"* + *"make sure it's saved in
+  the system prompts so you know it next time and it's not forgotten"*). §8 classification: NEW
+  RULE, mechanised. Every §5.1-§5.4 cross-session mechanism is pull-based (read at session start);
+  this closes the gap for two sessions live *simultaneously*, where "correct and complete" isn't
+  enough if nothing signals the file changed. Ships with `tools/bridge-notify.sh` (ntfy push to
+  the existing `adrianvault-fleet` topic, one call per bridge write) — deliberately a one-shot CLI
+  call, not a LaunchAgent/WatchPaths daemon, to avoid the exact class of unauthorized-standing-
+  automation incident caught and reverted elsewhere in the fleet the same night. Proposed to M2 via
+  the live coordination file for symmetric adoption, not unilaterally imposed.
 - 2026-08-04 — **GEMINI ULTRA→BASE DOWNGRADE CORRECTION** (Adrian-direct, live in-conversation: *"Make sure everything is fully handled and saved into the prompt architecture to make it reliable moving forward."*, following his 2026-07-29 downgrade decision, memory `gemini-subscription-downgraded-from-ultra`). §8 classification: **FACTUAL CORRECTION, no rule weakened, removed, or reinterpreted.** §2's role table described Antigravity as running on Gemini Ultra with "daily envelope much larger than Claude's... empirically un-throttled" — that plan was cut to a ~$20-30 basic tier on 2026-07-29; corrected in place with a dated note, historical text kept for context. §4.1's "AG has no such constraint" is now qualified — AG's *weekly-lockout* ceiling is unchanged, but its *pool size* is no longer the largest in the team. Full correction and operational consequence: `canonical/concepts/delegation-first-operating-doctrine.md` §15.
 - 2026-07-25 — **CONSOLIDATION PASS** (Adrian-direct). A delegated rule-extraction over this file found 29 rules, 5 duplicate clusters and **2 internal contradictions**, both now fixed: **§6's "fully automated" header** contradicted its own step-2 correction (the NUDGE ladder writes files; nothing keystrokes them into AG without a running feeder) — header corrected so no agent concludes AG self-heals; **§4.1's "Push until throttled — find the actual limit"** contradicted AGENTS §11.5, which retired exactly that phrase on 2026-06-10 because tripping AG's *weekly* cap darks the lane 4–7 days — amended in place, with the hourly-vs-weekly distinction made explicit. **§5.1's boot list removed** — it was the third divergent copy (6 items vs CLAUDE.md §2's 8 and AGENTS §11.1's 7); `CLAUDE.md` §2 is now the only boot list. Rule ownership index: `canonical/system/prompt-map.md`. Backup: `working/_research/2026-07-25-doctrine-consolidation/backup-before/`.
