@@ -3818,3 +3818,22 @@ the live file before anyone trusts a full automated regeneration of this file ag
 **Promoted to:** —
 
 **Tags:** `mistake` `process-change`
+
+---
+
+### LL-2026-08-12-001 [discovery, tool-gotcha] — Accessibility-tree truncation and a stuck DOM look the same (incomplete text) but need different fixes; try the cheap one first
+
+**Session:** 5d6d (M1) · **Archive:** [raw/sessions/2026-08-12-1802-ben-killen-script-review-and-growth-partner-terms.md](../../raw/sessions/2026-08-12-1802-ben-killen-script-review-and-growth-partner-terms.md)
+**Date:** 2026-08-12
+
+**Context:** Reading a Notion page (a draft commercial agreement) that was rendering normally, not stuck — but several clause bodies came back truncated mid-sentence.
+
+**What happened:** `read_page` (accessibility tree) returned the full clause *structure* correctly but cut several longer clause bodies short — the accessible-name truncation limit, distinct from LL-2026-08-11-003's stuck-render problem on a *different* document two days earlier. Reaching for that same network-response-body workaround would have worked but is the heavier tool for this job. `get_page_text` (plain-text DOM extraction), tried instead, returned the complete, untruncated document in one call.
+
+**Root cause:** Two different failure modes (a stuck render vs. a long-text truncation limit) produce the same surface symptom (incomplete text), which invites reaching for whichever fix worked last time rather than the cheapest fix for the actual problem in front of you.
+
+**Mitigation / pattern:** If a page is rendering (not stuck) but text looks cut short, try `get_page_text` before the network-layer workaround — it's one call and often sufficient. Reserve the response-body-fetch technique (LL-2026-08-11-003) for pages confirmed genuinely stuck (placeholder text persisting across reload/click/screenshot), not merely long.
+
+**Promoted to:** —
+
+**Tags:** `discovery` `tool-gotcha`
