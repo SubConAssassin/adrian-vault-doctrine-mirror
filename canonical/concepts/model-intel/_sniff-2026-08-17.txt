@@ -1,0 +1,8 @@
+- [531pts] Show HN: Needle2: 14MB agentic LLM for phones, wearables, smart home and robots  (https://cactuscompute.com/needle)
+- [216pts] Show HN: Smart model routing directly in Claude, Codex and Cursor  (https://github.com/workweave/router)
+- [170pts] Show HN: Distilling DeepSeek into GPT-OSS doesn't transfer censorship. Try it  (https://www.ctgt.ai/research/distillation-censorship-transfer)
+- [137pts] Read HN twice a day for the last decade. Here's my list of S-Tier HN links  (https://news.ycombinator.com/item?id=49183198)
+- [88pts] Launch HN: Screenpipe (YC S26) – Record how you work and turn that into agents  (https://news.ycombinator.com/item?id=49024620)
+- [85pts] Show HN: I mapped 8.5M research papers into an interactive atlas  (https://tomesphere.com/atlas)
+- [53pts] Show HN: GolemUI – Declarative Form Engine  (https://golemui.com)
+- [174pts] Show HN: Onit – Source-available ChatGPT Desktop with local mode, Claude, Gemini  (https://github.com/synth-inc/onit)
