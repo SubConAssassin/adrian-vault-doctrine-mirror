@@ -1,12 +1,13 @@
 ---
 title: Frictionless Operator Doctrine
 type: doctrine
-status: active
+status: SUPERSEDED — see AGENTS.md §13
 tier: 1
 firewall_class: working-internal
-version: 1.0
-last_updated: 2026-04-21
-last_verified: 2026-04-21
+version: 1.1
+last_updated: 2026-08-16
+last_verified: 2026-08-16
+superseded_by: "AGENTS.md §13 (THE EXECUTION-CHANNEL LADDER). This file is retained as history, NOT as an authority. Two of its rules were actively WRONG and were being cited to justify the escalations Adrian objects to."
 authored_by: adrian (directive to antigravity); codified by claude
 related:
   - canonical/concepts/four-room-stack-architecture.md
@@ -15,6 +16,20 @@ related:
   - canonical/concepts/adrian-claude-shorthand-protocols.md
   - AGENTS.md
 ---
+
+> # ⛔ SUPERSEDED 2026-08-16 — DO NOT ACT ON THIS FILE
+>
+> **The authority is now `AGENTS.md` §13 (THE EXECUTION-CHANNEL LADDER).** This file is kept as
+> history only. A 40-session forensic audit found it was not merely stale but **actively harmful**:
+> it had gone four months untouched (v1.0, 2026-04-21), described the retired four-room agent stack,
+> named no channel that exists today (no claude-in-chrome, no computer-use, no MCP registry), and
+> — the real damage — its "Escalation exceptions" blessed **"credential provisioning ... (GitHub PAT,
+> new API keys, password entry)"** as a legitimate thing to hand Adrian. He explicitly overturned that
+> on 2026-08-07: *"why can't you do these terminal prompts to get new tokens as no passwords anymore?"*
+> The correction landed in AGENTS.md §7.2.a and was never back-propagated here, so this file sat
+> saying the opposite of the live rule for nine days and was cited as authority.
+>
+> **Anything below that conflicts with AGENTS.md §13 is wrong.**
 
 # Frictionless Operator Doctrine
 
