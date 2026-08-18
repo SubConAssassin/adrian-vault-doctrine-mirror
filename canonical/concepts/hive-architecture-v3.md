@@ -90,7 +90,7 @@ The hive is no longer "Claude + AG + advisors." It's now a four-layer stack.
 **Tool ecosystem Claude commands:**
 - Bash, Read, Write, Edit, WebSearch, WebFetch
 - Agent (parallel subagents)
-- TaskCreate / TaskUpdate / ScheduleWakeup
+- ScheduleWakeup · Workflow (dynamic multi-agent orchestration) — ⚠️ **`TaskCreate` / `TaskUpdate` / `TaskList` / `TodoWrite` were REMOVED on Opus 4.8, Sonnet 5, Fable 5, Mythos 5 and all newer models** (Claude Code v2.1.233, 2026-08-14). Restore only if genuinely needed with `CLAUDE_CODE_ENABLE_TODO_TOOLS=1`. Nothing in this vault invoked them — verified by vault-wide grep 2026-08-19.
 - ~200 skills (brand-voice, mkt-*, wiki-self-heal, vault-ingest, voice-persona-curator, memory-hygiene, legal-dispute-mgr, ops-ledger-keeper, etc)
 - ~30 MCP servers (Gmail, Calendar, Wix, Apple Notes, iMessage, Apple Calendar, Granola, Bright Data, Apify, Postiz, Adobe, Blender, PDF Tools, computer-use, Claude_in_Chrome, Claude_Preview, mosaic-video-editor, claude-mem, etc — many underused per subagent D audit)
 
