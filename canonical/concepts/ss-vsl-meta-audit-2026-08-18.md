@@ -121,11 +121,16 @@ more often than in the VSL.
 
 **Substantiation to hold on file before the ad airs** (CAP requires evidence in hand at
 publication, not on request):
-- The client-tenure data behind the three-years claim, plus a written definition of what counts
-  as a client and how the figure was computed. **Corroborated in the corpus** —
-  `methodology-canon.md` IP-1 records "Average client relationship: 3+ years" — but that is a
-  secondary internal document, not primary client records. If it is an impression rather than a
-  computation, use "Most client relationships here run past three years."
+- **CORRECTION — the three-year claim does not survive.** My first pass called it corroborated
+  because `methodology-canon.md` IP-1 records "Average client relationship: 3+ years". A deeper
+  corpus pass shows that is the *only* occurrence in the vault: unsourced, sitting in a
+  delivery-model aside inside an **IP-governance memo**, with no dataset behind it anywhere. The
+  vault cannot even compute its own cohort completion rate, and the entire documented retention
+  evidence base is **one person at 11 of 12 payments** — about a year, not three. It is the one
+  line in the script that could be publicly falsified, and it sits in the position of maximum
+  trust-load in front of an audience that is explicitly testing for precision. **Strike it.**
+  The true replacement is nearly as strong and is citable: *people who have worked with him
+  across multiple cohorts since 2018*, with three documented arcs running five-plus years.
 - The operational commitment: **the sheet ships every time, automatically.** "Everything is
   stated, scored, and written down" is an unconditional deliverable promise. Defensible if the
   sheet always exists; it is the one line that generates misleading-ad reports if it quietly
@@ -258,113 +263,268 @@ scarcity) cannot be answered from this repo and need either the full vault or Ad
 
 # PART 3 — THE REBUILD
 
-Ben's structure kept exactly: same beats, same timecodes, same runtime. What changes is that
-the words are sourced from the corpus instead of from assumption.
+Ben's beat structure and runtime kept. Every line now traces to the corpus.
 
-**Three rules held throughout:** (1) the public framing rule — *language is my scalpel / I
-listen to how you frame what's blocking you / the proof is the outcome*; (2) no mechanism
-described; (3) third-person and first-person framing wherever Ben used second-person assertion,
-which is simultaneously more like Adrian and safer with Meta.
+**Two corrections this rebuild forced on my own first draft, recorded because they were real
+mistakes and both would have shipped:**
+
+1. **I repeated the three-year claim as corroborated.** It is not — see the correction in Part 1.
+2. **My first draft leaked a firewalled mechanism.** I wrote *"You score where you actually
+   stand, one to ten."* The 1–10 quantifiable inquiry is the **protected diagnostic**
+   (`muscle-testing-protocol.md` §3; `ss-methodology-stack.md` §3.1), banned from every public
+   surface by Adrian-direct ruling. Ben's step three did the same thing. **Neither of us
+   invented it — we both leaked it.** It is out of the script below.
+
+**One unresolved contradiction, flagged rather than silently decided:** the deep pass describes
+the 0–10 self-score as the only non-mystical, firewall-clean progress measure available, while
+the firewall ruling bans it from public surfaces. **The ban wins until Adrian says otherwise** —
+so the script below does not mention it, and the question is on his list.
 
 ## The script
 
-**[0:00-0:20 HOOK]** Nearly every founder I work with arrives with a decision they have already
-made three times, and reversed twice. [PAUSE] The hire. The price. The partner conversation.
-The offer that is built and still not sent. They know the move. And something keeps stopping it.
+**Subconscious Surgery — VSL v1.0**
+*Runtime 4:43. Timings measured at ~150 words/minute of speech plus the marked holds. If Adrian runs slower than that, cut the two lines marked [TRIM FIRST] and it lands at 4:28.*
 
-**[0:20-1:00 PROBLEM]** By the time someone gets to me, they have done the analysis. Asked the
-smart people. Bought the books, the coaching, the workshops. And the stall is still there.
-[lean in] It is not a strategy problem. It is not a discipline problem. When you were born, you
-had an operating system. Everything since has been software, installed by experience. Most of
-it runs fine. Some of it runs against you — and it does not announce itself. While it stays
-invisible, the delay feels rational.
+---
 
-**[1:00-1:30 CREDIBILITY]** I am Adrian Taffinder. The work is called Subconscious Surgery. I am
-not a therapist, not a guru, not a hype coach. What I do is quite unusual, but it works. I work
-with founders and high performers who have already done a lot of the work and can still feel
-the gap that will not shift. Most of the people I work with have been with me for years, not
-months. I do not think that is loyalty. I think it is that the work holds.
+**[0:00–0:24 HOOK]**
 
-**[1:30-2:45 UNIQUE MECHANISM]** So here is what is different. I do not work from my words. I
-work from yours.
+*Adrian seated, mid-shot, already looking down the lens when the frame opens. No music. No title card. No name super yet.*
 
-Language is my scalpel. I listen to how you frame what is blocking you. Not the story — the
-framing. The exact words you reach for when you describe the thing you will not do.
+Right. Before anything else — think of the thing you're stuck on.
 
-[PAUSE] Because you will tell me. Everybody does. Take the hire you keep re-interviewing in your
-head. Say it out loud enough times and what comes out is rarely "I'm not sure they're right."
-It is closer to "if I pick wrong again, it proves I can't trust my own judgement."
+Don't say it out loud. Say it in your head, the way you'd say it to somebody you trust.
 
-That is the belief. Not the hire.
+*[HOLD — three full seconds. He waits. He does not fill it. Do not cut away.]*
 
-Once it is in your own words, in front of you, it stops being weather and becomes something you
-can work on. And we do not put a flower on top of the weed. If the root stays, it grows back.
+Because the way you just said it — that's the whole thing. That's what I'd be listening to.
 
-So: one real decision. You talk, I take notes, I do not interrupt. Then I give you your own
-words back, in the right order. You score where you actually stand, one to ten. And you leave
-with one concrete move, and the date you will make it.
+*[Hold two seconds on his face before the first cut.]*
 
-**[2:45-3:30 PROOF]** If you are sceptical — good. That is the right starting position, and I
-would rather have it than enthusiasm. Play devil's advocate. Go and do the opposite if you want.
-Prove it to yourself. [PAUSE] And I will tell you the one thing I cannot do. I cannot do the
-push-ups for you. I can be exactly right about what is in the way, and if you do not move,
-nothing moves. That is not a threat, it is the arrangement. You are the one who decides. I am
-only ever giving you my read.
+---
 
-**[3:30-4:00 OFFER]** So we start with one conversation. Forty minutes. Free. One decision —
-the one you have been carrying. You leave with what we found: the belief in your own words,
-where you scored it, and the next move with a date on it. You keep that whether you ever work
-with me or not. Some people go on to work with me properly. Most do not, and I will say so. I
-would rather send you away with the sheet than sell you something you do not need.
+**[0:24–1:09 PROBLEM]**
 
-**[4:00-4:45 CTA]** If you want a straight read on the decision that has been sitting there,
-book the conversation on this page. It is free, and it runs forty minutes. Fill in the short
-form. Tell me the decision. I will tell you honestly whether this is the right tool for where
-you are — and if it is not, I will tell you that too. [look at camera] You already know the
-move. Let's find out what has been stopping it.
+You know exactly what to do.
 
-## Where every line came from
+You just… don't do it.
 
-| Line | Source |
+*[Beat. He's finding the next bit, not reciting it.]*
+
+And then you build a reason on top of it, and the reason's intelligent because you're intelligent — which means the not-doing stops looking like avoidance and starts looking like judgement.
+
+That's the bit that costs. Not the not-doing. The not-doing that looks like wisdom from the inside.
+
+And you already know all this. You could describe the pattern better than I could.
+
+And you still do it.
+
+*[PAUSE — three seconds. Silence is doing work here. Do not cut on it.]*
+
+So it isn't a strategy problem. It isn't a discipline problem. It's a loyalty to an old identity — and if understanding fixed it, you'd be free by now.
+
+---
+
+**[1:09–2:20 CREDIBILITY]**
+
+*Name super on first mention only, lower third, no credentials line beneath it.*
+
+I'm Adrian.
+
+I had a business before this one. Two hundred grand a week, twelve people on the payroll. Then the government changed the rules and the phone stopped. Ninety-eight per cent, overnight.
+
+I kept everybody on through Christmas because I thought we'd win the legal challenge.
+
+We won it. Three months later.
+
+The bank pulled my overdraft the week after I'd cleared it. Hundred and twenty grand of my own money, gone. A year on benefits.
+
+*[PAUSE — four seconds. This is the longest hold in the film. He is not performing recovery.]*
+
+January, two thousand and fifteen. Thirty pounds in my bank account. And I was completely calm.
+
+Not pretending. Calm.
+
+That's when I knew the thing I'd been learning actually worked. Because the number hadn't changed. I had.
+
+Thirty-seven weekly sessions with one man, over fifteen months. Eleven thousand dollars. I've been doing this since two thousand and fourteen, and there are people I've worked with across cohorts since two thousand and eighteen.
+
+And I'm not a licensed therapist. This isn't medical. I'd rather say it than let you assume otherwise.
+
+*[Deliberately no year given for the collapse — see Adrian's list, item 6.]*
+
+---
+
+**[2:20–3:13 UNIQUE MECHANISM]**
+
+What I do is quite unusual, but it works.
+
+Language is my scalpel. I listen to how you frame what's blocking you. The proof is the outcome.
+
+The construction of the sentence — not the story, the construction. That's where the pattern's kept.
+
+Somebody tells me a decision took their peace of mind. And I'll ask them: did that decision take your peace of mind, or did you hand it over?
+
+*[PAUSE — three seconds. He is watching an imagined person answer.]*
+
+And when they say — I handed it over — right. That's the truth. Now there's something we can actually work with.
+
+And we don't put a flower on top of the weed. You take the resistance out, or the root just grows back.
+
+Nothing of mine goes in. I re-sequence what you already said.
+
+---
+
+**[3:13–3:41 PROOF]**
+
+What actually changes is smaller than people expect.
+
+The sentence changes. That's the one I watch for. You come in saying it happened to you, and at some point, no fanfare, you say it differently. That's the turn.
+
+And the thing you've been carrying gets decided. Not gloriously. Just decided.
+
+I'm not going to tell you your revenue doubles. I don't know that. And neither does anybody who tells you it.
+
+*[ADRIAN TO CONFIRM: if the 0–10 self-score at the start of the work, re-checked as you go, is still run today, one sentence goes here — it is the only non-mystical, firewall-clean progress measure the corpus contains, and this beat is the thinnest in the film without it. Documented for 2017 only, so it cannot be stated in the present tense unaided.]*
+
+---
+
+**[3:41–4:12 OFFER]**
+
+You leave with a set of lines built out of your own words, and you say them every day.
+
+I can't do the push-ups for you. I'll tell you exactly what I see. You don't do anything with it, you don't get the results. I'd rather say that now than after you've paid me. **[TRIM FIRST: "I'd rather say that now than after you've paid me." — the same move recurs in the CTA.]**
+
+And the whole thing is built to end. The point is you stop needing me.
+
+This is surgery. You don't operate on yourself.
+
+*[ADRIAN TO CONFIRM: which rung this points at — Mastermind, the twelve-week, or the 1:1. The beat is written to be true of all three. If it is the Mastermind, one line naming the group goes after "every day." Also confirm whether "it's been remote since twenty-fifteen — that isn't a pandemic thing" can be said; it is a strong line resting on weak sourcing.]*
+
+---
+
+**[4:12–4:43 CTA]**
+
+Right. Here's where I'll leave it.
+
+There's a call. On it I'll tell you what I think is actually running underneath. In your words, not mine.
+
+I can't advise you; it'll only ever be my thoughts and feelings on it. And if I don't think it's right for you, I'll say so on the call, not after.
+
+The link's there. It's completely up to you whether you use it.
+
+*[Beat.]*
+
+You're the one who makes the call.
+
+*[Hold three seconds. He does not smile at the end. Cut on black, no outro card, no music sting.]*
+
+*[ADRIAN TO CONFIRM: length of the call and whether it is free. The corpus documents a complimentary 30-minute discovery call in 2017; current status unrecorded. Do not record the bracket — if confirmed, the line becomes "There's a call. Thirty minutes, no charge."]*
+
+---
+
+## WHY THIS VERSION
+
+Six things in Ben's draft the corpus contradicts, and what replaced them.
+
+**"Average client relationship: more than three years."** It exists once in the whole vault, unsourced, in an IP-governance memo, with no dataset behind it — the entire retention evidence base is one person at 11 of 12 payments. It sat in the credibility slot of a paid ad aimed at people the corpus describes as "testing for diagnostic precision." Struck. Replaced with the true, cited version: *people I've worked with across cohorts since two thousand and eighteen.*
+
+**The "Decision Audit," its four steps and its forty minutes.** The product doesn't exist. Worse, its third step — score the belief one to ten, logged — is the actual protected diagnostic, banned from every public surface by an Adrian-direct ruling. The script manufactured an offer that isn't real and leaked one that is. Both gone. The mechanism beat now says only what is cleared to be said, and says it in full, all three clauses.
+
+**No origin story.** Ben asked question 5.2 and shipped 4:45 without answering it. The £200k week, the 98% overnight, Christmas on the payroll, the High Court win three months late, £120k, and thirty pounds in the bank while completely calm — all Adrian's own biography, all clean once the family chapter comes out, and the strongest asset in the corpus. It now carries the middle third of the film.
+
+**"Every capable founder I meet."** That's the aspirational buyer. The documented paying base is a different demographic entirely, and no file reconciles them. The fix costs nothing: the corpus's audience definition is a psychographic — unable to shift a pattern despite intelligence and prior effort — which fits both. No demographic noun appears anywhere in this script.
+
+**Four imperatives in the CTA.** From a man whose documented register treats *what should I do* as the symptom being treated. The close is now a door with his own hedge grammar in front of it.
+
+**"I am not a therapist" used as a brag.** The word is banned outright in copy. The boundary still has to be stated, so it is stated once, plainly, as the compliance line it is — and the volunteering of it does the trust work the brag was reaching for.
+
+The spine is the conversational draft's, because its hook performs the one sanctioned public claim instead of asserting it. Grafted in: the £30 block and the peace-of-mind exchange with its four-beat rhythm, the flower-and-weed line, *nothing of mine goes in*, and *the not-doing that looks like wisdom from the inside.* Three lines the judges flagged in that spine are cut: *that's the only difference that matters* (unhedged absolutism), *that's the whole public version* (points at the firewall inside the ad), and the unsayable three-clause disqualifier.
+
+---
+
+## LINES CARRIED OVER FROM BEN
+
+**"That is not a strategy problem. It is not a discipline problem. It is a belief running underneath the logic."**
+The closest thing in his draft to the corpus's actual separating insight, and structurally right — anaphoric doubling is his documented shape. It survives at 1:05, contracted to spoken rhythm and landing on a pre-cleared hook: *It isn't a strategy problem. It isn't a discipline problem. It's a loyalty to an old identity.*
+
+**"You already know the move."**
+The right sentiment, and nearly the shape of the cleared public line *you're the one who makes the call.* It survives twice — as *and you already know all this* at 0:55, and as the final line of the film.
+
+**"The right starting position is scepticism. Good."**
+Correct instinct for this audience, and it is why the proof beat here refuses to overclaim rather than reaching for the $65M book deal. Not quoted directly, because the corpus's own answer to doubt is stronger and is already Adrian's: he invites you to disprove him. Held in reserve as the first line of a companion cut.
+
+**"Name the belief — the exact wording underneath how you talk about the decision."**
+The only part of his four-step invention that hits the real mechanism. It *is* "language is my scalpel," restated as an action. It survives as the mechanism beat's spine: *the construction of the sentence — not the story, the construction.*
+
+---
+
+## WHAT ADRIAN STILL HAS TO SUPPLY
+
+1. **Which offer does this point at — the Mastermind, the twelve-week, or the 1:1 retainer?** The corpus contradicts itself on whether the Mastermind teaches the method or only the concepts, and a VSL that converts against a one-operator retainer builds a queue you can't serve.
+2. **Is the call still thirty minutes, and is it still free?** One line in the CTA cannot be recorded until this is answered.
+3. **Is the first session with a new person still the full intervention, rather than a sales consultation — and is it paid?** If it is, it's a rare offer structure and it belongs in the film.
+4. **Is the 0–10 self-score at the start, re-checked as the work goes on, still run today?** If yes, it is the single best proof device available to this ad and needs no mechanism disclosure. If no, it cannot be described in the present tense.
+5. **Can I say the practice has been remote since 2015 — not a pandemic adaptation?**
+6. **What year did the solar business collapse?** The vault dates it twice, three years apart, and the two datings can't both be true. The script currently gives no year.
+7. **Is there a guarantee?** Nothing in the corpus records one. My read is no, and that we don't manufacture one — *I can't do the push-ups for you* is stronger for this buyer than a refund promise.
+8. **Do you want "I'm not a licensed therapist, this isn't medical" spoken on camera, or carried as an on-screen line?** Spoken, it becomes a trust signal. On-screen, it's compliance furniture. My read is spoken.
+
+No price is named anywhere in the film. Nine mutually inconsistent figures exist in the vault and the live one is unrecorded — and the doctrine on numbers is to state them on the call, then stop talking.
+
+---
+
+## DELIVERY NOTES
+
+**The voice track is the brand.** Everything else is subordinate and interruptible. Cut to B-roll rather than show him partially framed, and never break the audio to do it. Cut only when meaning, emotion or evidence changes — not on a metronome.
+
+**The three held pauses are load-bearing, not breathing room.** Silence after a hard line is doing work. The hook pause has to be genuinely held: he asks the viewer to think of something, and then he waits, on camera, doing nothing. If that hold gets trimmed in the edit, the hook stops working, because the whole move is that the viewer's own sentence is the diagnosis.
+
+**"Right." is a gear change, not a greeting.** Four of them, four different jobs — opener, turn, confirmation, close. None of them cheerful.
+
+**The collapse is told flat.** No rue, no war story, no relish in the numbers. The line that matters is not the hundred and twenty grand, it's *thirty pounds in my bank account, and I was completely calm.* That must be said as a plain fact about a Tuesday. *Not pretending. Calm.* is two beats, dropped in weight, not lifted. If it gets any performance at all it becomes a boast and stops being believable. Then *the number hadn't changed. I had.* — and immediately move on. Do not let it land as a moment.
+
+**The peace-of-mind exchange is recalled speech, not drama.** He's reporting a thing that happens in a room, quoting two people including himself. The question gets asked lightly. The *right — that's the truth* is fast and unceremonious. He books the insight and moves; he does not celebrate it.
+
+**Do not sell "wisdom from the inside."** It is the cleverest line in the film and will collapse if it is pointed at. Say it as an aside and carry on.
+
+**Let him think.** There is one marked hesitation — *You just… don't do it* — and it should be real. He drops into thought mid-sentence; that tic is documented and it is what makes the register readable as diagnosis rather than pitch. A fluent take is a worse take.
+
+**Register throughout: full empathy, zero rescue, in the same breath.** Warm, unhurried, completely unwilling to help you feel better about it. Nothing in here should sound encouraging.
+
+**End downward.** Voice drops on *you're the one who makes the call*, three seconds of held frame, no smile, no music sting, no outro card. He has offered a door and he isn't going to walk you through it.
+
+**Craft caveat, so nobody mis-sells this internally:** the vault's own measured finding is that every editing rule is already obeyed on essentially every SS video and reach still collapsed thirtyfold. Craft is not the lever; distribution is. This script is a paid-traffic asset and should be judged on calls booked, not on plays.
+---
+
+# PART 4 — META RE-CHECK ON THE NEW SCRIPT
+
+The audit in Part 1 was run against **Ben's** script. The rebuild is a different asset with a
+different risk profile, so here is the delta. This is my own read, not a second five-lens run.
+
+**What it removes.** The one finding that survived adversarial review — *"It is costing **you**
+months and **money you** have never written down"* — is gone, along with the entire
+second-person-assertion spine. The hook and problem beats are now first- and third-person. On
+Personal Attributes, which is the policy that actually rejects coaching ads, **the new script is
+materially safer than Ben's.** That is the convergence noted in Part 2: being more himself makes
+the ad safer.
+
+**What it adds, and you should see it before filming.**
+
+| New exposure | Read |
 |---|---|
-| "Language is my scalpel. I listen to how you frame what is blocking you." | The mandated public framing, verbatim — `ss-processing-statement-algorithm.md` frontmatter; `cross-project-methodology-map.md` §0 |
-| "When you were born, you had an operating system… software installed by experience" | 2019 practice corpus, quoted in `intake-session-structure.md` §1 |
-| "We do not put a flower on top of the weed. If the root stays, it grows back." | 2019 practice corpus, `intake-session-structure.md` §6 Citation 2 |
-| "What I do is quite unusual, but it works." | Same source, §1 |
-| "I cannot do the push-ups for you." | P4, `cross-project-methodology-map.md` §1 — forensically verified transcript `00000647` |
-| "Play devil's advocate. Go and do the opposite if you want. Prove it to yourself." | `ss-language-signature.md` §1 #17, citing a *declared* source (mastermind-32-testing) |
-| "You are the one who decides. I am only ever giving you my read." | The non-advisory sovereignty register, §1 passim |
-| "I do not work from my words. I work from yours." | `methodology-canon.md` IP-1: *"The practitioner re-sequences; he does not invent"* |
-| "Most of the people I work with have been with me for years, not months." | `methodology-canon.md` IP-1 — deliberately worded as the non-numeric form pending substantiation |
-| The hire / re-interviewing / "if I pick wrong again" passage | **Ben's.** Kept intact — it is the best thing in his draft and it cleared the audit twice. |
+| **Money figures — £200k/week, 98%, £120k, £30 in the bank** | Autobiographical, past tense, about his own former business. That is the *safe* form of a money claim: it asserts nothing about the viewer and promises nothing. But it raises the money density of a coaching ad substantially. **Do not put any of these figures on a burned-in card, in primary text, or in a thumbnail** — stripped of the narrative frame, OCR reads "£200,000 a week" as an income claim, which is the get-rich-quick pattern. Same logic as the quote-card warning in Part 1. |
+| **"This is surgery. You don't operate on yourself."** | Stronger line than the nickname, and slightly higher clinical-coherence risk, because the metaphor is now a full sentence rather than a name. It is well mitigated — *"I'm not a licensed therapist. This isn't medical"* sits two beats earlier. **Keep those two in the same cut.** If the film is ever trimmed, they travel together or both come out. |
+| **"A year on benefits"** | First-person, past tense, his own status. Safe. Would not be safe in any second-person form. |
+| **Substantiation duty moves** | Off the (struck) three-year retention claim and onto the Photon Utilities figures and the 2014 start date. Those are documented in `mea-business-arc-2014-2017.md` and `ss-methodology-stack.md` — but the **collapse year is given inconsistently in the vault, three years apart.** The script gives no year, which is the right call until that is resolved. |
 
-## What Adrian has to decide or supply
+**Unchanged and still binding:** the landing page and form-field guidance, the SRT requirement,
+and the no-scrubs/no-scalpels visual rule from Part 1 all apply to this script exactly as they
+applied to Ben's.
 
-1. **The three-year claim.** Is it a computed average from records, or an impression? The script
-   currently uses the safe non-numeric form. If it is computed and documented, the number is
-   stronger — say so and it goes back in.
-2. **"I am not a therapist" — keep or cut?** The Meta audit says keep (licensure cover).
-   `ss-language-signature.md` §8 bans the word. My read is keep. Your call.
-3. **The one line closest to the firewall:** *"Then I give you your own words back, in the right
-   order."* It describes the principle, not the mechanism — no statement grammar, nothing
-   somatic, nothing procedural. I judge it inside the line, but it is the closest the script
-   goes, so you should see it flagged rather than find it later.
-4. **Does the call actually run this way?** The script now promises: 40 minutes, free, you talk
-   first, you score one to ten, you leave with a move and a date, you keep the sheet. Under
-   Law 7 that is now a commitment. If the real first conversation is longer or shaped
-   differently, change the script — not the session.
-5. **Not answerable from this repo:** price ladder, what the Kajabi mastermind includes, whether
-   there is a paid tier immediately behind the free call. `companies/` is git-ignored in this
-   mirror.
-
-## Delivery notes
-
-- The sceptic line lands **dry**, not defensive. It is the moment trust is earned.
-- "I cannot do the push-ups for you" is the only place to allow a half-smile. It is the most
-  human line in the script and it does the disqualifying work without any hard edge.
-- The operating-system passage is the one place to slow right down. It is the idea most people
-  have never heard framed that way.
-- Do not over-perform "that is the belief, not the hire." Flat, and let the pause carry it.
-- **Production hygiene:** these notes and every bracketed cue stay out of the SRT, the primary
-  text, the description, the page and any burned-in card. Keep the voiceover script in a
-  separate file from this one.
+**One line the compliance and doctrine layers disagreed on, now resolved.** The audit said keep
+*"I am not a therapist"* (licensure cover, the strongest asset at human appeal).
+`editing-doctrine-2026-07-29.md:257` bans the word "therapy" in copy. The rebuild threads it:
+**"I'm not a licensed therapist. This isn't medical."** — the boundary is stated, the licensure
+cover is kept, and "therapy" never appears as the category word for the work. That satisfies
+both, and it is the version I would ship.
