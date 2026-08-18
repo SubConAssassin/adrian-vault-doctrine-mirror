@@ -124,8 +124,11 @@ cross-model transport, and the overall stack respectively.
 - **`link-integrity-check.py` 270k cleanup** — its own project.
 - **`localhost/` mangled-path artifacts** — a recurring AG output-path bug created garbage-named dirs holding
   real content: `ashta-app-recovered/` (505MB Ashta deliverables + app + corpus — recovered, needs canonical
-  home, likely `companies/ashta/`), and `localhost/Users/` (256 Kajabi PDFs, likely stray dups of `SubConMaster/`
-  — verify before deleting). **Pattern worth a guard:** AG commissions should validate `output_path` is real.
+  home, likely `companies/ashta/`), and `localhost/Users/` (256 Kajabi PDFs — 🔴 **NOT dups. DO NOT DELETE.**
+  ⚠️ CORRECTED 2026-08-18: `~/Documents/SubConMaster/` no longer exists on M1, so these are the ONLY
+  Kajabi PDFs left on this machine. All 256 verified as valid PDFs (`%PDF` header, 256/256). The live
+  copies are in iCloud + `/Volumes/M2-Storage/from-M1-housekeeping-2026-07-27/SubConMaster/`; these are
+  a third, independent copy of a corpus that already had one near-miss. Protected by AGENTS.md §15). **Pattern worth a guard:** AG commissions should validate `output_path` is real.
 
 ## 8. Revision history
 
