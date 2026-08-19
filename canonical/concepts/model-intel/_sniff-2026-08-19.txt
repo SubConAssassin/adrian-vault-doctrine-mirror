@@ -1,1 +1,2 @@
+- [460pts] Cursor launches Origin, GitHub alternative  (https://cursor.com/changelog/origin-code-hosting)
 - [359pts] GPT 5.6 Sol is the best "vision" model OpenAI ever released  (https://blog.roboflow.com/openai-gpt-5-6/)
