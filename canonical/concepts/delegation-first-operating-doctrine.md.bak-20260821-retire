@@ -125,7 +125,7 @@ For agy specifically: prepend "WRITING/RESEARCH TASK. Do NOT crawl the vault, do
 ## §7 — The Decision Gate (the behavioural trigger)
 
 **§7.0 — LOCAL PRE-PASS — run FIRST, before "WHO can I give this to?" (zero tokens to the team).** Pressure-tested 2026-06-06 by a codex+grok red-team: the bare reflex fires too early. Three local checks come BEFORE the gate:
-> 1. **FIREWALL PRE-SCAN.** Scan the task + a sample of every referenced source against the firewall list (personal-relationship material · Yoga-public · Schwartz-on-SS · client PII · legal case numbers / dollar figures · voice-critical markers). ANY hit → **Claude owns it; the team receives only redacted sub-queries, or nothing.** A prescriptive prompt embeds source excerpts, so "delegate by default" can leak firewalled content in plaintext to the $0 team — this scan is the guard.
+> 1. **FIREWALL PRE-SCAN.** Scan the task + a sample of every referenced source against the firewall list (Chelsea-ex · Yoga-public · Schwartz-on-SS · client PII · legal case numbers / dollar figures · voice-critical markers). ANY hit → **Claude owns it; the team receives only redacted sub-queries, or nothing.** A prescriptive prompt embeds source excerpts, so "delegate by default" can leak firewalled content in plaintext to the $0 team — this scan is the guard.
 > 2. **CONSTRAINTS-IN-PLAY.** Name every hard rule / ledger fact / boundary the task touches. **≥3 from distinct canonical locations → Claude owns the synthesis** (the team can't hold the interacting set; it returns a clean-looking matrix that quietly violates one rule, and a token-thin verify waves it through).
 > 3. **DELEGATION-TAX.** If Claude can finish safely in less time/tokens than prompt+launch+wait+read+verify, **Claude does it directly.** No routing ceremony for small bounded judgment work.
 
@@ -141,7 +141,7 @@ If AMBER/RED and the answer is borderline → delegate. When in doubt, delegate 
 
 The team confabulates in the editorial/title layer even when extraction is grounded. On every return:
 1. Spot-check claims against sources (grounding).
-2. Run the firewall (personal-relationship material never; no Yoga publicly; no Schwartz on SS site; de-woo on Ashta; etc.).
+2. Run the firewall (Chelsea-ex never; no Yoga publicly; no Schwartz on SS site; de-woo on Ashta; etc.).
 3. Cross-verify high-stakes output via a *different* model family (numeric requirement for grok, §14.6).
 4. Only then promote / ship / report to Adrian.
 
