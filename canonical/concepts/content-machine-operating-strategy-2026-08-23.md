@@ -115,8 +115,51 @@ accountant is blind, a reel can go out four times, and no rotation rule can be e
 
 ### The single most important correction
 **A YouTube channel already exists: 154 videos, 292 subscribers, dormant ~1 year.**
-This is not a cold start. It is a revival with standing, an existing upload history, and 154
-videos of accumulated search surface. Every plan written on "no YouTube presence" is mis-framed.
+This is not a cold start. Every plan written on "no YouTube presence" is mis-framed.
+
+#### What dormancy actually costs (verified against YouTube's own docs, 2026-08-23)
+- **There is no recommendation penalty for inactivity.** YouTube evaluates each video individually;
+  an underperforming video does not penalise the channel. There is no "gap tax" and no "comeback
+  multiplier" — the first upload is scored like any other. (support.google.com/youtube/answer/16559651)
+- **What dormancy DOES cost:** monetisation may be switched off after 6 months of no uploads or
+  Posts (a Partner Program activity rule, not a discovery penalty — irrelevant at 292 subs); and
+  since April 2026 **push notifications are cut for subscribers who have not watched in ~a month.**
+  After a year dark, assume almost none of the 292 get a phone ping.
+- **The subscriber count is not the audience.** It counts historical subscribe events. Unique
+  Viewers in the Audience tab is the real number. Read that before planning anything.
+- 🔴 **REAL RISK, not folklore:** a 17-year, 58k-sub channel dormant five years was **terminated in
+  early 2026** for "spam, scams, commercially deceptive content" after a burst of ~10 uploads —
+  an apparent automated false-positive for account takeover. **Do not dump a batch on day one.
+  Space uploads, keep the Google account / 2FA / country consistent.** One weekly upload, never a burst.
+- Folklore explicitly NOT in any YouTube doc: the "90-day algorithm memory", "the channel is
+  shadowbanned for being quiet", "one great video reignites everything". All [NOT FOUND].
+
+#### Publish-first, not audit-first — the decision rule
+Re-optimisation pays only on videos that **still get impressions**. A dormant 292-sub library does
+not. The famous re-opt case studies (+32% views, +140% subs) were run on live million-sub channels
+whose back catalogue was still being served. Copying that onto this channel wastes weeks.
+
+**Cap the channel-surface prune at 72 hours, then ship.** Per video, last 365 days in Studio:
+- **KEEP AND RE-PACK** only if on-brand AND in the top quintile of impressions AND CTR is weak.
+- **KEEP AND IGNORE** if on-brand and true, even at tiny views — the library is depth for a new viewer.
+- **UNLIST** if off-brand, low quality, or it is the first thing a $25k buyer would see. Links still
+  work, stats survive, it leaves search/related/Videos tab.
+- **DELETE only for policy or legal.** Deleting removes the video from viewers' watch history, which
+  severs a recommendation connection to people who already watched you.
+
+#### The revival sequence
+Week 1: analytics export (Unique Viewers, not subs) · banner/avatar/About/links · unlist the
+pollutants · playlists + Home sections · a <60 s trailer cut from existing footage · one Posts-tab
+post · **then** long-form 1 on day 4, and two Shorts on days 5 and 7 with Related Video pointing at it.
+Weeks 2–3: same pillar, cluster don't scatter. Weeks 4+: step up to the 47-minute class **only if**
+average-percentage-viewed on the 13-minute files is not a cliff.
+**Start with `ss-solo-mid` (avg 13 min), not the 76-minute multi-person files.** A 13-minute video
+that holds is a better first signal than a 76-minute file that dies at minute 8.
+Re-packing happens in the gaps between uploads, never instead of them, and one variable at a time
+(title OR thumbnail, then watch 3–7 days) so you can tell which lever moved.
+
+**Do not optimise for the Partner Program.** At 292 subs you are ~708 subscribers and 4,000 watch
+hours short, and YouTube is an acquisition channel for a $997–$50,000 ladder, not an ads play.
 
 ### Order of operations: long-form FIRST, clips the same week
 Not shorts-first. The evidence:
