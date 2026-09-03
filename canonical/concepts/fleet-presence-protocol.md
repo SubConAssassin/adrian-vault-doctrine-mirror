@@ -271,9 +271,34 @@ Update this file, bump version, add a revision_history line, continue.
 This is doctrine, not law — it evolves with operating experience, same
 as `claude-ceo-operating-doctrine.md`.
 
+## 12. Shared-resource claims (added 2026-09-03) — see `fleet-resource-claim` skill
+
+**Reading §6-§8 (who runs where) is not the same as knowing what's live on a shared box right now.**
+2026-09-03: an M1 session ran an image-generation stack on the PC's GPU (12.1 GB / 100% of the 16 GB
+card) without checking this file or `working/claude-coordination/` first, contending with M2's
+ingestion pipeline on the same box. Adrian caught it by noticing the PC looked idle when it should
+have been busy, and asked directly whether M2 had been consulted. The gap wasn't a missing rule —
+CLAUDE.md §2 item 6 already says read `working/claude-coordination/` on boot — it was that this
+happened mid-session, well past boot, with no re-check before touching new shared hardware.
+
+**The rule, generalised beyond the PC:** before starting anything that holds a shared resource
+(GPU, a disk migration, a deploy target, a lock another session's grind depends on), post a written
+claim to `working/claude-coordination/`, push it with `tools/bridge-notify.sh`, verify the
+resource's state with a LIVE check (never a remembered or reported one — reported numbers go stale
+within minutes), and post a release note the moment you're done. Full protocol, the four-step
+sequence, and what counts as a shared resource: `~/.claude/skills/fleet-resource-claim/SKILL.md`.
+
+This section doesn't restate §6-§9 (who owns which seat) — it governs the moment ANY session,
+regardless of assigned role, is about to touch a resource another session may be mid-use of.
+
 ---
 
 revision_history:
+- 2026-09-03 — §12 added (Adrian-direct, after an M1 session ran the PC's GPU without checking this
+  file or `working/claude-coordination/` first, contending with M2's ingestion pipeline; Adrian's
+  own words: *"this is the type of coordination and collaboration that I'm looking for. Can we look
+  at having this as a skill or a protocol when interacting?"*): shared-resource claim protocol,
+  pointer to `~/.claude/skills/fleet-resource-claim/SKILL.md`. No prior section altered.
 - 2026-07-21 — created (Adrian-direct, 2026-07-21 20:3x WITA session): mechanised the PRESENT/GRIND boundary after Adrian's explicit instruction to stop depending on ad-hoc memory. Documents `tools/fleet-mode.py` + scheduler LaunchAgent + mem-guardian mode-awareness, the 00:00-09:00 WITA default window, the idle interlock, the manual-flip trigger-phrase contract, the 5-node role map, the M1-LARGE/PC-FAST two-seat split, and the standing M2→PC SSH-key blocker.
 
 — Claude, CEO of the stack, 2026-07-21
