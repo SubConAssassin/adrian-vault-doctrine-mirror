@@ -109,8 +109,10 @@ Fable 5.1 is genuinely the strongest model on the board (Artificial Analysis ind
 It is still **not** our default, and the adversarial pass showed the *reason* we had written down
 was the weak one. The cost argument is contested; the **compatibility** argument is not:
 
-- **It is a Covered Model requiring 30-day data retention.** It **400s on every request** under
-  zero-data-retention.
+- **It is a Covered Model requiring 30-day data retention by default.** A request from an
+  organization or workspace configured for zero-data-retention **400s unless Anthropic has
+  expressly authorized Fable under that arrangement** (including eligible Enterprise Frontier
+  Safeguards customers).
 - **It 400s on forced `tool_choice`** (`any` / `tool`), including via `count_tokens` and Batches.
 - **No fast mode**; Opus 5 has it. **Priority Tier is not a difference**: the current service-tier
   table excludes both Fable 5.1 and Opus 5.
@@ -134,7 +136,7 @@ The Fable-specific behaviour guide also warns of less parallel tool batching in 
 fewer progress messages, and fewer search/retrieval calls at `low` effort.
 
 **The cost picture, stated honestly because two legs disagreed.** Artificial Analysis measures
-Opus 5 at index **63 for ~$2.34/task** against Fable 5.1's **66 for ~$3.76** — 95% of the score for
+Opus 5 at index **63 for ~$2.34/task** against Fable 5.1's **66 for ~$3.69** — 95% of the score for
 62% of the cost — and AA's Fable entry is a *"with fallback"* system that routed ~4% of its output
 tokens to Opus 4.8/5 on safety escalations. **The widely-repeated "1.7× output tokens, +20% cost per
 task" claim is secondary-sourced and was NOT FOUND in Anthropic's own material by three independent
@@ -184,7 +186,7 @@ Claude Max**. And **Astra is still refused on this account after the upgrade** (
 
 ### 2.1 What our account actually has
 
-Read from `~/.codex/models_cache.json` (cache written 2026-09-03 19:27) and a live banner probe.
+Read from `~/.codex/models_cache.json` (latest cache fetch 2026-09-04 06:32 UTC) and a live banner probe.
 
 | Priority | Slug | Context (CLI) | Role |
 |---|---|---|---|
@@ -194,6 +196,7 @@ Read from `~/.codex/models_cache.json` (cache written 2026-09-03 19:27) and a li
 | 8 | `gpt-5.6-luna` | 272,000 | classification / extraction |
 | 12 | `gpt-5.5` | 272,000 | previous generation |
 | 16 / 23 | `gpt-5.4`, `gpt-5.4-mini` | 272,000 | legacy |
+| 26 | `gpt-5.3-codex-spark` | 128,000 | ultra-fast, text-only, real-time coding preview |
 | 43 | `codex-auto-review` | 272,000 | approval review |
 
 **`gpt-reserve` is solved, from our own cache.** It carries `"visibility": "hide"`,
@@ -205,6 +208,33 @@ by the CLI banner. **Treat it as an opaque private alias. Do not route work to i
 **⚠️ The context number is the CLI's, not the API's.** The API lists ~1.05M for the GPT-5.6 family.
 The Codex CLI caps the session at **272K raw** (400K minus 128K reserved output), roughly 258K
 usable, and auto-compacts near 200K. **Route against the harness limit, never the spec sheet.**
+
+#### `gpt-5.3-codex-spark` — interaction-speed specialist, not the default workhorse
+
+OpenAI launched Spark on 2026-02-12 as a **research-preview, smaller version of
+GPT-5.3-Codex**, and its first model designed for real-time coding. OpenAI states **more than
+1,000 output tokens/second**, text-only input, 128K context, ChatGPT Pro access, separate
+model-specific limits that do **not** count against standard Codex limits, and no API access at
+launch. It is a separate model, not GPT-5.3-Codex or a current model with Fast mode enabled.
+Official sources: [launch entry](https://learn.chatgpt.com/docs/changelog) ·
+[speed distinction](https://learn.chatgpt.com/docs/agent-configuration/speed) ·
+[current model card](https://learn.chatgpt.com/docs/models).
+
+Our 2026-09-04 ChatGPT-auth catalogue confirms: `supported_in_api: false`; text input only;
+efforts `low|medium|high|xhigh` with **high default**; unified shell, apply-patch and search tool
+support; **128,000 raw context with a 95% effective-window setting (~121,600)**; no extra speed
+tier because Spark itself is the speed tier. Its model-specific harness prompt says sampling is
+~1,500 tokens/second and deliberately optimizes for synchronous pairing: few tool calls, minimal
+exploration, one-shot patches, and no tests/verification unless explicitly requested. Treat the
+1,500 figure as catalogue configuration, not an independently measured SLA.
+
+**Routing:** use Spark when human-turn latency is the dominant constraint and the task is tightly
+bounded — small UI/CSS tweaks, a precise local edit, a short bug fix, a small test or snippet, or
+rapid pair-programming iterations. Do **not** route architecture, ambiguous diagnosis, repository-
+wide discovery, migrations/refactors, security review, long autonomous jobs, image-dependent work,
+or verification-heavy/high-stakes changes to it. Use Sol for complex/open-ended work, Terra for
+the everyday all-rounder, and Luna for clear repeatable/high-volume work. Spark's separate quota
+makes it a useful extra interactive lane; it does not replace the Sol default.
 
 **Pricing correction:** OpenAI first-party lists **GPT-5.6-Sol at $4.00 in / $0.40 cached / $20.00
 out**, flagged promotional at least through 21 Nov 2026. Terra is $2/$12, Luna $0.20/$1.20. Our
