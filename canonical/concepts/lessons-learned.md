@@ -3930,3 +3930,69 @@ the live file before anyone trusts a full automated regeneration of this file ag
 **Promoted to:** `canonical/concepts/claude-ceo-operating-doctrine.md` §5.5
 
 **Tags:** `discovery`, `process-change`
+
+---
+
+## Batch: 2026-09-04 fleet/coordination session (M2 session `d10f8c`, promoted by M1)
+
+**Provenance:** staged by M2 at `working/_m2-staging/2026-09-04-shutdown-lessons-d10f8c/` and handed to
+M1 for promotion (M2 cannot write `canonical/`). Entries preserved in M2's compact format rather than
+recast into this file's longer prose form — they are dense, tagged and specific, and rewriting risked
+distorting measured figures. **LL-010 and LL-013 were independently verified first-hand by M1 the same
+evening** (M1 reproduced the remote-control unreachability twice and separately built + live-fire-tested
+the polling-based watcher on the M1 side). LL-011/012/014 are M2's measurements, not re-verified by M1.
+
+### LL-2026-09-04-010 — launchd `WatchPaths` does not fire on an SMB mount
+`tags: [launchd, smb, coordination, notify]`
+The coordination auto-notify LaunchAgent watched `working/claude-coordination/` on the
+network-mounted vault via `WatchPaths`. **fsevent watches do not fire across SMB**, so it never
+triggered — while being labelled COMPLETE and appearing loaded. **Fix:** replace `WatchPaths` with
+`StartInterval` (60s polling); the watcher script diffs a seen-list per fire and is
+trigger-agnostic, so polling is a drop-in. Verified live-fire: push in **42 s**, no manual call.
+**Generalisation:** any launchd job watching a path on the vault mount is silently inert.
+
+### LL-2026-09-04-011 — m4 runs Apple rsync 2.6.9; use `--protocol=29`
+`tags: [rsync, m4, fleet]`
+Transfers from M2 (rsync 3.4.4) to/from m4 fail with `rsync error: error in rsync protocol data
+stream (code 12)`. Pass **`--protocol=29`** and an **absolute** remote path (not `~`). Measured
+throughput M2↔m4 ~41 MB/s.
+
+### LL-2026-09-04-012 — SQLite cannot open `content-index.db` over SMB (error 14)
+`tags: [sqlite, smb, content-index]`
+`sqlite3 "file:...?mode=ro"` against the vault over SMB returns *"unable to open database file
+(14)"* — WAL requires real shared memory the mount cannot provide. **Do not** reach for
+`immutable=1` (reads past a live `-wal`). **Correct route from M2: `ssh m1max` and query it
+locally on M1.**
+
+### LL-2026-09-04-013 — `claude --remote-control <name>` does not name the session
+`tags: [claude, remote-control, coordination]`
+The name argument is **not** the listed session name; sessions auto-name (`subconm2-42`,
+`subconm2-7c`). Reproduced twice. Searching `ListAgents` for the name you passed finds nothing and
+reads as total failure. **Address the endpoint by its LISTED name.** Related: an **idle** Remote
+Control session with no human at the keyboard did not drain its message queue (3 messages, ~25 min,
+0.1% CPU) — a registered endpoint is not automatically a usable channel.
+**M1 addendum, same evening:** M1 independently attempted the inbound hop to `subconm2-42` twice
+(bare name, then ref-qualified) — both returned *"not reachable"*. M2's genuinely-active working
+session (`d10f8c`) did not appear in M1's `ListAgents` at all. **So the limitation is broader than
+idleness: a normal interactive session on another node is not cross-machine discoverable, and even
+a `--remote-control`-registered one is not a usable channel unless something actively drives its
+turn loop.** Cross-session `SendMessage` between two live sessions on the SAME machine does work —
+verified M1↔M1 the same evening.
+
+### LL-2026-09-04-014 — `du` silently under-reports volume-root metadata stores
+`tags: [disk, du, diagnosis, broken-probes]`
+On m4, `du` accounted for only 45 GiB of 414 GiB used and produced **no error** for
+`.Spotlight-V100`, `.fseventsd`, `.DocumentRevisions-V100` — they are absent from its output
+entirely (root-only `drwx------` at the Data volume root). Before concluding "the space is
+missing", rule out **by measurement**: `diskutil apfs listSnapshots` (snapshots), `lsof +L1`
+(deleted-but-open handles), then check those three stores explicitly. A disk that is 96% full with
+a 45 GiB tree is metadata, not content.
+
+### LL-2026-09-04-015 — §15 bans DELETING, not MOVING — a safety rule became an excuse
+`tags: [process, disk, capacity, adrian-direct]`
+A node was left at 97% full and merely *reported*, citing the never-write-a-reclaim-script rule.
+Adrian-direct: *"Your job is to manage the hard drives... You shouldn't be asking. You should be
+managing it."* §15.1 forbids **deletion**; the sanctioned method — copy → checksum-verify → only
+then remove source — was already written down. **A node above ~90% is M2's to fix immediately,
+without asking.** Corollary from the same exchange: *"you need to be sending messages to resolve
+this rather than just abandoning it"* — unreachable is a **routing decision**, not a conclusion.
