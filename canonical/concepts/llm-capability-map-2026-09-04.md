@@ -567,9 +567,11 @@ and therefore **Adrian's**, not an agent's (§9).
   tower and MTP head preserved: independently measured at **28.1GB peak for load + short probe**
   and **34.46GB whole-process peak at 16K context with BF16 KV cache** on an Apple M3 Ultra. Its
   hardware fit is separately confirmed on the exact fleet class: an 8-bit oMLX run on an **M1 Max
-  64GB** measured **28.3GB at 1K, 29.6GB at 4K, 30.1GB at 8K, and 30.9GB at 16K**. That second run
-  is a generic Qwen3.8-27B 8-bit build, not proof of the exact Alis tensor mix, so retain the
-  exact-build **34.46GB** figure as the conservative 16K planning number. Its
+  64GB** measured **29.64GB MLX-active / 32.51GB whole-process peak at 4K**, and **30.93GB
+  MLX-active / 32.51GB whole-process peak at 16K**; total system memory in use peaked at
+  **54.38GB** during the 16K run. That second run is a generic Qwen3.8-27B 8-bit build, not proof
+  of the exact Alis tensor mix, so retain the exact-build **34.46GB** figure as the conservative
+  16K model-process planning number. Its
   ≈103K-token English/Korean/code perplexity was statistically indistinguishable from BF16, while
   the BF16 reference itself peaked at 51.1GB before meaningful context and is therefore a paper fit,
   not a sensible 64GB operating point. At the native 262K window, use 4-bit KV cache: cache alone is
@@ -654,7 +656,7 @@ to read it.** The engine ingests it in pieces; nothing is stuffed into a context
 | ID | Defect | Disposition |
 |---|---|---|
 | D1 | agy pinned a generation behind | ✅ **FIXED.** Repinned `gemini-3.8-flash-high`, verified live. Risk model corrected: headless now errors on an unknown slug. |
-| D2 | agy wrapper masked CLI failures as THIN rc=0 | ✅ **FIXED LOCALLY 2026-09-04.** The direct CLI already reported `RESOURCE_EXHAUSTED` / 429, `Individual quota reached`, and a reset timer; since v1.1.9 print mode writes server failures to stderr and exits non-zero. `agy-ask.py` discarded the PTY child status and did not propagate its own status; both layers now preserve non-zero exits. Empty-success remains `AMBIGUOUS_EMPTY`, never a quota diagnosis. |
+| D2 | agy wrapper masked CLI failures as THIN rc=0 | ✅ **FIXED LOCALLY 2026-09-04.** The direct CLI already reported `RESOURCE_EXHAUSTED` / 429, `Individual quota reached`, and a reset timer; since v1.1.1 (2026-07-10) print mode writes server failures to stderr and exits non-zero. `agy-ask.py` discarded the PTY child status and did not propagate its own status; both layers now preserve non-zero exits. Empty-success remains `AMBIGUOUS_EMPTY`, never a quota diagnosis. |
 | D3 | agy fabricates citations | ❌ **NO FIX.** 3.8 makes no such claim. Mitigation: read links from `groundingChunks` metadata, not from generated inline markdown. **Keep must-cite research on `grok-web`.** |
 | D4 | "Grok 54% hallucination" | 🔧 **NUMBER STALE.** 4.6 measures **34.3%** (aggregator-sourced, vendor disagrees on direction). **Replace the number, keep the cross-check rule.** |
 | D5 | Grok Build 402 + lapsed OAuth | ❌ **NO MODEL FIX.** Account state. Do not route around it via a metered xAI key. |
