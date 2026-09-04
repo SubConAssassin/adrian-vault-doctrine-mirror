@@ -7,6 +7,7 @@ status: CURRENT
 date: 2026-09-04
 author: Claude (Opus 5) — CEO-of-the-stack, with a full 8-way CLI team fan-out + a 30-agent verification workflow
 as_of_utc: 2026-09-04T05:20:00Z
+updated: 2026-09-04
 grounding_mode: web_assisted + engine_native_probe
 supersedes:
   - canonical/concepts/llm-capability-map-2026-07-25.md
@@ -116,8 +117,12 @@ was the weak one. The cost argument is contested; the **compatibility** argument
 - **It 400s on forced `tool_choice`** (`any` / `tool`), including via `count_tokens` and Batches.
 - **No fast mode**; Opus 5 has it. **Priority Tier is not a difference**: the current service-tier
   table excludes both Fable 5.1 and Opus 5.
-- **Server-side web fetch supports Fable 5.1 but not Opus 5.** It is available on the Claude API,
-  Claude Platform on AWS and Microsoft Foundry, not Amazon Bedrock or Google Cloud; preserve a
+- **Server-side web fetch supports Fable 5.1 but not Opus 5.** Fable 5.1 is available on the
+  Claude API, Claude Platform on AWS, Microsoft Foundry, **and Amazon Bedrock**. AWS launched the
+  Bedrock model on 1 September 2026 with a 1M-token context window
+  ([AWS model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-fable-5-1.html)).
+  The earlier “not Amazon Bedrock” claim was stale launch-day evidence. Bedrock availability does
+  not by itself establish that Anthropic's server-side web-fetch tool is exposed there; preserve a
   client-side fetch path where cloud portability matters.
 - **Published API token throughput is 4× lower than Opus 5** in the standard rate-limit table:
   500k ITPM / 100k OTPM for Fable 5.x versus 2M / 400k for Opus 5 (RPM is 1,000 for both).
@@ -206,11 +211,23 @@ Read from `~/.codex/models_cache.json` (latest cache fetch 2026-09-04 06:32 UTC)
 | 26 | `gpt-5.3-codex-spark` | 128,000 | ultra-fast, text-only, real-time coding preview |
 | 43 | `codex-auto-review` | 272,000 | approval review |
 
-**`gpt-reserve` is solved, from our own cache.** It carries `"visibility": "hide"`,
-`supported_in_api: true`, a `Fast` service tier (1.5× speed), efforts low→max, and it appears in
-**no** public OpenAI catalogue. Because it is hidden, it does **not** win the picker despite its
-low priority number — which is exactly why a bare `codex` call correctly lands on **Sol**, verified
-by the CLI banner. **Treat it as an opaque private alias. Do not route work to it.**
+**`gpt-reserve` is OpenAI's internal Codex/ChatGPT Work route for Luna Reserve, not a new frontier
+model.** OpenAI's public Help Center now says selected personal Plus and Pro accounts may receive a
+separate, finite allowance that continues an exhausted regular session on **GPT-5.6 Luna**; it does
+not restore regular usage, apply to ordinary ChatGPT Chat, or add API credits. It is unavailable in
+Business and Enterprise workspaces, and eligibility may change. Independent inspection of the
+shipped Codex app connects the exact `gpt-reserve` identifier to the `luna_reserve` fallback state,
+separate metering, temporary model switching and restoration of the original selection. Sources:
+[OpenAI Help](https://help.openai.com/en/articles/20001499-luna-reserve-in-codex-and-chatgpt-work) ·
+[RuntimeWire client analysis](https://runtimewire.com/article/openai-is-testing-luna-reserve-a-codex-fallback-tier).
+
+Our authenticated cache supplies the Codex-route metadata: `"visibility": "hide"`, 272K context,
+a `Fast` service tier and efforts low→max. Its `supported_in_api: true` field refers to the Codex
+transport catalogue; `gpt-reserve` is absent from OpenAI's public API model catalogue and Reserve
+adds no API credits. Because it is hidden, it does **not** win normal model selection despite its
+low priority number — a bare `codex` call correctly lands on **Sol**. **Treat it as a
+server-entitlement-controlled fallback: do not pin automation to it, but allow Codex to enter it
+when the account is eligible and ordinary usage is exhausted.**
 
 **⚠️ The context number is the CLI's, not the API's.** The API lists ~1.05M for the GPT-5.6 family.
 The Codex CLI caps the session at **272K raw** (400K minus 128K reserved output), roughly 258K
@@ -314,8 +331,28 @@ Up to **3,600 images per request** via the File API; **20MB** inline payload cei
 are 50% of standard token rates; Batch targets completion within 24 hours, while Flex targets
 1–15 minutes but is best-effort/sheddable.
 
-Agentic reliability improved materially (Terminal-Bench 2.1 **81.6% → 90.8%**), with stricter
-tool-call verification and less loop degradation over long horizons.
+Agentic reliability improved materially. Google's current model-evaluation table reports
+Terminal-Bench 2.1 at **85.8% → 89.4%** from 3.7 to 3.8, using Gemini at high thinking in the
+Terminus 2 harness. A separate Google Enterprise page published **81.6% → 90.8%**; those figures
+use a different configuration and must not be spliced into the current model-card series.
+
+#### 3.1.a Published coding comparison: Gemini 3.8 Flash High vs GPT-5.6 Sol
+
+The answer depends on whether the benchmark isolates the model or evaluates the deployed agent
+system. Both views point to the same routing decision:
+
+| Evaluation | Gemini 3.8 Flash High | GPT-5.6 Sol | Read |
+|---|---:|---:|---|
+| Artificial Analysis Coding Agent Index v1.4, our actual harness families | **59** in Antigravity SDK | **63 xhigh / 64 high / 65 max** in Codex | Sol leads at every serious effort. At xhigh it uses 9.9M tokens/task in 7.3 min versus Gemini's 19.8M in 7.6 min. |
+| DeepSWE v1.1, same mini-swe-agent harness | **74% ±1** | **73% ±3** at max | Statistical tie; Gemini uses 143K output tokens and 166 steps versus Sol's 60K and 61. |
+| Terminal-Bench 4.0, deployed agent systems | **19.1% ±3.4** in mini-SWE-agent | **37.3% ±3.8** in Codex at max | Sol is roughly 2× on open-ended terminal recovery. Harnesses differ, so this is a system result, not pure-model isolation. |
+
+**Routing consequence:** use **GPT-5.6 Sol** as the sole owner of an ambiguous, unattended
+overnight build; use Gemini 3.8 Flash High for bounded, well-specified work, multimodal inputs, or
+parallel throughput. Sources: [Artificial Analysis harness comparison](https://artificialanalysis.ai/agents/coding-agents/comparisons/antigravity-sdk-vs-codex) ·
+[DeepSWE v1.1](https://deepswe.datacurve.ai/) ·
+[Terminal-Bench 4.0](https://snorkel.ai/leaderboard/terminal-bench-4-0/) ·
+[Google evaluation methodology](https://deepmind.com/models/evals-methodology/gemini-3-8-flash).
 
 **3.8 Flash Cyber** is Fairwind-Program-only (government, critical infrastructure, maintainers).
 Not available to us, no published public slug, and its rate card is **[NOT FOUND]** — do not assume
@@ -401,8 +438,30 @@ effort**, which is a bigger and ungated pool.
 **Grok 4.7** is a claim on X by Musk (~12 Sep, 2.1T params). No release note, no model card, no
 benchmark. **Watch item, not a planning input.**
 
-**Live account state:** the Grok Build usage meter has been at HTTP 402 since 26 Aug and the OAuth
-token lapsed 27 Aug. Neither is fixable by a model release. The `grok-web` research lane works.
+### 4.1 Consumer-subscription limits and the live lane state
+
+**The public plan does not publish a numeric request or token allowance.** SpaceXAI's consumer FAQ
+now defines one compute-weighted weekly pool shared across Chat, Imagine, Voice and Build. It shows
+only percentage used, per-product attribution and the account-specific reset time. A long coding
+task or high-quality video costs more of the pool than an ordinary chat message; no public formula
+converts Grok 4.6 tokens, turns or wall time into one percentage point. The 150 RPS / 50M TPM figures
+on the Grok 4.6 model page are API limits and do **not** describe this subscription.
+
+At 100%, paid features pause until the displayed weekly reset, a top-up or a plan upgrade. Free-tier
+Chat and Voice remain on their own separate limits. This is distinct from transient admission
+throttles: the shipped client has separate errors for exhausted balance (`usage_pool_exhausted`),
+an exhausted non-billable allowance (`usage_limit_reached`), shared product/tier saturation
+(`global_rate_limit`) and too many in-flight requests (`concurrency_limit`). The latter two are
+retriable; a spent weekly pool is not. Consumer terms also reserve discretion to impose limits for
+system-resource or usage needs. Current public plan names are SuperGrok / SuperGrok Plus /
+SuperGrok Heavy; “Grok Pro” is local shorthand, not the name in the current price table.
+
+**Live correction, 4 Sep:** the earlier claim that Grok Build had remained at HTTP 402 since
+26 Aug is stale. Native logs record 253 successful inference turns during 3–4 Sep (UTC), including
+successful Grok 4.6 calls on 4 Sep. One 3 Sep run instead hit ten automatic retries over roughly
+four minutes: first `Service temporarily unavailable`, then `model is currently at capacity due
+to high demand`; that was a transient capacity throttle, not proof of weekly-pool exhaustion. The
+OAuth token also refreshed normally. The `grok-web` research lane works.
 
 ---
 
@@ -519,7 +578,13 @@ and therefore **Adrian's**, not an agent's (§9).
   [M1 Max 64GB oMLX measurement](https://omlx.ai/benchmarks/performance/5you1zwa),
   [independent AA score](https://artificialanalysis.ai/models/releases/qwen3-8-27b). The stronger
   on-paper Qwen3.8-Flash-Next does not cross the line: its smallest published Unsloth GGUF is
-  **72.5GB before runtime overhead**, so it cannot reside in 64GB.
+  **72.5GB before runtime overhead**, so it cannot reside in 64GB. **Late 4 Sep caveat:** a
+  third-party `125B-UltraLite-37GiB` artifact subsequently appeared, but it does not overturn this
+  verdict. It needs a custom patched llama.cpp, requantizes the PLE table and most routed-expert
+  gates/up projections to Q1_0, drops vision, and has only a one-token load smoke test — **no
+  task-quality evaluation and no measured whole-process footprint on a 64GB Mac**. Treat it as an
+  experimental compression lead, not evidence that Flash-Next fits at useful quality.
+  [UltraLite build card](https://huggingface.co/0xKitkat/Qwen3.8-Flash-Next-125B-UltraLite-37GiB-GGUF)
 - **Local, confirmed on our fleet:** M2 Studio Ollama (`bge-m3`, `qwen2.5:14b`, `qwen3.5:9b`,
   `nomic-embed-text`, `moondream`) and the PC RTX 5080 vision lane (`qwen2.5-vl-7b`, one image per
   request, concurrency 1 — the build crashes on concurrent decode).
@@ -589,7 +654,7 @@ to read it.** The engine ingests it in pieces; nothing is stuffed into a context
 | ID | Defect | Disposition |
 |---|---|---|
 | D1 | agy pinned a generation behind | ✅ **FIXED.** Repinned `gemini-3.8-flash-high`, verified live. Risk model corrected: headless now errors on an unknown slug. |
-| D2 | agy wrapper masked CLI failures as THIN rc=0 | ✅ **FIXED LOCALLY 2026-09-04.** The direct CLI already reported `RESOURCE_EXHAUSTED` / 429, `Individual quota reached`, and a reset timer; since v1.1.1 print mode writes server failures to stderr and exits non-zero. `agy-ask.py` discarded the PTY child status and did not propagate its own status; both layers now preserve non-zero exits. Empty-success remains `AMBIGUOUS_EMPTY`, never a quota diagnosis. |
+| D2 | agy wrapper masked CLI failures as THIN rc=0 | ✅ **FIXED LOCALLY 2026-09-04.** The direct CLI already reported `RESOURCE_EXHAUSTED` / 429, `Individual quota reached`, and a reset timer; since v1.1.9 print mode writes server failures to stderr and exits non-zero. `agy-ask.py` discarded the PTY child status and did not propagate its own status; both layers now preserve non-zero exits. Empty-success remains `AMBIGUOUS_EMPTY`, never a quota diagnosis. |
 | D3 | agy fabricates citations | ❌ **NO FIX.** 3.8 makes no such claim. Mitigation: read links from `groundingChunks` metadata, not from generated inline markdown. **Keep must-cite research on `grok-web`.** |
 | D4 | "Grok 54% hallucination" | 🔧 **NUMBER STALE.** 4.6 measures **34.3%** (aggregator-sourced, vendor disagrees on direction). **Replace the number, keep the cross-check rule.** |
 | D5 | Grok Build 402 + lapsed OAuth | ❌ **NO MODEL FIX.** Account state. Do not route around it via a metered xAI key. |
