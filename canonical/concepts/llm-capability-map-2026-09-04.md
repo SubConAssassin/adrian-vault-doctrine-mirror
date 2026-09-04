@@ -196,8 +196,16 @@ codex exec -m gpt-6-astra  →  HTTP 400
 `chatgpt_plan_type` is **`plus`**. OpenAI's help page states Astra appears as **GPT-6 Pro** for
 **Pro $100 / Pro $200 / Business / Enterprise** and is **not included with Plus**.
 
-> **Do not write Astra into the engine board. Do not plan around it. It is a plan-tier decision for
-> Adrian (§9), not a rollout we are waiting on.** If he does upgrade, note that Codex reportedly
+> 🔴 **UPDATED 2026-09-04 ~11:35 WITA, AFTER ADRIAN UPGRADED TO PRO. THE PLAN WAS NOT THE BLOCKER.**
+> The token refreshed live to `chatgpt_plan_type: prolite`, the Codex CLI was upgraded 0.144.1 →
+> **0.153.2** (0.153.1 explicitly added Astra support), and the model cache was deleted and rebuilt
+> — it DID refresh, surfacing a new model (`gpt-5.3-codex-spark`), which proves entitlements flow
+> through. **Astra is still absent from the catalogue and still returns the same 400.** So the
+> "plan-tier gate" reading was wrong or incomplete. Remaining candidates: the Codex *surface* has
+> not rolled Astra out at any tier, or it needs Pro $200 rather than `prolite`. **Unresolved — do
+> not assert either.** The distinguishing check is Adrian's ChatGPT model picker: if **GPT-6 Pro**
+> appears there, the entitlement is live and Codex is simply behind.
+> **Do not write Astra into the engine board and do not plan around it.** If he does upgrade, note that Codex reportedly
 > does **not** apply the >272K long-context multiplier and does not charge cache writes, which
 > would make Astra's 96.3% MRCR retrieval in the 512K–1M band genuinely useful rather than theatre.
 
