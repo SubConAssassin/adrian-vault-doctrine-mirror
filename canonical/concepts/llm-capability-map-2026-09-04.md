@@ -116,17 +116,19 @@ was the weak one. The cost argument is contested; the **compatibility** argument
 - **It 400s on forced `tool_choice`** (`any` / `tool`), including via `count_tokens` and Batches.
 - **No fast mode**; Opus 5 has it. **Priority Tier is not a difference**: the current service-tier
   table excludes both Fable 5.1 and Opus 5.
+- **Server-side web fetch supports Fable 5.1 but not Opus 5.** It is available on the Claude API,
+  Claude Platform on AWS and Microsoft Foundry, not Amazon Bedrock or Google Cloud; preserve a
+  client-side fetch path where cloud portability matters.
 - **Published API token throughput is 4× lower than Opus 5** in the standard rate-limit table:
   500k ITPM / 100k OTPM for Fable 5.x versus 2M / 400k for Opus 5 (RPM is 1,000 for both).
   Fable 5.1 also shares its bucket with Fable 5; Opus 5 has a separate bucket.
 - **On Max it is included but capped at 50% of the weekly usage limit.** On Pro it is not included
   in plan limits at all. **This is the number that matters to us**: half our weekly ceiling.
-- **Requires Claude Code v2.1.251+. Use v2.1.260+ in practice:** Anthropic's API rejects older
-  clients with `claude_code_version_too_old` and explicitly names 2.1.251 as the floor. There was
-  no 2.1.255 release. Anthropic's 2.1.260 changelog
-  fixes Fable-specific failures where `model: fable` subagents ignored `[1m]` and silently ran at
-  200K, the model picker omitted Fable, post-tool-result cache reads were missed, and `/effort`
-  changes invalidated the prompt cache.
+- **Claude Code's public support floor is v2.1.255; use v2.1.260+ in practice:** Anthropic's Help
+  Center names v2.1.255+, while the public changelog first records Fable 5.1 model support in
+  v2.1.257. v2.1.260 then fixes Fable-specific failures where `model: fable` subagents ignored
+  `[1m]` and silently ran at 200K, the model picker omitted Fable, post-tool-result cache reads were
+  missed, and `/effort` changes invalidated the prompt cache.
 - Thinking cannot be disabled at any effort.
 
 **Opus 5 → Fable 5.1 harness breakpoints, first-party migration guide:** forced `tool_choice`
@@ -422,14 +424,15 @@ token lapsed 27 Aug. Neither is fixable by a model release. The `grok-web` resea
 output 131,072. Singapore first-party pricing is **$2 in / $6 out**, implicit cache $0.25 — note
 this differs from the account catalogue's figures above, which are the plan's own credit units.
 
-For **`qwen3.8-flash` pay-as-you-go**, first-party Singapore/International pricing is
-**$0.15 input / $0.47 output per MTok**. Global deployments in Germany, Japan, the US and Hong
-Kong are $0.113 / $0.382. Vision input is
+For **`qwen3.8-flash` pay-as-you-go**, the model-specific first-party rate card (read
+2026-09-04) prices Singapore/International at **CNY 1.094 input / CNY 3.427 output per MTok**
+(approximately **$0.163 / $0.510** at that day's CNY/USD mid-market rate). Germany, Japan and the
+US are **CNY 0.8 / CNY 2.7** (approximately **$0.119 / $0.402**). Vision input is
 approximately `height × width / (32 × 32) + 2` tokens after preprocessing, so 512×512 is about
-258 image tokens. The Singapore real-time limit is 15,000 RPM / 2,000,000 TPM. Alibaba's current
-pricing table marks `qwen3.8-flash` for a 50% Batch discount in **China (Beijing)**, but not in
-**Singapore/International**; do not apply the discount to Adrian's Singapore route unless that
-region's support table changes.
+258 image tokens. The Singapore real-time limit is 15,000 RPM / 2,000,000 TPM. **Batch inference
+is not supported for `qwen3.8-flash` in any region listed on its model page**, including Beijing
+and Singapore; an older/general pricing-table marker must not be used to infer a 50% batch discount.
+[First-party model page](https://help.aliyun.com/en/model-studio/qwen3-8-flash)
 
 **The lane works.** Two research briefs returned rc=0 with 17KB each this session. Doctrine's
 "qwen BLOCKED, needs a reissued key" is **stale** — the 2026-08-27 rewire to `bl` fixed it.

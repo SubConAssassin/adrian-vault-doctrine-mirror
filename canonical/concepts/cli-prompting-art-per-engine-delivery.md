@@ -21,8 +21,8 @@ Grok failed 3× to audit a 116 KB source bundle, then succeeded on a 22 KB cross
 
 ## Per-engine cheat-sheet (verified 2026-07-18)
 - **grok (grok-4.5, Grok Build TUI)** — `--single/-p` (small), `--prompt-file` (small→medium), `--prompt-json`, `--json-schema` (structured out), `--max-turns`, `--permission-mode {default,acceptEdits,auto,dontAsk,bypassPermissions,plan}`, `--tools`, `--disable-web-search`. **Context 500 K (regressed from 4.3's 1 M).** Large content → **file-read idiom** (now automated in cli-ask, see below). Confident-hallucinator → never promote grok facts without a different-family cross-check.
-- **codex (GPT-5.6 sol/terra/luna)** — `codex exec -m …`, prompt as argv. ~1.05 M ctx / 128 K out. Handled the 116 KB bundle inline in one shot this session (strongest single audit). Smallest pool → sparing on sol.
-- **agy (Gemini 3.6 Flash High)** — `agy-ask.py`, prompt as argv (PTY). 1 M ctx. ⚠️ **Small pool since the 2026-07-29 Ultra→base downgrade** (was "biggest pool / default grind" — see the 2026-08-04 note at the end of this file); still the $0 vision lane. Reads serials/images.
+- **codex (GPT-5.6 sol/terra/luna)** — `codex exec -m …`, prompt as argv. The API models advertise ~1.05 M context / 128 K output, but the ChatGPT-auth Codex CLI exposes **272 K raw context**. ChatGPT Pro 5x makes this the team's biggest subscription pool; Sol/xhigh is the explicit default and may be used freely at depth.
+- **agy (Gemini 3.8 Flash High)** — `agy-ask.py`, prompt as argv (PTY). 1 M ctx. ⚠️ **Small pool since the 2026-07-29 Ultra→base downgrade** (was "biggest pool / default grind" — see the 2026-08-04 note at the end of this file); still the $0 vision lane. Reads serials/images.
 
 ## The fix baked into `tools/cli-ask.sh` (2026-07-18)
 The non-web grok branch is now **size-gated** (`CLI_ASK_GROK_INLINE_MAX`, default 40 000 bytes):
@@ -34,13 +34,13 @@ The non-web grok branch is now **size-gated** (`CLI_ASK_GROK_INLINE_MAX`, defaul
 1. **Match the idiom to the delivery.** Do NOT tell an engine "read file X" while also dumping X inline — the conflict confuses agentic CLIs (this was half the original grok failure). Either inline-with-"content-below" framing, OR file-read-with-a-path — never both.
 2. **Prescriptive structure** (from [[delegation-first-operating-doctrine]] §6): ROLE / CONTEXT (exact paths) / DO / DON'T / OUTPUT (exact format) / GROUNDING ("[NOT FOUND] not invention") / VERIFY (print count + first lines).
 3. **Output-mode preamble** for agentic CLIs: "write your COMPLETE answer as plain text to stdout; no plan mode; no subagents; no file writes" — stops the agent from going off to write a file and emitting 0 bytes.
-4. **Route by payload size:** >400 K tokens → agy/codex (1 M-class), never grok (500 K). Big single bundles → codex/agy inline, or grok via the file-read path.
+4. **Do not route by advertised window size:** no lane is a big-payload destination. `cli-ask.sh` spills inputs over 100 K characters to a file already; chunk oversized corpora with deterministic retrieval. Use agy's genuine 1 M window only when the analysis itself needs that breadth; the ChatGPT-auth Codex CLI is capped at 272 K raw context.
 5. **Reserve grok for what it's best at:** bounded verification, cross-audit, `grok-web` live research — not 100 KB solo reads. It excelled at the 22 KB cross-audit (23 confirmations + 12 gaps) the same session it failed the 116 KB solo.
 6. **Verify-before-trust every large return:** confirm the engine actually ingested the whole payload (ask it to echo a count/marker) before believing a "clean" audit — a truncated-input audit looks identical to a complete one.
 
 ## 2026-07-25 UPDATE — the prompting law inverted, and the current engine strings
 
-Companion: **[[llm-capability-map-2026-07-25]]** (full specs/benchmarks/pricing) + delegation-doctrine **§14**.
+Companion: **[[llm-capability-map-2026-09-04]]** (full specs/benchmarks/pricing) + delegation-doctrine **§14**.
 
 **The big inversion: STOP OVER-PROMPTING.** Everything above about *delivery idioms* still holds — but the guidance on *how much* to instruct has flipped for the frontier models. Every vendor published the same finding in Q3-2026. **OpenAI measured that stating each instruction exactly once and deleting repeated rules raises scores 10–15% while cutting tokens up to 66%.** Anthropic's Opus 5 guidance says to *remove* "verify everything" / "double-check" / "use a subagent to verify" outright. The §6 prescriptive-prompt law is **not** repealed — it exists because agy/grok confabulate without exact paths and grounding clauses — but it should now be applied as **structure, not volume**: exact paths, exact output format, one grounding clause. Not the same rule three times.
 
@@ -210,12 +210,12 @@ The routing mistake that wastes the most is sending bulk work to a scarce cloud 
 | Bulk classification / extraction / tagging / dedup over thousands of rows | **`local`** | $0 and unmetered. This is the doctrine's stated home for big-corpus first-pass. Cost of a 20,000-row pass is electricity. |
 | Vision at volume (scene tags, b-roll, serials, stills) | **`local-vision`** (PC Qwen2.5-VL) | Measured 2,196 img/hr, 0 failures in 300 — vs agy's 576 img/hr at 35–90% batch failure post-downgrade |
 | Live-web facts, anything after a model cutoff | **`grok-web`** | Only lane with in-CLI search + mandatory citations |
-| One genuinely hard reasoning shot, or arbitrating a split council | **`codex-sol --effort xhigh\|max`** | Strongest single model in the $0 team. Scarce — never batch it |
-| Everyday reasoning / drafting / audit | **`codex-terra`** | Beats 5.5, and keeps Sol in reserve |
-| Mechanical code edits, refactors, migrations | **`composer`** | Fast and cheap; keeps premium tokens and agy quota out of plumbing |
+| One genuinely hard reasoning shot, or arbitrating a split council | **`codex-sol --effort xhigh\|max`** | Strongest single model in the $0 team; the Pro 5x pool is not scarce |
+| Everyday reasoning / drafting / audit | **`codex-sol --effort xhigh`** | Explicit default after the Pro 5x upgrade; use Terra only for deliberate down-tiering |
+| Mechanical code edits, refactors, migrations | **`codex-terra --effort low`** | Replacement for the dead `composer` lane |
 | Multimodal, image reading, Google-grounded lookups | **`agy`** | Still the best tool-use reliability — but a **small pool**, so spend it deliberately |
-| Long-context single-document reads (>400 K tokens) | **`codex`** or **`agy`** | grok is 500 K and will truncate |
-| Classification only, never reasoning | **`codex-luna`** | Nerova 41.3 vs Sol 91.5 — it is a router, not a thinker |
+| Oversized corpora / documents | **Chunk + deterministic retrieval** | No lane is a big-payload destination; Codex CLI is 272 K, and file-read is delivery rather than guaranteed full recall |
+| Short schema-bound classification / extraction | **`codex-luna`** | Its 41.3 is **MRCR v2 8-needle long-context recall**, not reasoning; avoid needle-in-a-haystack work |
 
 **The reflex to build:** when a task involves judging N items where N > ~200, the first question is
 "why is this not on `local`?" — and the answer has to be a real one (needs live web, needs 1 M
