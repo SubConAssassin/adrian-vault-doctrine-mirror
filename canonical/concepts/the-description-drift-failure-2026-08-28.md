@@ -21,7 +21,7 @@ trusting the description.**
 |---|---|---|
 | "qwen is BLOCKED, Adrian must activate Model Studio" | it was a working paid subscription; our tooling injected a key that clobbered its credential | Adrian, told 3× to fix an account that already worked |
 | "codex = GPT-5.5" | gpt-5.6-**Sol** since 2026-07-10; 0 of 1,065 threads on 5.5 | a false engine attribution published to Adrian; batch work on the arbitration tier |
-| "composer = grok-composer-2.5-fast" | vendor-retired; 0 bytes in 6,179 sessions | a documented lane that could never run |
+| "composer = grok-composer-2.5-fast" | absent from the live xAI catalogue returned to this account (no public retirement notice; underlying Cursor model still live); 0 bytes in 6,179 sessions | a documented lane that could never run |
 | "local-vision = the PC vision lane" | wrong protocol, no auth header, **no image field at all** | a vision lane that could not receive an image |
 | "$20/month DeepSeek cap" | two ledgers, blind to each other → **$40** | the authorised ceiling was double |
 | "grok is down" | Grok **Pro subscription ACTIVE, 40/40 unused**; only the Build meter dry | paid capacity idle while we called it dead |
@@ -89,7 +89,7 @@ moment of the decision.**
 | `check_fleet()` in `standing-rules-gate.py` | mutating another node without reading its channel | **fired on me twice within an hour**, and is how I found M2's newest files |
 | `tools/coordination-watch.sh` | the other node wrote and you never noticed | negative control: never announces your own outbound |
 | `tools/caption-grouping-gate.py` | caption cards breaking mid-clause | 14 findings on the re-regressed engine, 0 on the fixed one |
-| composer pin resolution | a vendor-retired model pin | mock account tests, both directions |
+| composer pin resolution | a model pin withdrawn from the live provider catalogue | mock account tests, both directions |
 | the frame-hash motion test in `render.py` | an "animation" that is 133 identical frames | caught exactly that |
 
 **The pattern to keep: when a rule recurs, build the exit code, not another memory.**

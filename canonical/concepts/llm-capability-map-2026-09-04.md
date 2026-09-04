@@ -6,7 +6,7 @@ tier: 1
 status: CURRENT
 date: 2026-09-04
 author: Claude (Opus 5) — CEO-of-the-stack, with a full 8-way CLI team fan-out + a 30-agent verification workflow
-as_of_utc: 2026-09-04T02:00:00Z
+as_of_utc: 2026-09-04T05:20:00Z
 grounding_mode: web_assisted + engine_native_probe
 supersedes:
   - canonical/concepts/llm-capability-map-2026-07-25.md
@@ -268,10 +268,14 @@ video, audio, PDF. Intro pricing **$0.75 / $3.75** per MTok through **31 Dec 202
 **The capability delta that matters to us** is not the headline benchmark, it is
 **per-part `media_resolution` control (LOW / MEDIUM / HIGH within a single request)**. That is the
 lever for cheap batch vision: downsample background assets, keep resolution only where it counts.
-Image token maths: ≤384×384 costs a flat 258 tokens; larger images tile into 768×768 crops at 258
-tokens per tile, bounded at 3072×3072. PDFs rasterise per page (258–1,032 tokens/page). Video
-samples at 1fps, ~263 tokens/second, so a one-hour video consumes ~947K tokens and nearly fills the
-window. Up to **3,000 images per request** via the File API; **20MB** inline payload ceiling.
+For an explicit Gemini 3 `media_resolution`, Google documents approximately **280 / 560 / 1,120**
+tokens per image at LOW / MEDIUM / HIGH (ULTRA_HIGH: 2,240). A separate raw-size token-counting
+rule says an image already ≤384×384 is 258 tokens and larger images tile into 768×768 crops at 258
+tokens per tile; do not substitute that raw-size rule when costing an explicitly selected
+`media_resolution`. Video LOW/MEDIUM samples at ~70 tokens/second; HIGH at ~280 tokens/second.
+Up to **3,000 images per request** via the File API; **20MB** inline payload ceiling. Batch and Flex
+are 50% of standard token rates; Batch targets completion within 24 hours, while Flex targets
+1–15 minutes but is best-effort/sheddable.
 
 Agentic reliability improved materially (Terminal-Bench 2.1 **81.6% → 90.8%**), with stricter
 tool-call verification and less loop degradation over long horizons.
@@ -340,8 +344,21 @@ card points the *other way* on an internal factuality eval (4.6 worse than 4.5).
 number, keep the rule.** 34.3% is still high, the sourcing is second-hand, and the vendor disagrees
 with the direction. **The different-family cross-check before promotion stands.**
 
-**`grok-composer-2.5-fast` is retired and no vendor named a successor** (confirmed by two legs).
-The `composer` lane is dead as named. Replacement for fast mechanical edits: **`codex-terra` at low
+**`grok-composer-2.5-fast` has been withdrawn from the live xAI Grok Build catalogue returned to
+this account, but a global retirement by xAI is not verified.** A direct selection returned
+`unknown model id` on 2026-08-21; the server-fetched subscription catalogue at
+`~/.grok/models_cache.json` (origin
+`https://cli-chat-proxy.grok.com/v1/models`, fetched 2026-09-04 05:17Z) contains only `grok-4.5`
+and `grok-4.6`. xAI's [June launch post](https://x.ai/news/composer-2-5) remains online, while the
+[current Grok Build documentation](https://docs.x.ai/build/overview) says `grok-4.6` powers the
+product. Its [retirement notice](https://docs.x.ai/developers/migration/may-15-retirement) and
+[release notes](https://docs.x.ai/developers/release-notes) do not name Composer. Therefore
+"retired" is valid operational shorthand for the dead model ID, **not a verified formal xAI
+designation or proof of a global withdrawal**. The underlying model itself is still live in
+[Cursor's current Composer 2.5 documentation](https://prod.cursor.com/docs/models/cursor-composer-2-5),
+including its Fast variant. xAI has named **no Composer successor**; `grok-4.6` is the current de
+facto Grok Build replacement, not an announced successor in the Composer lineage. The local
+`composer` lane is dead as named. Replacement for fast mechanical edits: **`codex-terra` at low
 effort**, which is a bigger and ungated pool.
 
 **Grok 4.7** is a claim on X by Musk (~12 Sep, 2.1T params). No release note, no model card, no
@@ -356,7 +373,7 @@ token lapsed 27 Aug. Neither is fixable by a model release. The `grok-web` resea
 
 ### 5.1 The models, read live from `bl model list` on Adrian's own account
 
-| Model | Ctx | Capabilities | $/MTok in–out | Cache read |
+| Model | Ctx | Capabilities | Plan-catalogue in–out | Cache read |
 |---|---|---|---|---|
 | **`qwen3.8-max`** | 1,000,000 | Reasoning, Vision, Text | 12 / 36 | 1.0 |
 | **`qwen3.8-flash`** | 1,000,000 | Text, Vision, Reasoning | **0.8 / 2.7** | **0.1** |
@@ -369,6 +386,14 @@ token lapsed 27 Aug. Neither is fixable by a model release. The `grok-web` resea
 `qwen3.8-max` is a **2.4T-parameter MoE**, snapshot `qwen3.8-max-0902`, max input 991,808, max
 output 131,072. Singapore first-party pricing is **$2 in / $6 out**, implicit cache $0.25 — note
 this differs from the account catalogue's figures above, which are the plan's own credit units.
+
+For **`qwen3.8-flash` pay-as-you-go**, first-party Singapore/International pricing is
+**$0.15 input / $0.47 output per MTok**. Global deployments in Germany, Japan, the US and Hong
+Kong are $0.113 / $0.382. Vision input is
+approximately `height × width / (32 × 32) + 2` tokens after preprocessing, so 512×512 is about
+258 image tokens. The Singapore real-time limit is 15,000 RPM / 2,000,000 TPM. Alibaba's current
+Batch support list names `qwen3.8-max` but **not `qwen3.8-flash`**, so do not apply the generic 50%
+Batch discount to Flash until its support table changes.
 
 **The lane works.** Two research briefs returned rc=0 with 17KB each this session. Doctrine's
 "qwen BLOCKED, needs a reissued key" is **stale** — the 2026-08-27 rewire to `bl` fixed it.
@@ -411,9 +436,37 @@ and therefore **Adrian's**, not an agent's (§9).
   for $0.55 against Sol max's $0.95 — the cheapest route to that score anywhere.** It is a **metered
   API outside §7.2's approved list**, and the contributor terms interact with client and venture
   material. **Flagged for Adrian. Not wired. No token minted.**
-- **GLM-5.3** open weights (28 Aug): **753B MoE**. **Does not fit** the M1 Max 64GB or a 192GB
-  Studio at any useful quantisation; deployment targets are vLLM / SGLang, i.e. GPU-server shaped.
-  GLM-5.3-Flash at 320B is equally out of reach. **Closed as a negative so nobody re-derives it.**
+- **GLM-5.3 flagship** open weights (28 Aug): **753B MoE**. Its smallest shipped Unsloth GGUF,
+  `UD-IQ1_S`, is **216.7GB before runtime overhead**; therefore no flagship quant fits below
+  100GB, the M1 Max 64GB, or a 192GB Studio. [Unsloth GGUF sizes](https://huggingface.co/unsloth/GLM-5.3-GGUF)
+- **CORRECTION, later 4 Sep:** the separate **GLM-5.3-Flash** (320.6B total / 17.3B active) now
+  has a genuinely sub-100GB route. The hand-mixed `AJ-IQ2_XXS` is **87.35GB** and has been
+  measured fully resident on a 96GB RTX PRO 6000 (also 11.55 tok/s using 24GB VRAM + 64GB RAM).
+  The cost is severe: against BF16 on a matched 30-chunk Wikitext-2 run, perplexity is **1.883x**,
+  KLD **0.707**, and the same top token is selected only **73.2%** of the time. The next useful
+  rung, `AJ-IQ3_XXS`, is 112.4GB and improves those figures to **1.341x / 0.356 / 81.77%**.
+  [build, memory and matched quality data](https://huggingface.co/aj9o9/GLM-5.3-Flash-GGUF)
+  Unsloth also publishes 93.1GB and 97.6GB 1-bit files, but runtime needs approximately 100GB+
+  and the open llama.cpp integration currently reports repeated-token garbage for `UD-IQ1_M` on
+  M1 Ultra; upstream Flash support remains an open PR. Treat every sub-100GB build as experimental,
+  low-temperature/greedy-only, not a production agent. A 50%-expert-pruned 72–99GB GGUF family also
+  exists, but pruning alone agrees with the parent on only 84.25% of top tokens (code 91.9%, generic
+  prose 58.0%) before the unmeasured extra quantisation loss. It is a domain-biased experiment, not
+  a clean substitute. [llama.cpp status](https://github.com/ggml-org/llama.cpp/pull/27752) ·
+  [REAP50 evidence](https://huggingface.co/patrickbdevaney/GLM-5.3-Flash-REAP50-GGUF)
+  **Fleet verdict remains NO:** none fits the current 64GB Mac; a 96GB-class device can technically
+  run Flash only with a large quality haircut. The earlier blanket claim that Flash was equally out
+  of reach below 100GB is withdrawn.
+- **Best post-July open-weight model that genuinely fits 64GB Apple Silicon: Qwen3.8-27B**
+  (14 Aug, Apache-2.0). Use the Apple-native **8-bit MLX AWQ/affine quant** with its BF16 vision
+  tower and MTP head preserved: independently measured at **28.1GB peak for load + short probe**
+  and **34.46GB whole-process peak at 16K context with BF16 KV cache** on an Apple M3 Ultra. Its
+  ≈103K-token English/Korean/code perplexity was statistically indistinguishable from BF16, while
+  the BF16 reference itself peaked at 51.1GB before meaningful context and is therefore a paper fit,
+  not a sensible 64GB operating point. At the native 262K window, use 4-bit KV cache: cache alone is
+  16.8GB in BF16 versus 4.2GB at 4-bit. Sources: [official model card](https://huggingface.co/Qwen/Qwen3.8-27B),
+  [measured Apple-Silicon MLX quant](https://huggingface.co/avlp12/Qwen3.8-27B-Alis-MLX-8bit),
+  [independent AA score](https://artificialanalysis.ai/models/releases/qwen3-8-27b).
 - **Local, confirmed on our fleet:** M2 Studio Ollama (`bge-m3`, `qwen2.5:14b`, `qwen3.5:9b`,
   `nomic-embed-text`, `moondream`) and the PC RTX 5080 vision lane (`qwen2.5-vl-7b`, one image per
   request, concurrency 1 — the build crashes on concurrent decode).
@@ -473,7 +526,7 @@ to read it.** The engine ingests it in pieces; nothing is stuffed into a context
 | D3 | agy fabricates citations | ❌ **NO FIX.** 3.8 makes no such claim. Mitigation: read links from `groundingChunks` metadata, not from generated inline markdown. **Keep must-cite research on `grok-web`.** |
 | D4 | "Grok 54% hallucination" | 🔧 **NUMBER STALE.** 4.6 measures **34.3%** (aggregator-sourced, vendor disagrees on direction). **Replace the number, keep the cross-check rule.** |
 | D5 | Grok Build 402 + lapsed OAuth | ❌ **NO MODEL FIX.** Account state. Do not route around it via a metered xAI key. |
-| D6 | `composer` lane dead | ✅ **REPLACED** by `codex-terra` at low effort. No vendor successor exists. |
+| D6 | `composer` lane dead | ✅ **REPLACED LOCALLY** by `codex-terra` at low effort. xAI named no Composer successor; current Grok Build uses `grok-4.6`, a de facto product replacement rather than an announced successor. |
 | D7 | ">400K payloads to codex" impossible | ✅ **RULE REWRITTEN** (§7.3). Chunk, do not re-route. |
 | D8 | "Never batch Sol" vs bare codex → Sol | ✅ **RESOLVED.** `gpt-reserve` is `visibility: hide`, so Sol is the correct bare resolution. **Fix: never call bare `codex` in automation — pin terra/luna/sol explicitly.** |
 | D9 | "Luna 41.3 on reasoning" | 🔧 **MISLABELLED.** 41.3 is **MRCR v2 8-needle long-context recall**, not reasoning (Sol 91.5 / Terra 89.6 on the same test). Luna is fine for short-document classification, bad at needle-in-haystack. **Doctrine §14.6 must say MRCR.** |

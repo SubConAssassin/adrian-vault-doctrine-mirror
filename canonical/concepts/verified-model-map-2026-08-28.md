@@ -83,8 +83,11 @@ codex's can. The pin is set in `tools/agy-ask.py` and overridable with `AGY_MODE
 | **grok-4.6** | default |
 | grok-4.5 | available |
 
-🔴 `grok-composer-2.5-fast` is **RETIRED** by the vendor and appears zero times in 6,179 recorded
-sessions. The `composer` lane pin now resolves against the live list and falls back loudly.
+🔴 `grok-composer-2.5-fast` is **absent from the live xAI catalogue returned to this account** and
+appears zero times in 6,179 recorded sessions. xAI published no retirement notice for it and named
+no Composer successor; "retired" was operational shorthand, not verified vendor terminology or
+proof of a global withdrawal. Cursor still lists Composer 2.5 and its Fast variant as live. The
+`composer` lane pin now resolves against the live list and falls back loudly.
 
 🔴 **State on 2026-08-28: `grok models` reports "You are not authenticated"** — the OAuth token in
 `~/.grok/auth.json` had `expires_at 2026-08-27T14:26Z` and has lapsed. Separately the **Grok Build
