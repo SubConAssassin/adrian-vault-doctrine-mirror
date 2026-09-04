@@ -121,7 +121,10 @@ was the weak one. The cost argument is contested; the **compatibility** argument
   Fable 5.1 also shares its bucket with Fable 5; Opus 5 has a separate bucket.
 - **On Max it is included but capped at 50% of the weekly usage limit.** On Pro it is not included
   in plan limits at all. **This is the number that matters to us**: half our weekly ceiling.
-- **Requires Claude Code v2.1.255+.**
+- **Requires Claude Code v2.1.255+. Use v2.1.260+ in practice:** Anthropic's 2.1.260 changelog
+  fixes Fable-specific failures where `model: fable` subagents ignored `[1m]` and silently ran at
+  200K, the model picker omitted Fable, post-tool-result cache reads were missed, and `/effort`
+  changes invalidated the prompt cache.
 - Thinking cannot be disabled at any effort.
 
 **Opus 5 → Fable 5.1 harness breakpoints, first-party migration guide:** forced `tool_choice`
@@ -502,8 +505,22 @@ and therefore **Adrian's**, not an agent's (§9).
   request, concurrency 1 — the build crashes on concurrent decode).
   ⚠️ **`cli-ask.sh` pins `CLI_ASK_LOCAL_CTX=16384`.** The local lane is a **16K** window, not a
   large-context lane. Anyone writing "cheap 1M flat-rate lane" is conflating `local` with `qwen`.
-- **Local video, newly plausible and untested here:** Wan 2.2 TI2V-5B (Apache-2.0, 720p/24fps) on
-  the RTX 5080, and LTX-2.3 via MLX on the M1 Max. Recorded as a lead.
+- **Local video, documented but still untested here:** Wan 2.2 TI2V-5B (Apache-2.0,
+  720p/24fps) has an official ComfyUI-native route that says the 5B workflow should fit in **8GB
+  VRAM with native offloading**, so the PC's RTX 5080 16GB is sufficient. This is distinct from
+  Wan's own `generate.py` path, which documents **24GB minimum** at 1280x704 with model offload,
+  dtype conversion and T5 on CPU. The ComfyUI assets are a 10GB FP16 diffusion model, 6.74GB FP8
+  text encoder and 1.41GB VAE (about 18.15GB on disk); the components are loaded/offloaded rather
+  than held in VRAM together. The official quick-start template uses 1280x704, 41 frames and 30
+  steps; its own note identifies 121 frames (5.04 seconds at 24fps) as the intended full clip.
+  Wan reports **under 9 minutes** for a 5-second 720p clip on a single consumer GPU without special
+  optimisation, but publishes no RTX 5080-specific result. Until measured locally, budget roughly
+  **6-10 minutes** for the 30-step 121-frame ComfyUI job and **2-4 minutes** for the 41-frame preview;
+  those two ranges are planning estimates, not measured fleet facts.
+  [official Wan runner and timing](https://github.com/Wan-Video/Wan2.2#run-wan22) ·
+  [official ComfyUI workflow and 8GB statement](https://docs.comfy.org/tutorials/video/wan/wan2_2) ·
+  [official 5B workflow JSON](https://comfyanonymous.github.io/ComfyUI_examples/wan22/text_to_video_wan22_5B.json)
+  LTX-2.3 via MLX on the M1 Max remains only a lead.
 
 ---
 
