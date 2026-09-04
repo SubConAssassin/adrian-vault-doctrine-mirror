@@ -112,11 +112,26 @@ was the weak one. The cost argument is contested; the **compatibility** argument
 - **It is a Covered Model requiring 30-day data retention.** It **400s on every request** under
   zero-data-retention.
 - **It 400s on forced `tool_choice`** (`any` / `tool`), including via `count_tokens` and Batches.
-- **No Priority Tier. No fast mode.**
+- **No fast mode**; Opus 5 has it. **Priority Tier is not a difference**: the current service-tier
+  table excludes both Fable 5.1 and Opus 5.
+- **Published API token throughput is 4× lower than Opus 5** in the standard rate-limit table:
+  500k ITPM / 100k OTPM for Fable 5.x versus 2M / 400k for Opus 5 (RPM is 1,000 for both).
+  Fable 5.1 also shares its bucket with Fable 5; Opus 5 has a separate bucket.
 - **On Max it is included but capped at 50% of the weekly usage limit.** On Pro it is not included
   in plan limits at all. **This is the number that matters to us**: half our weekly ceiling.
 - **Requires Claude Code v2.1.255+.**
 - Thinking cannot be disabled at any effort.
+
+**Opus 5 → Fable 5.1 harness breakpoints, first-party migration guide:** forced `tool_choice`
+(`any` / `tool`) becomes a 400 · `thinking.disabled` becomes a 400 at every effort · Fable thinking
+blocks are unreadable by Opus and are silently dropped on a switch back unless transformation
+reporting is enabled · replayed Fable thinking is bound to the byte-identical preceding system,
+tools and message prefix (400 or opt-in drop on a mismatch) · narration between tool calls moves
+from visible `text` blocks to normally-empty `thinking` blocks · refusal classifiers expand beyond
+Opus's cyber-only surface, so HTTP-200 `stop_reason: refusal`, partial-output discard and fallback
+handling become materially more important · ZDR is unavailable without express authorization.
+The Fable-specific behaviour guide also warns of less parallel tool batching in implied long loops,
+fewer progress messages, and fewer search/retrieval calls at `low` effort.
 
 **The cost picture, stated honestly because two legs disagreed.** Artificial Analysis measures
 Opus 5 at index **63 for ~$2.34/task** against Fable 5.1's **66 for ~$3.76** — 95% of the score for
@@ -149,6 +164,23 @@ run the preserved-thinking history-editing check Fable 5.1 enforces.
 ---
 
 ## §2 — OPENAI (the `codex` lane)
+
+### 2.0 🟢 PLAN CHANGE: ChatGPT Pro 5x (2026-09-04, Adrian-direct)
+
+Adrian upgraded mid-session. Verbatim: *"ChatGPT is now on a Pro 5X so we've got phenomenally more
+usage… let's utilize that fully."* **The `codex` lane is therefore the BIGGEST pool in the team, not
+the smallest, and three standing rules are retired: the "~10% batch share" cap, "never batch Sol",
+and "Terra is the everyday pin".** Sol is now the default at `xhigh`, batching it is correct, and the
+lane should be saturated rather than rationed.
+
+**Measured the same day, not assumed:** 20 concurrent codex clients at Sol/xhigh produced **zero
+provider throttles**; the binding constraint is **latency and the box**, not quota (mean call 289s at
+8-wide → 338s at 20-wide). A sustained quota-exhaustion burn is running to find the actual wall.
+
+⚠️ **The upgrade did NOT buy the market leader, and this file will not pretend otherwise.** On
+Artificial Analysis: **Fable 5.1 = 66 (#1)**, Opus 5 = 63, **GPT-5.6 Sol = 61**, GPT-6 Astra = 61.
+Sol is the strongest model in the **$0 CLI team**; the best model on the board is **Fable 5.1 via
+Claude Max**. And **Astra is still refused on this account after the upgrade** (§2.2).
 
 ### 2.1 What our account actually has
 
@@ -276,8 +308,9 @@ end-to-end (clean reply, rc=0).** Backup at `tools/agy-ask.py.bak-20260904-prere
 > call by design and advises lower effort for everyday tasks — and `agy` is our **most
 > quota-fragile lane** since the Ultra→base downgrade. That is a fair point and it is unmeasured.
 > I changed **one variable** (3.7-high → 3.8-high) to keep the comparison clean.
-> **Trigger for dropping to `-medium`: any rise in the THIN rc=0 rate on this lane.** That signal is
-> quota exhaustion (§8, D2), and it is the thing to watch this week.
+> **Trigger for testing a drop to `-medium`: any rise in confirmed quota errors on this lane.** A
+> direct exhaustion response is `RESOURCE_EXHAUSTED` / 429 with `Individual quota reached` and a
+> reset timer. Empty success is `AMBIGUOUS_EMPTY`, not proof of quota exhaustion (§8, D2).
 
 **Google Search grounding is a metered surface inside a flat-rate lane.** 5,000 free grounding
 queries/month across Gemini 3.x, then **$14 per 1,000 requests**, billed separately from tokens.
@@ -407,7 +440,7 @@ Enforced gates: **codex ungated · agy 2 · grok 2 · qwen 2 · deepseek 1 · lo
 | Everyday coding, mechanical edits | **`codex-terra`** | medium (low for edits) | **The `composer` replacement.** Make this the everyday codex default. |
 | Schema-bound classification, short docs | **`codex-luna`** | low | **Never reasoning, never long-context recall.** |
 | Bulk classification/extraction, big corpus | **`local` → `qwen3.5:9b`** first, escalate residue | lowest | Route by **token volume and per-item stakes**, not item count. 16K ctx: chunk. |
-| Vision / OCR batch | **`agy` (3.8 Flash) with `media_resolution: LOW`**, or `qwen3.8-flash`; PC vision serial | low | The `media_resolution` lever is new and is the cost win. |
+| Vision / OCR batch | **Gemini 3.8 Flash Batch API** with `media_resolution: LOW`/`MEDIUM`, or **`qwen3.8-flash` pay-as-you-go API**; PC vision serial | low | Both cloud routes are metered and require §7.2 per-job approval. The Alibaba Token Plan is interactive-only and MUST NOT back an automated batch (§5.3). |
 | Live-web research with citations | **`grok-web`** | high | Then a **different-family** check before anything promotes. |
 | Large single payload | **chunk it — see §7.3** | — | No lane is a big-payload destination. |
 | Image generation | **Alibaba Token Plan** (`wan2.7-image`, `qwen-image-3.0-pro`) | — | ⚠️ **Interactive use only.** Read §5.3 first. |
@@ -436,7 +469,7 @@ to read it.** The engine ingests it in pieces; nothing is stuffed into a context
 | ID | Defect | Disposition |
 |---|---|---|
 | D1 | agy pinned a generation behind | ✅ **FIXED.** Repinned `gemini-3.8-flash-high`, verified live. Risk model corrected: headless now errors on an unknown slug. |
-| D2 | agy quota exhaustion looks like auth failure (THIN rc=0) | ❌ **NO FIX.** No vendor change. Operator-side: treat empty-success as `AMBIGUOUS_EMPTY`, retry once, then probe auth separately. **This is the signal to watch after the repin.** |
+| D2 | agy wrapper masked CLI failures as THIN rc=0 | ✅ **FIXED LOCALLY 2026-09-04.** The direct CLI already reported `RESOURCE_EXHAUSTED` / 429, `Individual quota reached`, and a reset timer; since v1.1.1 print mode writes server failures to stderr and exits non-zero. `agy-ask.py` discarded the PTY child status and did not propagate its own status; both layers now preserve non-zero exits. Empty-success remains `AMBIGUOUS_EMPTY`, never a quota diagnosis. |
 | D3 | agy fabricates citations | ❌ **NO FIX.** 3.8 makes no such claim. Mitigation: read links from `groundingChunks` metadata, not from generated inline markdown. **Keep must-cite research on `grok-web`.** |
 | D4 | "Grok 54% hallucination" | 🔧 **NUMBER STALE.** 4.6 measures **34.3%** (aggregator-sourced, vendor disagrees on direction). **Replace the number, keep the cross-check rule.** |
 | D5 | Grok Build 402 + lapsed OAuth | ❌ **NO MODEL FIX.** Account state. Do not route around it via a metered xAI key. |
@@ -446,9 +479,9 @@ to read it.** The engine ingests it in pieces; nothing is stuffed into a context
 | D9 | "Luna 41.3 on reasoning" | 🔧 **MISLABELLED.** 41.3 is **MRCR v2 8-needle long-context recall**, not reasoning (Sol 91.5 / Terra 89.6 on the same test). Luna is fine for short-document classification, bad at needle-in-haystack. **Doctrine §14.6 must say MRCR.** |
 | D10 | Engines cannot self-identify | ❌ **NO FIX**, and our remedy needed sharpening (§8.1). |
 | D11 | Flat-rate image/video lane | 🔧 **SPLIT.** **Images: CONFIRMED** on Adrian's own account. **Video: claim WITHDRAWN** (per-second billing misread as per-token). Both gated by interactive-only terms. §7.2 change is Adrian's. |
-| D12 | Cheap bulk classification | ✅ **IMPROVED.** `local` first, then `qwen3.8-flash`. Route by token volume and stakes, not item count. |
+| D12 | Cheap bulk classification | ✅ **IMPROVED.** `local` first, then `qwen3.8-flash` **pay-as-you-go only with §7.2 approval**. The Token Plan cannot serve automation/batch. Route by token volume and stakes, not item count. |
 | D13 | Fable 5.1 output-token cost | 🔧 **REFRAMED.** The 1.7×/+20% claim is unverified in first-party material. The real constraints are the **50% Max cap**, ZDR incompatibility and forced-tool_choice 400s. |
-| D14 | Multimodal batch bottleneck | ✅ **IMPROVED.** Gemini 3.8's per-part `media_resolution` is the new lever; `qwen3.8-flash` is a second 2-wide multimodal lane. |
+| D14 | Multimodal batch bottleneck | ✅ **IMPROVED.** Gemini 3.8's per-part `media_resolution` is the new lever; `qwen3.8-flash` pay-as-you-go is the cheaper high-concurrency alternative. The 2-wide Token Plan lane is interactive-only, not a batch backend. |
 | D15 | Prompt caching barely used | ✅ **ACTIONABLE.** Stable-prefix architecture: doctrine → project facts → tool schemas → corpus, then an append-only tail. Gemini implicit caching starts at 4,096 common-prefix tokens, Qwen at 1,024, Opus 5 at 512. **And effort is now changeable mid-conversation without invalidating the cache.** |
 | **D16** | **Codex CLI nine releases behind (0.144.1 vs 0.153.2)** | 🆕 **NEW, found this pass.** Does not unlock Astra (account-keyed refusal), but it is real drift. |
 | **D17** | **ChatGPT plan is Plus, not Pro** | 🆕 **NEW.** Gates Astra entirely. Adrian's decision (§9). |

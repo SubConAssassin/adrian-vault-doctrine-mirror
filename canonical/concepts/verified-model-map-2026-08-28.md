@@ -116,8 +116,10 @@ Read live from `bl model list`. **10 models.** Invocation is `bl text chat`, NOT
    **That is now false** — there is a subscription video lane. It needs its own verification pass
    before use, and changing §7.2 requires an AGENTS.md §8 doctrine change, so this is **reported,
    not actioned.**
-2. **`qwen3.8-flash` is 1M context at 0.8/Mtok** and is the obvious bulk-classification lane,
-   against a plan already paid for.
+2. **`qwen3.8-flash` is 1M context at 0.8/Mtok in the Token Plan catalogue**, but the plan is
+   expressly interactive-only. It is useful for interactive classification, not an automated
+   bulk backend. A 10,000-item batch must use the pay-as-you-go API (metered, §7.2 approval) or the
+   local fleet; “already paid for” must never be used to justify wiring the Token Plan into batch.
 
 **CONCURRENCY: gate is 2** (`CLI_ASK_QWEN_MAX`).
 
