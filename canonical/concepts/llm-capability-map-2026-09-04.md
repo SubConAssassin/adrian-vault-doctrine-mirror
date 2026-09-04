@@ -121,7 +121,9 @@ was the weak one. The cost argument is contested; the **compatibility** argument
   Fable 5.1 also shares its bucket with Fable 5; Opus 5 has a separate bucket.
 - **On Max it is included but capped at 50% of the weekly usage limit.** On Pro it is not included
   in plan limits at all. **This is the number that matters to us**: half our weekly ceiling.
-- **Requires Claude Code v2.1.255+. Use v2.1.260+ in practice:** Anthropic's 2.1.260 changelog
+- **Requires Claude Code v2.1.251+. Use v2.1.260+ in practice:** Anthropic's API rejects older
+  clients with `claude_code_version_too_old` and explicitly names 2.1.251 as the floor. There was
+  no 2.1.255 release. Anthropic's 2.1.260 changelog
   fixes Fable-specific failures where `model: fable` subagents ignored `[1m]` and silently ran at
   200K, the model picker omitted Fable, post-tool-result cache reads were missed, and `/effort`
   changes invalidated the prompt cache.
@@ -306,7 +308,7 @@ tokens per image at LOW / MEDIUM / HIGH (ULTRA_HIGH: 2,240). A separate raw-size
 rule says an image already ≤384×384 is 258 tokens and larger images tile into 768×768 crops at 258
 tokens per tile; do not substitute that raw-size rule when costing an explicitly selected
 `media_resolution`. Video LOW/MEDIUM samples at ~70 tokens/second; HIGH at ~280 tokens/second.
-Up to **3,000 images per request** via the File API; **20MB** inline payload ceiling. Batch and Flex
+Up to **3,600 images per request** via the File API; **20MB** inline payload ceiling. Batch and Flex
 are 50% of standard token rates; Batch targets completion within 24 hours, while Flex targets
 1–15 minutes but is best-effort/sheddable.
 
@@ -425,8 +427,9 @@ For **`qwen3.8-flash` pay-as-you-go**, first-party Singapore/International prici
 Kong are $0.113 / $0.382. Vision input is
 approximately `height × width / (32 × 32) + 2` tokens after preprocessing, so 512×512 is about
 258 image tokens. The Singapore real-time limit is 15,000 RPM / 2,000,000 TPM. Alibaba's current
-Batch support list names `qwen3.8-max` but **not `qwen3.8-flash`**, so do not apply the generic 50%
-Batch discount to Flash until its support table changes.
+pricing table marks `qwen3.8-flash` for a 50% Batch discount in **China (Beijing)**, but not in
+**Singapore/International**; do not apply the discount to Adrian's Singapore route unless that
+region's support table changes.
 
 **The lane works.** Two research briefs returned rc=0 with 17KB each this session. Doctrine's
 "qwen BLOCKED, needs a reissued key" is **stale** — the 2026-08-27 rewire to `bl` fixed it.
@@ -464,7 +467,14 @@ and therefore **Adrian's**, not an agent's (§9).
 ## §6 — EVERYONE ELSE, and the local fleet
 
 - **Meta Muse Spark 1.3** (2 Sep). `muse-spark-1.3`, 1,048,576 ctx. Standard **$1.25 / $4.25**,
-  cached $0.15. **Contributor tier $0.10 / $0.20 — where the discount is paid in training data.**
+  cached $0.15. **Contributor tier $0.10 / $0.20. Meta's exact Contributor term is:**
+  *“Heavily discounted token pricing in exchange for permission to use your prompts and completions
+  to train future Meta models. It lowers the barrier to entry for prototyping, testing integrations,
+  and scaling experiments where training on your data is acceptable.”* The shorter product-card
+  label is *“Used to improve our products.”* This is a training permission covering prompts and
+  completions, not a published retention, confidentiality, human-review or deletion guarantee.
+  Source: [Meta Model API pricing and rate limits](https://dev.meta.ai/docs/pricing-rate-limits/)
+  (authenticated Meta page; wording independently reproduced by TechCrunch on 3 Sep 2026).
   AA index 61 (xhigh) / 62 (max, partner preview). **On AA's own cost-to-run-index it buys index 61
   for $0.55 against Sol max's $0.95 — the cheapest route to that score anywhere.** It is a **metered
   API outside §7.2's approved list**, and the contributor terms interact with client and venture
@@ -494,12 +504,19 @@ and therefore **Adrian's**, not an agent's (§9).
   (14 Aug, Apache-2.0). Use the Apple-native **8-bit MLX AWQ/affine quant** with its BF16 vision
   tower and MTP head preserved: independently measured at **28.1GB peak for load + short probe**
   and **34.46GB whole-process peak at 16K context with BF16 KV cache** on an Apple M3 Ultra. Its
+  hardware fit is separately confirmed on the exact fleet class: an 8-bit oMLX run on an **M1 Max
+  64GB** measured **28.3GB at 1K, 29.6GB at 4K, 30.1GB at 8K, and 30.9GB at 16K**. That second run
+  is a generic Qwen3.8-27B 8-bit build, not proof of the exact Alis tensor mix, so retain the
+  exact-build **34.46GB** figure as the conservative 16K planning number. Its
   ≈103K-token English/Korean/code perplexity was statistically indistinguishable from BF16, while
   the BF16 reference itself peaked at 51.1GB before meaningful context and is therefore a paper fit,
   not a sensible 64GB operating point. At the native 262K window, use 4-bit KV cache: cache alone is
   16.8GB in BF16 versus 4.2GB at 4-bit. Sources: [official model card](https://huggingface.co/Qwen/Qwen3.8-27B),
   [measured Apple-Silicon MLX quant](https://huggingface.co/avlp12/Qwen3.8-27B-Alis-MLX-8bit),
-  [independent AA score](https://artificialanalysis.ai/models/releases/qwen3-8-27b).
+  [M1 Max 64GB oMLX measurement](https://omlx.ai/benchmarks/performance/5you1zwa),
+  [independent AA score](https://artificialanalysis.ai/models/releases/qwen3-8-27b). The stronger
+  on-paper Qwen3.8-Flash-Next does not cross the line: its smallest published Unsloth GGUF is
+  **72.5GB before runtime overhead**, so it cannot reside in 64GB.
 - **Local, confirmed on our fleet:** M2 Studio Ollama (`bge-m3`, `qwen2.5:14b`, `qwen3.5:9b`,
   `nomic-embed-text`, `moondream`) and the PC RTX 5080 vision lane (`qwen2.5-vl-7b`, one image per
   request, concurrency 1 — the build crashes on concurrent decode).
