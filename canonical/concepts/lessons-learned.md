@@ -3996,3 +3996,55 @@ managing it."* §15.1 forbids **deletion**; the sanctioned method — copy → c
 then remove source — was already written down. **A node above ~90% is M2's to fix immediately,
 without asking.** Corollary from the same exchange: *"you need to be sending messages to resolve
 this rather than just abandoning it"* — unreachable is a **routing decision**, not a conclusion.
+
+---
+
+## Batch: 2026-09-04/05 M1 session `1414a4` (own lessons, not M2's — those are in the batch above)
+
+### LL-2026-09-05-016 — cross-machine clock-skew claims need simultaneous readings, not cached ones
+`tags: [mistake, diagnosis, fleet, time]`
+Declared m4's clock ~90 minutes fast by comparing a `date` output captured ~2 hours earlier against
+a fresh reading — a comparison error, not a real skew. **Actual drift, measured via `sntp` against
+Apple's time servers directly: 0.235 seconds.** Retracted immediately once actually measured.
+**Rule: never diff a cached/earlier timestamp from one machine against a fresh one from another to
+claim clock skew — query both sides at the same moment, or query one side against a third-party
+time authority (`sntp time.apple.com`), never against your own memory of an earlier check.**
+
+### LL-2026-09-05-017 — a killed LaunchAgent doesn't stop disk consumption from its already-in-flight requests
+`tags: [discovery, launchd, disk, diagnosis]`
+`launchctl bootout` on an iCloud video-download worker was followed by free space continuing to
+fall for ~10 more minutes, briefly read as "the pause failed." Root cause: the process had already
+requested several large files (0.4-1.9 GB each) from Apple's servers before it died; those
+downloads completed independently with nothing local holding them open. **Confirmed genuinely
+stopped only on a second, longer sampling pass** (4 readings, 19MB spread = noise) after the first
+pass's continued fall. **Rule: after killing a downloader/ingestion process, sample free space
+over several minutes before concluding the pause failed — the first few minutes can still reflect
+work it already committed to before dying.**
+
+### LL-2026-09-05-018 — `sudo` over SSH fails cleanly without a client-side TTY; don't misread it as a wrong password
+`tags: [tool-gotcha, ssh, sudo]`
+`ssh host "sudo cmd"` (no `-t`) fails with *"sudo: a terminal is required to read the password;
+either use the -S option... or configure an askpass helper"* — reproduced directly. This is easy to
+conflate with "wrong password" or "account locked" if you haven't hit it before, especially when a
+user reports "it wouldn't accept my password" after trying exactly this form. **Always add `-t`**
+(`ssh -t host "sudo cmd"`) for any interactive sudo prompt over SSH, and check for this specific
+error text before concluding a credential problem.
+
+### LL-2026-09-05-019 — corpus-map.db's `in_m1` flag can be a false positive on generic camera filenames
+`tags: [discovery, corpus-map, photos, data-quality]`
+Two Photos assets flagged `in_m1=1` (implying a surviving M1 copy) were checked directly against
+M1's `Photos.sqlite` and found **absent** — the flag was a false positive from filename-only
+matching (`IMG_8382.PNG` / `IMG_8381.PNG`) against unrelated M1 assets sharing the same
+auto-numbered camera filename but dated 4-7 years apart from the real missing files. **Any `in_m1`
+check used to justify "don't worry, it exists elsewhere" should be treated as a lead to verify by
+UUID/creation-date, not a settled fact**, until the underlying matching logic is fixed to
+cross-check more than filename.
+
+### LL-2026-09-05-020 — the fleet-node mutation gate matches `launchctl` anywhere in a bash command block
+`tags: [tool-gotcha, fleet-gate, bash]`
+`~/.claude/hooks/standing-rules-gate.py`'s cross-node mutation check fires on the substring
+`launchctl` appearing anywhere in a submitted Bash command, including a purely local (same-node)
+`launchctl print` bundled in the same multi-line command as an unrelated `ssh <other-node>` call —
+even though the local check itself needs no cross-node acknowledgment. **Split local-node and
+cross-node commands into separate Bash calls** rather than combining them, to avoid a false-positive
+gate trip on the local half.

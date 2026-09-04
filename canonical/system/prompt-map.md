@@ -37,7 +37,7 @@ Measured 2026-07-25.
 | **0. Global** | `~/.claude/CLAUDE.md` | every Claude session, **every project** | ~1.7k tok | Who Adrian is · how to talk to him · what's true outside this vault |
 | **1. Constitution** | `AGENTS.md` | every session (@import) | ~6.2k tok | What is TRUE and what is FORBIDDEN · ventures · firewalls · contacts · precedence |
 | **2. Runtime** | `CLAUDE.md` | every session | ~1.8k tok | The boot sequence · Claude-specific mechanics · the API stack |
-| **3. Token law** | `canonical/concepts/delegation-first-operating-doctrine.md` | every session (@import) | ~12.9k tok | HOW tokens are spent · delegation · engines · model routing |
+| **3. Token law** | `canonical/concepts/delegation-first-operating-doctrine.md` | every session (@import) | ~10.4k tok (was ~16.2k; collapsed 2026-08-15) | HOW tokens are spent · delegation · engines · model routing |
 | **4. Conduct** | `canonical/concepts/claude-ceo-operating-doctrine.md` | every session (@import) | ~3.6k tok | HOW Claude behaves toward Adrian · anti-patterns · the single-question protocol |
 | **5. Live state** | `working/handoffs/STATE-OF-STACK.md` | every session (@import) | ~7.8k tok | What is firing RIGHT NOW |
 | — | **TOTAL** | | **~34k tok/session** | |
@@ -70,11 +70,15 @@ If you need a rule, go to its home. If you find the same rule stated somewhere e
 | Precedence when instructions conflict | **AGENTS.md §4** | everywhere else |
 | Source-of-truth invariant (what is canonical) | **AGENTS.md §1** | global CLAUDE.md, ceo §5.3/§5.4 |
 | Venture list + which are active | **AGENTS.md §6** | global CLAUDE.md |
-| Hard firewalls (Chelsea · crystal facts · Apple Notes · AYA) | **AGENTS.md §7** | global CLAUDE.md "Hard rules" |
+| Hard firewalls (personal-relationship material · crystal facts · Apple Notes · AYA) | **AGENTS.md §7** | global CLAUDE.md "Hard rules" |
 | Key contacts + legal disputes | **AGENTS.md §9** | global CLAUDE.md "Key people" |
 | Event-log / state-kernel write contract | **AGENTS.md §10** | — |
 | Doctrine-change protocol | **AGENTS.md §8** | — |
+| **Frictionless protocol · the execution-channel ladder · when a hand-off to Adrian is legitimate** | **AGENTS.md §13** | `canonical/concepts/frictionless-operator-doctrine.md` (superseded 2026-08-16), `memory/full-stack-capability-map.md` §6, and the ~17 `memory/feedback-*` files that restate it as case law — all now pointers, not authorities |
+| **What you owe a fault you DISCOVERED rather than were assigned · the second end-of-turn question · what a legitimate "park" requires** | **AGENTS.md §14** | `memory/feedback-detect-means-fix-now.md` (demoted to case law 2026-08-17), `MEMORY.md` "detect=fix now" index line — pointers, not authorities. Distinct from §13: §13 asks "have I actually tried?", §14 asks "is this mine to close?" |
+| **What you owe an instruction you have ALREADY been given · the answered-question test · when a question still deserves his attention** | **AGENTS.md §16** | `memory/feedback-answered-question-just-act.md` (case law, not authority); §3.1's "no asking permission" is the slogan this section supplies the missing test for. Distinct from §13 ("have I actually tried?") and §14 ("is this mine to close?"): §16 asks **"do I already have the answer?"** |
 | Session-end state-write contract | **AGENTS.md §11.4** | global CLAUDE.md, ceo §5.2 |
+| **Every image in a session is saved out before it ends · a design decision must name its artefact BY PATH · a transcript is a buffer, not storage** | **AGENTS.md §11.4.a** | `tools/session-images-save.py` + `~/.claude/hooks/image-gate.py` are the mechanism, not a second authority; `memory/implement-the-agreed-design-never-redesign-it.md` and `memory/render-js-designs-headless-before-judging.md` are case law. Added 2026-09-03 after an Adrian-agreed portal design, held only as base64 in a `.jsonl`, was lost through a §11.4-compliant shutdown and a later session rebuilt `/cluster` from a superseded prototype. §11.4 asks "is the state written?"; §11.4.a asks **"did the artefact survive?"** |
 | **The bootup read order** | **CLAUDE.md §2** | AGENTS §11.1, ceo §5.1, global CLAUDE.md |
 | One-shot metered-API protocol (+ the 1,053-call war story) | **CLAUDE.md §4** | global CLAUDE.md |
 | Hardware / fleet / remote control | **CLAUDE.md §5** | — |
@@ -92,6 +96,7 @@ If you need a rule, go to its home. If you find the same rule stated somewhere e
 | **The single-question protocol (format template)** | **ceo §8** | AGENTS §11.3, global CLAUDE.md |
 | Production cadence / watchdog ladder | **ceo §6** | — |
 | What is firing right now | **STATE-OF-STACK.md** | any doctrine file |
+| **What may push to Adrian's phone · notification classes · the edge-trigger rule** | **`canonical/concepts/notification-policy.md`** (enforced by `tools/notify-gate.py`) | AGENTS §7.1 governs REQUESTED personal-app notifications and is unchanged; this owns the OPERATIONAL side. Added 2026-08-25 after a measured 382 pushes/day, 100% ops chatter. |
 
 ---
 
@@ -114,8 +119,10 @@ Unchanged from AGENTS §4, restated here once because this is the index:
 - **Adrian's lived number wins** over any automated meter (the resource-router). If they diverge,
   recalibrate the tool, don't argue with him.
 
-**Within a file, later supersedes earlier** where explicitly marked — delegation-doctrine is built
-in dated layers (§1 → §14) and §14 is the current one.
+**Within a file, later supersedes earlier** where explicitly marked. delegation-doctrine was
+collapsed to a single current statement on 2026-08-15 (§10 and §13 are superseded-layer stubs;
+§14 + §15 are the current model law; the pre-collapse layers live verbatim in
+`canonical/concepts/_archive/delegation-doctrine-layers-2026-06-05-to-2026-08-04.md`).
 
 ---
 
@@ -165,19 +172,18 @@ still works) — `cli-ask-selftest.sh` now **16/16**.
 
 ---
 
-## §5b — NEXT: the compression pass (handed over, not done)
+## §5b — ✅ DONE 2026-08-15: the compression pass
 
-This map fixed **correctness**. It did not fix **size** — measured honestly, the 2026-07-25 pass moved
-the five imported files from 104,869 → 110,901 chars (**+1,508 tokens/session**), because relocated
-content and contradiction records outweighed the duplication removed.
-
-The real compression is `canonical/concepts/delegation-first-operating-doctrine.md`: **53,768 chars of
-fourteen dated accretion layers** (§1→§14), where later layers supersede earlier ones without deleting
-them. Collapsing it to a single current statement + an archive targets **~28KB (~6–7k tokens off every
-session)**.
-
-**Plan, 52-rule verification checklist, hard constraints and rollback:**
-`working/handoffs/2026-07-25-HANDOVER-delegation-doctrine-layer-collapse.md`.
+This map fixed **correctness** on 2026-07-25 (and honestly measured **+1,508 tokens/session** for it —
+relocated content and contradiction records outweighed the duplication removed). The compression half
+landed 2026-08-15: `delegation-first-operating-doctrine.md` collapsed from fourteen dated accretion
+layers at **64,681 chars** (it had grown past the plan's 53,768 baseline with §11.1a + §15, both new
+current law) to **41,649 chars** — **−36%, ~5.8k tokens off every session**. The ~28KB target was set
+against the pre-§11.1a/§15 file and was not reachable without cutting live law; the real number is
+reported, per the plan's own honest-measurement rule. All 52 inventory rules traced; superseded text
+archived verbatim at `canonical/concepts/_archive/delegation-doctrine-layers-2026-06-05-to-2026-08-04.md`.
+Plan + checklist: `working/handoffs/2026-07-25-HANDOVER-delegation-doctrine-layer-collapse.md`;
+completion note: `working/claude-coordination/m2-to-m1-2026-08-15-doctrine-collapse-COMPLETE.md`.
 
 ## §6 — MAINTENANCE RULE (how to stop the sprawl coming back)
 
@@ -196,9 +202,23 @@ session)**.
 ---
 
 revision_history:
+- 2026-08-15 — §5b marked DONE (delegation-doctrine layer collapse: 64,681 → 41,649 chars, −36%);
+  §1 size table + §3 layered-file note updated to match. No rule ownership moved — every rule domain
+  keeps the same home. Executed by M2 (WINDOW-1), promoted by M1.
 - 2026-07-25 — created. Adrian-direct: *"run a full consolidation pass, make sure everything is of
   the highest accuracy and efficacy. Single source of truth so you have this in your database as a
   prompt map."* Built from a delegated rule-extraction of the delegation and CEO doctrines (52 rules,
   10 duplicate clusters, 5 internal contradictions found in delegation-first alone) plus Claude's own
   audit of the firewall-bearing files. Backups of all five pre-consolidation files:
   `working/_research/2026-07-25-doctrine-consolidation/backup-before/`.
+
+## Content / media strategy — the spine (added 2026-08-23)
+- **`canonical/concepts/content-machine-operating-strategy-2026-08-23.md`** — the MACRO layer:
+  diagnosis, platform allocation, selection algorithm, cadence, the 90-day ramp, the rule
+  adjudications, and the open faults. **Read this before touching any content/social/YouTube task.**
+  It is the pointer that `companies/subconscious-surgery/mastermind-launch/` (844KB, Jun-Jul 2026)
+  never had — that corpus sat orphaned from the operating layer for two months.
+- `.claude/skills/mkt-reel-craft/SKILL.md` — the CRAFT layer (how one reel is built correctly).
+- `.claude/skills/mkt-social-deploy/SKILL.md` — the DEPLOY surface and its hard limits.
+- **Authorisation is centralised**: nothing writes its own consent SQL. Every selector reads
+  `v_authorised_hook` in `tools/content/content-index.db`.
