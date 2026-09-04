@@ -3,7 +3,7 @@ name: llm-capability-map-2026-07-25
 title: The LLM Capability Map — every engine in the stack, what it is best at, and how to prompt it
 type: doctrine
 tier: 1
-status: CURRENT
+status: SUPERSEDED by canonical/concepts/llm-capability-map-2026-09-04.md
 date: 2026-07-25
 author: Claude (Opus 5) — CEO-of-the-stack
 as_of_utc: 2026-07-25T09:30:00Z
@@ -18,6 +18,15 @@ cross_references:
 ---
 
 # The LLM Capability Map — 2026-07-25
+
+> ⛔ **SUPERSEDED 2026-09-04.** The current map is
+> `canonical/concepts/llm-capability-map-2026-09-04.md`. Four frontier models shipped 28 Aug – 3 Sep
+> (Fable 5.1, Gemini 3.8 Flash, Muse Spark 1.3, GPT-6 Astra) and **four specific claims below are now
+> known wrong**: Sonnet 5's price never rose to $3/$15 ($2/$10 is standard); Grok's 54% hallucination
+> figure is a 4.5 number (4.6 is 34.3%); "Luna 41.3 on reasoning" is actually **MRCR long-context
+> recall**; and "changing effort mid-conversation invalidates prompt caching" is retired by
+> Anthropic's `mid-conversation-output-config-2026-07-01` beta. Kept for history, not for routing.
+
 
 **Why this exists.** Between 9 June and 24 July 2026 every vendor in the stack shipped a new
 frontier tier. Adrian's routing doctrine was written against Gemini 3.5 Flash, GPT-5.5, Grok 4.3

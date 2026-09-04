@@ -1,5 +1,21 @@
 # VERIFIED MODEL MAP, 2026-08-28
 
+> ⛔ **SUPERSEDED 2026-09-04** by `canonical/concepts/llm-capability-map-2026-09-04.md`, which
+> re-derived every lane from an engine-native probe on that date.
+>
+> 🔴 **ONE CLAIM BELOW IS WITHDRAWN, NOT JUST STALE.** §4's *"`wan-video` is on the Token Plan …
+> doctrine §7.2 is now false"*, citing a price of `0.45`, was an **arithmetic misread**: that figure
+> sat under a `price /Mtok` column, but **video is billed per SECOND of output**
+> (`video_ratio_480p`). Alibaba's Token Plan Personal table lists video as `happyhorse-1.1-t2v/i2v/r2v`;
+> Wan **video** IDs are pay-as-you-go. **A catalogue appearance never proved plan coverage.**
+> The IMAGE half of that finding turned out to be true and is now proven on Adrian's own account
+> (`~/.bailian/telemetry.jsonl`, `wan2.7-image`, 2026-08-07, success in 16.7s, drawing Credits).
+> See the current map §5.2 and §5.3.
+>
+> Also corrected since: bare `codex` resolving to `gpt-5.6-sol` is **right**, because `gpt-reserve`
+> carries `visibility: hide`; and the `qwen` lane is **working**, not blocked.
+
+
 **Every row below was read from the engine's own live catalogue or proven by a probe on 2026-08-28.
 Nothing here is copied from prior doctrine.** That is the point: the previous map said `codex` was
 GPT-5.5, and it had not been GPT-5.5 since 2026-07-10.
