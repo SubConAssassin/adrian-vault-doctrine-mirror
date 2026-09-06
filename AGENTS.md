@@ -404,6 +404,38 @@ content-derived sha filename so re-runs are idempotent, alongside the MANIFEST. 
 hook that saves automatically and reports, rather than blocking and handing Adrian manual admin.
 Originals are never touched: transcripts are read-only to it, per §15.
 
+#### 11.4.b THE COMPLETENESS GATE — closes the "saved but uncited" gap 11.4.a itself left in place
+
+**DOCTRINE CHANGE 2026-09-06. §8 classification: MECHANISM EXTENSION of §11.4.a. No existing rule is
+weakened, removed or reinterpreted.** Built live in-session at Adrian's direction, after he asked
+whether letting a long Claude Code conversation auto-compress instead of running the shutdown
+protocol would be safer for continuity (it is not: nothing wires to the compression event, only to
+Stop, so compressing instead of shutting down would only delay every gate below, not satisfy one) —
+he then confirmed he wanted the resulting gap closed now rather than parked.
+
+**The gap 11.4.a left open.** `session-images-save.py` extracts every image in a session's
+transcript unconditionally, on every Stop — real, verified, working. But extraction runs as a
+Stop-hook subprocess, not as a Write/Edit/Bash tool call inside the session's own transcript, so it
+never registers as "vault state changed by this session" under §11.4's own transcript-attributed
+write-gate (`tools/sos-gate.sh`). A session can therefore paste and discuss images, have them
+dutifully saved to `working/session-images/`, and still end with STATE-OF-STACK saying nothing
+about them — the identical shape of the original 11.4.a incident, one layer further down.
+
+**Proven, not theoretical, same day.** The first real run of the new gate — against a live,
+unrelated, already-running session, not a test fixture — caught exactly this: 15 real frame-check
+images backing a genuine, verified bugfix to `composite_reel.py` (documented in reel-tools' own
+RULES.md as CM-071), never once named in STATE-OF-STACK. See `working/handoffs/STATE-OF-STACK.md`,
+2026-09-06 ~15:52 WITA entry, for the full finding.
+
+**THE MECHANISM.** `tools/design-completeness-gate.py`, wired as a Stop hook immediately after
+`image-gate.py` (so it runs against a freshly-updated manifest). If a session's own image folder
+holds at least one image, it checks the top of STATE-OF-STACK for that folder's path, the session's
+short id, or a plain image/design word. Missing → blocks the stop once, names the exact path to
+cite, and never nags again that session (mirrors `sos-gate.sh`'s own one-shot safety valve — a gate
+that fires every turn teaches everyone to ignore it). Found anywhere in that check → silent pass,
+the correct common case. Fails soft on everything else (unreadable manifest, missing STATE-OF-STACK,
+malformed hook payload) — it blocks on exactly one provable, narrow condition, never on ambiguity.
+
 ### 11.5 THE RULE OF UNLIMITED BURN (No rationing of AG)
 
 Antigravity tokens are practically unlimited. You have over 1 million tokens per hour available. The daily target for Antigravity is officially **30,000,000+ tokens per day**. Burn as fast as you physically and mechanically can. 

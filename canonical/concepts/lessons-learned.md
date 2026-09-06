@@ -4048,3 +4048,31 @@ cross-check more than filename.
 even though the local check itself needs no cross-node acknowledgment. **Split local-node and
 cross-node commands into separate Bash calls** rather than combining them, to avoid a false-positive
 gate trip on the local half.
+
+### LL-2026-09-06-001 — Codex's "not supported when using Codex with a ChatGPT account" 400 can mean "wrong model slug", not "wrong account tier"
+`tags: [tool-gotcha, codex, cross-machine]`
+M2 called Codex CLI with `--model gpt-6` (and separately `gpt-6-sol`) and got `"The 'gpt-6' model
+is not supported when using Codex with a ChatGPT account"` — a message that reads exactly like an
+account/entitlement gate. It wasn't: neither string is a real Codex model slug, so the CLI's own
+pre-refusal log said "Model metadata for `gpt-6` not found. Defaulting to fallback metadata" before
+hitting that refusal on the fallback. The real slug, verified live on two separate machines, is
+`gpt-6-astra`. No API key is needed either — both machines authenticate via ChatGPT account, not
+`OPENAI_API_KEY`. **Before reading this error as a plan/entitlement problem, check the model string
+against the actual catalogue first** — the account-type wording is a red herring when the model
+name itself is invalid. Cost this session a cross-machine coordination round-trip to resolve.
+**Promoted to:** `memory/codex-astra-model-slug-is-gpt-6-astra-not-bare-gpt-6.md` (vault-shared,
+cross-machine-visible — the earlier plan-tier fix for this same model had only been recorded in
+one machine's personal Claude-Code auto-memory, which is why M2 couldn't find it and had to ask).
+
+### LL-2026-09-06-002 — this fleet's shared PC has no remote power-cycle path; a failed reboot is a physical-access dead end
+`tags: [discovery, fleet-hardware, pc]`
+M2 issued a normal `shutdown /r /t 5` to the shared PC after confirming it was idle (safe to
+reboot). It did not return after 20+ minutes, confirmed by two independent signals (SSH timing
+out the full window; Tailscale showing the device offline with zero bytes received the entire
+time — not a flaky single probe). Checked for IPMI, a smart-plug, or Wake-on-LAN: **none exist for
+this box**, and WoL would not route over the Tailscale WAN path even if configured. **A stuck
+reboot on this specific PC is not remotely recoverable by any current means — it always needs a
+human at the physical machine.** Worth knowing before spending time hunting for a remote fix next
+time this happens. (Resolved this instance: the PC was back and back in active use ~8 hours later,
+per a later session's PC-claim file — most likely Adrian power-cycled it after being told, though
+that specific action wasn't independently confirmed.)
