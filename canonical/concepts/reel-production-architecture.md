@@ -68,6 +68,20 @@ Evidence: [original Facebook screenshot](../../working/session-images/01a07a11-0
 
 ---
 
+## 0.2 Mandatory viewer next step — Adrian, 2026-09-08
+
+**Every Subconscious Surgery reel must tell the viewer what to do next.** Adrian corrected ABEL-19 because the ending posed a question but gave no call to action. This requirement applies to the storyboard, final on-screen ending and accompanying post. A logo, reflective question or closing payoff alone does not satisfy it.
+
+- Choose one clear primary action that fits the reel's purpose. For teaching and audience growth, the default is **“Follow Subconscious Surgery for more.”** “Save this for later” or a specific, relevant sharing/comment invitation may suit a different piece. Do not stack a list of competing requests by default.
+- Preserve the established teaching/conversion cadence. A teaching reel still gets a light engagement action; “no sales CTA” does not mean “no action.” Use a commercial next step only for an intended conversion piece and an existing approved offer/destination. This amendment adds no new sales ratio or offer.
+- Keep authored CTA text distinct from Adrian's verbatim speech subtitles. Add a clearly designed closing card or overlay; never fabricate spoken words or label the CTA as something he said. Preserve the full mind-chatter branding and any source credit.
+- Specify `cta.action`, `cta.on_screen_copy`, `cta.post_copy`, `cta.start_sec` and `cta.end_sec` in the edit handoff. Keep the action visible through the final frame, with enough reading time for the complete ending. Fit the actual text, backing and animation extrema within CM-079, separate from captions and branding.
+- Before sharing a revision, inspect the actual exported ending at phone size and in portrait, 4:5 and square crops. Verify the action is present and legible, the final frame still carries it, and the post gives the same next step. An absent CTA is a production defect; fix it before calling the reel complete. Existing full-playback and per-piece approval requirements remain.
+
+Authority: Adrian's direct correction in Codex task `01a07a11-0db6-7f31-9fca-3327a478e52a`, 2026-09-08. Classification: user-directed clarification and enforcement of the reel CTA requirement, not an amendment to AGENTS.md or authority to publish.
+
+---
+
 ## 1. THE TEAM MODEL
 
 ### Batch source variety — Adrian, 2026-09-07
