@@ -2,7 +2,7 @@
 
 **Status:** Canonical operating doctrine for the Subconscious Surgery (SS) short-form video production operation.
 **Operator:** Adrian Taffinder / "Subconscious Surgery" — spiritual / mindset / manifestation niche. Wordmark logo, handle `@adrian_taffinder`.
-**Last updated:** 2026-08-01
+**Last updated:** 2026-09-07 (caption visibility amendment; older architecture retained)
 **Source:** Synthesised from 6 verified research dimensions (shot_analysis + audio_to_video), each adversarially verified. Confidence HIGH on architecture; numeric thresholds flagged as TUNABLES to calibrate on Adrian's real corpus before being trusted as hard gates.
 **Existing code spine:** `working/reels-build/2026-06-21-ss-batch/yt_reel.py` (452 lines: `portrait_crop`, `transcribe`, `make_hook_card`, `make_caption_pngs`, `cut_portrait_video` filler-cut, `composite`).
 
@@ -21,7 +21,44 @@ Everything below operationalises that rule.
 
 ---
 
+## 0.1 Caption visibility and chest placement — CM-079 (Adrian, 2026-09-07)
+
+**Mandatory for future SS reels, every renderer and every model.** Adrian's live Facebook screenshot showed the bottom captions hidden before opening the reel and a thought card clipped at the top. Muted, unexpanded viewing is an acceptance case. On talking-head shots, Adrian requires subtitles **on his upper chest, as close to his face as possible**, so viewers can read his expression and words together with less eye movement.
+
+The machine-readable companion is [reel-layout-standard.json](reel-layout-standard.json). It is a house production baseline, not a guarantee of every Facebook/Instagram interface. At 1080×1920:
+
+| Check | Bounds (left, top, right, bottom) |
+|---|---|
+| Essential hook, subtitle, thought/label and endcard copy | 96, 480, 936, 1440 |
+| Default B-roll caption panel | 96, 1160, 936, 1440 |
+| Full portrait proof | 0, 0, 1080, 1920 |
+| Centred 4:5 feed proof | 0, 285, 1080, 1635 |
+| Conservative centred square proof | 0, 420, 1080, 1500 |
+
+The screenshot is consistent with a centred 4:5 viewport. The square test is an additional conservative house check. Actual platform previews, when available, remain the final check for that surface.
+
+- **Talking head:** inspect the actual shot and annotate the anatomical chin and upper-chest region. Use a stable chest anchor for the shot; captions must not cover the mouth or chin. A face detector's rectangle bottom is not the chin. Start on the nearest readable upper chest; reframe a source copy or reflow the text if the panel cannot fit the feed-safe rectangle. The 24–400 px chin gap is only a broad geometry guard: chest placement must also be evidenced and visually reviewed.
+- **B-roll:** use a clear lower-central caption panel inside the safe rectangle. Keep thought bubbles, labels and essential illustrated actions separate; do not overlap competing text. Caption readability has priority.
+- Use high-contrast type, normally 56–60 px on the full-size canvas, no more than two lines, with phrase-based timing. Preserve the words and qualifying clauses. Judge readability at phone size, not just on a desktop.
+- Measure the whole text-and-panel bounds and animation extrema, not just an anchor point. Hook cards, thought bubbles and the final brand/CTA must also survive all three previews. A supplemental corner logo may disappear entirely in a crop, but no half logo is acceptable and the required endcard branding must remain readable.
+- Build proofs from the actual decoded export, review talking-head and B-roll moments plus hook/outro in all three layouts, and watch muted. Geometry checks and still proofs do not establish full audiovisual review.
+- Save an export-hash-bound layout manifest with every caption group, intervals, measured bounds, speaker chest evidence and proof paths. Run `~/reel-tools/verify_feed_layout.py MANIFEST --standard /Users/adriantaffinder/Documents/Adrian-Vault/canonical/concepts/reel-layout-standard.json --report REPORT`. Exit 0 is geometry pass; 1 is fail; 2 is incomplete. Do not release with fail/incomplete. Re-encode requires a fresh matching manifest/check.
+
+The canonical Facebook/Instagram `reel` CLI commands now require `--layout-report REPORT` for the SS accounts. The guard reruns the current standard on the linked manifest and matches the actual local upload file before creating a publication attempt. A stale file, stale manifest, missing evidence or geometry failure blocks the write. This is installed in the M1 canonical publishing tools; another node must have the current helper/config before using those commands. URL-only uploads cannot satisfy this local-file binding. Existing publication/duplicate/approval controls still apply, and no live post was replaced by this amendment.
+
+This amendment supersedes CM-065's old fixed vertical bands **only for feed-safe placement**; its ban on overlapping competing text remains. Do not assume the historical 1267–1728 caption band is release-safe. This applies to both the active reel-craft skill and its GPT-6 review fork. Adrian's requested pilot correction is an explicit, copy-based revision of a produced reel; preserve all originals and published versions. It does not authorise automatic replacement or reposting.
+
+Evidence: [original Facebook screenshot](../../working/session-images/01a07a11-0db6-7f31-9fca-3327a478e52a/2026-09-07-facebook-feed-caption-clipping.png). Authority: Adrian's direct feedback in Codex task `01a07a11-0db6-7f31-9fca-3327a478e52a`. Classification: current user-approved production correction; other doctrine is unchanged.
+
+---
+
 ## 1. THE TEAM MODEL
+
+### Batch source variety — Adrian, 2026-09-07
+
+Adrian requires a visible mix of original recordings and periods of his life, including newer podcast footage alongside older archive material. Do not fill a batch with many extracts from the same source video. Deduplicate source identity using recording IDs and available full-file hashes, not filenames or alternate encodes alone. Track recording date/era and its evidence, set/outfit and format; file modification time is not proof of recording age. Unknown dates remain unknown. Adrian estimates the pilot footage is about eleven years old; that is an estimate until source evidence confirms it.
+
+For the current 30-reel selection, the working editorial target is at most two extracts per original recording, separated in the release order, and approximately ten newer podcast selections if enough suitable, cleared footage exists. These numbers are execution choices to implement variety, not a quotation of Adrian's instruction or permission to use weaker material to fill a quota. Screen podcast speakers, guests and consent individually. Preserve every source's clearance and actual opening/payoff context. Report candidate cards, distinct qualified recordings and finished reels separately; duplicates, rejected takes and unresolved sources do not count as a production-ready batch.
 
 The operation is six concrete capability clusters ("teams"). Each is a defined stage with named tools and a defined handoff artifact. Work flows left to right; the artifact each team produces is the input contract for the next.
 

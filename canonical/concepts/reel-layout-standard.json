@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "standard_id": "SS-CM-079",
+  "updated": "2026-09-07",
+  "authority": "Adrian direct: muted Facebook feed readability and talking-head chest captions",
+  "canvas": {
+    "width": 1080,
+    "height": 1920
+  },
+  "safe_zones": {
+    "critical": [
+      96,
+      480,
+      936,
+      1440
+    ],
+    "caption_panel": [
+      96,
+      1160,
+      936,
+      1440
+    ],
+    "full_9x16": [
+      0,
+      0,
+      1080,
+      1920
+    ],
+    "feed_4x5": [
+      0,
+      285,
+      1080,
+      1635
+    ],
+    "square_1x1": [
+      0,
+      420,
+      1080,
+      1500
+    ]
+  },
+  "speaker_caption": {
+    "min_chest_gap_px": 24,
+    "max_chest_gap_px": 400,
+    "placement": "Stable per-shot upper chest, nearest face without covering chin or mouth. Measure anatomical chin and upper_chest_bbox; detector box bottom is not chin evidence."
+  },
+  "typography": {
+    "preferred_font_px": [
+      56,
+      60
+    ],
+    "max_lines": 2
+  },
+  "notes": [
+    "House QA baseline derived from Adrian screenshot, not a guarantee of every Meta surface.",
+    "Caption panel is the default b-roll zone; speaker captions follow measured upper chest inside critical.",
+    "Bounds include text, backing panel and animation extrema. Inspect decoded video in all three layouts muted.",
+    "Chin gap is a broad guard, not proof of chest placement. Caption vertical center must also fall inside measured upper chest.",
+    "Supplemental corner logo can be outside critical if it is not cropped partially in a proof; essential endcard brand remains inside critical."
+  ],
+  "evidence": "/Users/adriantaffinder/Documents/Adrian-Vault/working/session-images/01a07a11-0db6-7f31-9fca-3327a478e52a/2026-09-07-facebook-feed-caption-clipping.png"
+}
