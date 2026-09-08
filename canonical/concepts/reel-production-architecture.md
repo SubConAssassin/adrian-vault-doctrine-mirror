@@ -191,6 +191,37 @@ Candidate selection also records why the exact story is useful to serial or spir
 entrepreneurs in business, identity, relationships or inner work. Job and interview material may
 qualify when that link is real. A topic label alone neither qualifies nor excludes it.
 
+## 0.7 Mind Chatter artwork as meaningful reel accents — 2026-09-08
+
+Use the authentic Mind Chatter v10 library as a production input for future and in-progress
+unapproved SS reels. Select an icon, letter or symbol only where it punctuates the actual meaning
+or a spoken emphasis; do not add one to every shot or count a decorative accent as B-roll.
+A Mastermind mark may identify a genuine Mastermind excerpt; an idea, question or direction mark
+may reinforce the corresponding spoken beat. Retain the varied visual treatments suited to each story.
+
+The canonical artwork rules are in
+[SS brand guidelines](../../companies/subconscious-surgery/intelligence/brand-guidelines.md),
+section “Mind Chatter”. The reusable SVG and transparent-PNG kit, usage guide and asset hashes are at
+`/Users/adriantaffinder/Documents/Adrian-Vault/working/content-machine/2026-09-08-mindchatter-brand/kit/`.
+Existing v10 source SVGs remain at
+`/Users/adriantaffinder/Documents/localhost/subconscious-surgery-next/public/brand/mc-v10/`.
+For a missing short glyph, use the copy-preserving adapter
+`/Users/adriantaffinder/Documents/Adrian-Vault/tools/content/mindchatter-generate.py`
+with the intended glyph, seed and new output path; retain its source/parameter/hash receipt.
+The engine composes authentic vector splash shapes; raster texture mask-fill is not this treatment.
+
+Record any selected accent's source/hash, intended meaning, timing and motion bounds in the
+storyboard/build receipt. Preserve the supplied artwork palette, counters and proportions. Judge
+legibility at phone size and protect captions, complete heads, actions, primary branding and CTA
+through the full motion; the existing CM-079 and audiovisual checks still apply to the new export.
+An accent does not replace persistent branding or the full Mind Chatter ending. Consume copies;
+keep approved/scheduled export hashes intact unless Adrian commissions a specific revision.
+
+Authority: Adrian's SS marketing deployment request, relayed by the cooperating marketing task
+`01a07f21-eae8-7c93-9353-dacc69fe557a` and recorded in the canonical brand guidelines on 2026-09-08.
+Classification: scoped adoption of the existing brand production input; no constitutional,
+publication, spend or fleet-priority change.
+
 ## 1. THE TEAM MODEL
 
 ### Batch source variety — Adrian, 2026-09-07
