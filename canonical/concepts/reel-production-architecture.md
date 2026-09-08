@@ -222,6 +222,26 @@ Authority: Adrian's SS marketing deployment request, relayed by the cooperating 
 Classification: scoped adoption of the existing brand production input; no constitutional,
 publication, spend or fleet-priority change.
 
+## 0.8 Audio/video quality and learned noise reduction — Adrian, 2026-09-08
+
+**Qualify the source before expensive B-roll or finishing.** Adrian liked MM18's visuals but heard objectionable background noise/hum. Loudness normalization had made the noise much louder. LUFS, peak limits, waveform correlation, successful decoding and transcript agreement did not establish acceptable sound. Prioritise demonstrably clean, intelligible recordings in the launch queue while preserving audience, source variety and teaching/conversion balance. Older or noisy archive remains available for restoration; age alone is not a quality verdict.
+
+Inspect the selected source for background noise, changing hum/buzz, room echo, clipping, dropouts, mouth noise and speech intelligibility. Inspect video for usable focus, exposure, compression, motion and source completeness before committing to a treatment. Record `source_quality` as `clean_eligible`, `restoration_needed`, `reserve` or `unassessed`, with source hash, exact interval, measured findings and what was actually heard/viewed. `clean_eligible` requires listening evidence, not only measurements. Check alternate microphones/camera tracks under the existing source-hunt protocol first.
+
+### RX learned-profile procedure
+
+Use the installed version's instructions. For RX 5 Spectral De-noise in manual mode:
+
+1. Work on a copy at original timing. Inspect noise-only pauses across the recording, including later sections where the noise may change. Choose representative noise without speech, breath or useful sound. Several appropriate samples can improve coverage; indiscriminately selecting more audio can contaminate the profile. Retain their timestamps and source identity.
+2. In RX standalone, Shift-add separate time/spectral selections and **click Learn**. Selecting regions or opening the module does not train it. Verify the learned profile is present; the orange trace shows that profile plus the threshold offset. Repeated separate Learn clicks must not be assumed to accumulate earlier samples. When the interface cannot add disjoint selections, a documented training-only copy joining the selected pause interiors is an explicit workaround; keep its interval mapping and never insert it into the programme audio.
+3. Select the intended programme span and preview. If noise changes substantially, compare region-specific profiles or an available adaptive mode rather than forcing one broad profile over unrelated conditions. Start conservatively; threshold and reduction are listening decisions, not a universal preset. RX 5 quality C/D use offline processing; D also reconstructs high-frequency detail, so C is the initial choice when preserving source detail without that reconstruction is preferred.
+4. Audition **Output noise only** or an accurately aligned, unnormalised source-minus-result residual: recognisable voice in what is removed means revisit the selection/settings. Compare before/after at matched speech level for consonants, breath, warmth, reverberant tails, pumping, gating and watery artifacts. Aim for natural, intelligible speech, not absolute silence. A pressed Preview button is not evidence that an agent heard it.
+5. Process once from the original working state, export a new lossless intermediate, then set programme loudness. Another candidate starts from the original, not an already processed pass. Record module/version, sample intervals, Learn verification, parameters, processing span, export hash and comparison evidence. For this authorised audio repair, preserve the picture stream and verify unchanged duration, sample alignment and speech/caption timing when replacing the audio. No voice cloning or invented replacement speech is implied by restoration.
+
+Before presenting an export as approval-ready, a named reviewer must listen to the complete final encode at normal speed and review its picture and muted feed presentation. Save `audio_video_quality_review` with export hash, reviewer, method, checks, verdict and unresolved defects. Separate machine measurements from actual listening/visual findings. Unperformed listening is **INCOMPLETE**; user-reported noise or other quality failure is **HOLD** until repaired and reviewed. An earlier visual approval does not approve revised audio. Existing source, caption, tracking, creative, privacy and publication gates remain in force.
+
+References: [iZotope RX 5 guide, pp.106–110](https://help.izotope.com/docs/izotope-rx5-help.pdf), [iZotope noise-floor workflow](https://www.izotope.com/community/blog/what-is-the-noise-floor). Multi-region sampling and explicit Learn are Adrian's direct instructions. Classification: authorised production correction; no change to fleet ownership, spending or publication authority.
+
 ## 1. THE TEAM MODEL
 
 ### Batch source variety — Adrian, 2026-09-07
