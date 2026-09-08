@@ -242,6 +242,38 @@ Before presenting an export as approval-ready, a named reviewer must listen to t
 
 References: [iZotope RX 5 guide, pp.106–110](https://help.izotope.com/docs/izotope-rx5-help.pdf), [iZotope noise-floor workflow](https://www.izotope.com/community/blog/what-is-the-noise-floor). Multi-region sampling and explicit Learn are Adrian's direct instructions. Classification: authorised production correction; no change to fleet ownership, spending or publication authority.
 
+## 0.9 Demonstration integrity — CM-081 (Adrian, 2026-09-08)
+
+Classify each source as `demonstration` or `not_demonstration` **before excerpt selection**. A
+demonstration needs a source action map with exact source intervals for `setup`, `instruction`,
+`action`, `viewer_response` and `payoff`, in that order. Record the spoken and visual cues and the
+hands, props or other action components the viewer must see. An explicit `not_demonstration`
+classification records its reason; do not use it to bypass a visible exercise.
+
+The selected excerpt and paper edit retain the complete mapped sequence. If the teaching depends
+on seeing a finger change, gesture, prop movement or response, those intervals remain
+`source_demonstration` video. Place supporting B-roll around the essential demonstration, not over
+it. The 60/40 target cannot cover, replace, fragment or reorder the action. Captions, branding,
+hooks and labels stay clear of every meaning-bearing hand, prop and action box in full portrait,
+centre 4:5 and centre square crops.
+
+Bind each retained stage's source interval to its final export interval and to the applicable
+CM-079 essential-subject IDs. Those subjects require complete source extents, actual crop
+transforms and decoded start, middle, end, motion-extremum and transition evidence. Run:
+
+`python3 /Users/adriantaffinder/reel-tools/verify_demonstration_integrity.py DEMONSTRATION-INTEGRITY.json --standard /Users/adriantaffinder/Documents/Adrian-Vault/canonical/concepts/reel-layout-standard.json --report DEMONSTRATION-INTEGRITY-REPORT.json`
+
+The current export must then be reviewed as actual video at normal speed and muted for sequence,
+visible hands/props, unobscured action, viewer response, payoff and cadence. Transcript checks and
+decoded stills remain useful evidence but do not establish that the exercise plays correctly. An
+unperformed video review is **INCOMPLETE**; a hold or failed review is **FAIL**. This is a quality
+review, not a new consent, publication or permission gate. The executable validates receipt
+completeness, hashes and declared mappings; it does not watch pixels or decide whether the action
+is understandable.
+
+Classification: mechanism extension / new production gate. It preserves CM-079, CM-080, R-006,
+the 60/40 creative target and all source, claim, privacy, audio and human-review requirements.
+
 ## 1. THE TEAM MODEL
 
 ### Batch source variety — Adrian, 2026-09-07

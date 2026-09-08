@@ -110,5 +110,43 @@
     "geometry": "At each computed start, middle, end, eye extremum and maximum-step frame, bind the whole-head source bbox through the actual source crop and output transform. The full head, hair and eyes must remain visible inside the common critical crop intersection.",
     "human_acceptance": "A named human reviewer checks the current-export decoded full 9:16, center 4:5 and center square proofs for Adrian identity, full head and eyes, smooth tracking, source-edge feasibility and composition, then completes the normal-speed audiovisual and muted watches. Assistant or automated still review is not the named human watch. Missing detection, proof or human watch blocks release; automated detection does not establish identity, hair completeness or visual quality.",
     "acceptance_basis": "Internal SS tracking thresholds. They are production acceptance values, not platform guarantees."
+  },
+  "demonstration_integrity": {
+    "standard_id": "SS-CM-081",
+    "classification_required_before_selection": true,
+    "required_stages": [
+      "setup",
+      "instruction",
+      "action",
+      "viewer_response",
+      "payoff"
+    ],
+    "required_temporal_evidence": [
+      "start",
+      "mid",
+      "end",
+      "motion_extremum",
+      "transition_in",
+      "transition_out"
+    ],
+    "source_visual_rule": "When understanding depends on seeing the demonstration, its action and viewer response remain source-demonstration video. Supporting B-roll and the 60/40 target cannot cover, replace or fragment those intervals.",
+    "overlay_rule": "Keep every meaning-bearing hand, prop and action box clear of captions, persistent branding, hooks and labels in portrait, centre 4:5 and centre square crops.",
+    "actual_video_review_methods": [
+      "full_normal_speed_and_muted_video"
+    ],
+    "actual_video_review_checks": [
+      "sequence_complete",
+      "hands_props_visible",
+      "actions_unobscured",
+      "viewer_response_retained",
+      "payoff_retained",
+      "cadence_intact"
+    ],
+    "checker_limitations": [
+      "The executable validates receipt completeness, hashes and declared mappings; it does not watch the video or identify hands, props or actions.",
+      "CM-079 crop and collision geometry cannot prove that a demonstration is understandable.",
+      "Transcript review and decoded stills do not satisfy actual-video review.",
+      "The 60/40 coverage target never overrides essential demonstration continuity."
+    ]
   }
 }
