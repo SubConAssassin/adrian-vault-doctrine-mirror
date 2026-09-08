@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "standard_id": "SS-CM-079",
-  "updated": "2026-09-07",
-  "authority": "Adrian direct: muted Facebook feed readability and talking-head chest captions",
+  "updated": "2026-09-08",
+  "authority": "Adrian direct: muted Facebook/Instagram feed readability, talking-head chest captions, prominent persistent branding and essential-subject crop framing",
   "canvas": {
     "width": 1080,
     "height": 1920
@@ -52,11 +52,63 @@
     "max_lines": 2
   },
   "notes": [
-    "House QA baseline derived from Adrian screenshot, not a guarantee of every Meta surface.",
+    "House QA baseline derived from Adrian review evidence; it is an internal design acceptance standard, not a guarantee of every Meta surface.",
     "Caption panel is the default b-roll zone; speaker captions follow measured upper chest inside critical.",
     "Bounds include text, backing panel and animation extrema. Inspect decoded video in all three layouts muted.",
     "Chin gap is a broad guard, not proof of chest placement. Caption vertical center must also fall inside measured upper chest.",
-    "Supplemental corner logo can be outside critical if it is not cropped partially in a proof; essential endcard brand remains inside critical."
+    "Primary persistent branding stays fully visible, readable and deliberately composed throughout the reel. A closing endcard does not replace it, and shrinking a corner bug to avoid collisions is not acceptable.",
+    "Measure the tight visible mark rather than its backing tile. Human phone-preview review decides actual legibility and prominence; the executable only checks the recorded floor and receipt integrity.",
+    "Protect every meaning-bearing face and action through actual crop transforms. Review decoded start, mid, end, motion extrema and transition samples; geometry alone is not a visual pass."
+    ,"Speaker tracking is checked only inside explicitly declared Adrian A-roll intervals. Every frame remains in the denominator; missing detections, discarded positional outliers and Haar fallback cannot support a pass."
   ],
-  "evidence": "/Users/adriantaffinder/Documents/Adrian-Vault/working/session-images/01a07a11-0db6-7f31-9fca-3327a478e52a/2026-09-07-facebook-feed-caption-clipping.png"
+  "evidence": "/Users/adriantaffinder/Documents/Adrian-Vault/working/session-images/01a07a11-0db6-7f31-9fca-3327a478e52a/2026-09-07-facebook-feed-caption-clipping.png",
+  "persistent_brand": {
+    "required": true,
+    "phone_preview_width_px": 360,
+    "min_glyph_width_at_preview_px": 133,
+    "min_glyph_height_at_preview_px": 22,
+    "timeline_gap_tolerance_sec": 0.001,
+    "measurement": "Tight visible logo/glyph bounds in the decoded 1080x1920 export, excluding transparent padding and backing tile; scaled to a 360px-wide design-review preview.",
+    "acceptance_basis": "Internal SS design floor chosen from a human-reviewed 460x92 panel whose tight mark measured 400x68 at 1080 canvas (133.3x22.7 at 360 preview). It is not a Meta surface guarantee."
+  },
+  "essential_subjects": {
+    "safe_zone": "critical",
+    "kinds": [
+      "face",
+      "action"
+    ],
+    "bbox_rule": "Measure the full meaning-bearing extent: a face box includes the whole head and hair, not only detector eyes/nose; an action box includes every object/gesture required to understand the beat.",
+    "transform_rule": "Bind source_bbox through the actual per-sample source_rect to output_rect transform and verify the calculated output_bbox in portrait, center 4:5 and center square views.",
+    "temporal_evidence": [
+      "start",
+      "mid",
+      "end",
+      "motion_extremum",
+      "transition_in",
+      "transition_out"
+    ],
+    "source_completeness": "Mark complete only after viewing the source. Intentional partial framing requires explicit named human editorial acceptance and reason."
+  },
+  "speaker_tracking": {
+    "speaker": "Adrian Taffinder",
+    "detector": "YuNet eye landmarks",
+    "detector_min_score": 0.7,
+    "decode_max_dimension_px": 960,
+    "required_detection_coverage": 1.0,
+    "eye_x_band": [
+      0.38,
+      0.62
+    ],
+    "eye_y_band": [
+      0.25,
+      0.48
+    ],
+    "max_eye_deviation_x_frac": 0.08,
+    "max_eye_deviation_y_frac": 0.05,
+    "max_eye_step_px_at_1080": 36,
+    "measurement": "Decode every frame of every declared Adrian A-roll interval. Never include B-roll faces in the measurement. Never discard positional outliers, lower the denominator or substitute Haar/collar boxes. More than one detected face is identity-ambiguous and blocks automated passage.",
+    "geometry": "At each computed start, middle, end, eye extremum and maximum-step frame, bind the whole-head source bbox through the actual source crop and output transform. The full head, hair and eyes must remain visible inside the common critical crop intersection.",
+    "human_acceptance": "A named human reviewer checks the current-export decoded full 9:16, center 4:5 and center square proofs for Adrian identity, full head and eyes, smooth tracking, source-edge feasibility and composition, then completes the normal-speed audiovisual and muted watches. Assistant or automated still review is not the named human watch. Missing detection, proof or human watch blocks release; automated detection does not establish identity, hair completeness or visual quality.",
+    "acceptance_basis": "Internal SS tracking thresholds. They are production acceptance values, not platform guarantees."
+  }
 }

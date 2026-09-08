@@ -18,7 +18,7 @@
 
 **Status:** Canonical operating doctrine for the Subconscious Surgery (SS) short-form video production operation.
 **Operator:** Adrian Taffinder / "Subconscious Surgery" — spiritual / mindset / manifestation niche. Wordmark logo, handle `@adrian_taffinder`.
-**Last updated:** 2026-09-08 (source-screen and chroma review gate; earlier architecture retained)
+**Last updated:** 2026-09-08 (source-screen, feed composition, speaker tracking and subtractive-cut gates; earlier architecture retained)
 **Source:** Synthesised from 6 verified research dimensions (shot_analysis + audio_to_video), each adversarially verified. Confidence HIGH on architecture; numeric thresholds flagged as TUNABLES to calibrate on Adrian's real corpus before being trusted as hard gates.
 **Existing code spine:** `working/reels-build/2026-06-21-ss-batch/yt_reel.py` (452 lines: `portrait_crop`, `transcribe`, `make_hook_card`, `make_caption_pngs`, `cut_portrait_video` filler-cut, `composite`).
 
@@ -56,7 +56,7 @@ The screenshot is consistent with a centred 4:5 viewport. The square test is an 
 - **Talking head:** inspect the actual shot and annotate the anatomical chin and upper-chest region. Use a stable chest anchor for the shot; captions must not cover the mouth or chin. A face detector's rectangle bottom is not the chin. Start on the nearest readable upper chest; reframe a source copy or reflow the text if the panel cannot fit the feed-safe rectangle. The 24–400 px chin gap is only a broad geometry guard: chest placement must also be evidenced and visually reviewed.
 - **B-roll:** use a clear lower-central caption panel inside the safe rectangle. Keep thought bubbles, labels and essential illustrated actions separate; do not overlap competing text. Caption readability has priority.
 - Use high-contrast type, normally 56–60 px on the full-size canvas, no more than two lines, with phrase-based timing. Preserve the words and qualifying clauses. Judge readability at phone size, not just on a desktop.
-- Measure the whole text-and-panel bounds and animation extrema, not just an anchor point. Hook cards, thought bubbles and the final brand/CTA must also survive all three previews. A supplemental corner logo may disappear entirely in a crop, but no half logo is acceptable and the required endcard branding must remain readable.
+- Measure the whole text-and-panel bounds and animation extrema, not just an anchor point. Hook cards, thought bubbles, persistent primary branding and the final brand/CTA must survive all three previews. Primary branding stays fully visible and readable throughout; the endcard does not substitute for it. Do not shrink a corner mark into an incidental bug to dodge collisions.
 - Build proofs from the actual decoded export, review talking-head and B-roll moments plus hook/outro in all three layouts, and watch muted. Geometry checks and still proofs do not establish full audiovisual review.
 - Save an export-hash-bound layout manifest with every caption group, intervals, measured bounds, speaker chest evidence and proof paths. Run `~/reel-tools/verify_feed_layout.py MANIFEST --standard /Users/adriantaffinder/Documents/Adrian-Vault/canonical/concepts/reel-layout-standard.json --report REPORT`. Exit 0 is geometry pass; 1 is fail; 2 is incomplete. Do not release with fail/incomplete. Re-encode requires a fresh matching manifest/check.
 
@@ -104,6 +104,92 @@ The executable verifies that the declared review is complete and applies to the 
 It does not detect a screen, inspect pixels, choose thresholds or establish a visual pass. Human
 review remains the visual gate. This section adds to the factual, method, caption, creative and
 normal-speed audiovisual gates; it does not replace them.
+
+## 0.4 Persistent branding and essential-subject feed composition — CM-079 (Adrian, 2026-09-08)
+
+Every reel carries intentionally prominent, readable primary branding throughout the decoded
+export. A closing brand card supports this requirement but does not replace it. Placement may
+adapt by shot to protect the composition; a fixed tiny corner bug is not an acceptable way to
+avoid captions, faces or actions. Measure the tight visible glyph/mark, excluding transparent
+padding and its backing panel. The current internal floor in `reel-layout-standard.json` was
+chosen from a human-reviewed 460×92 panel whose tight mark measured 400×68 on the 1080-wide
+canvas (133.3×22.7 in a 360-pixel-wide phone design preview). The executable uses a 133×22 preview
+floor to tolerate measurement rounding. This is an SS design acceptance floor, not a claim about
+every Facebook or Instagram interface. Human review must still find the mark readable, prominent
+and deliberately aligned with the subtitles and shot.
+
+For each shot, identify every meaning-bearing face and action before framing. A face box includes
+the complete head and hair, not just a detector's eye/nose rectangle. An action box includes the
+gesture and objects needed to understand it. Inspect the source first: absent or already cropped
+subject matter cannot be recovered by reframing. Mark it complete only when the source proves it;
+an intentional partial subject needs a named human editorial acceptance and reason.
+
+The layout receipt maps each source box through the actual per-sample source crop and output
+placement. The resulting output box must remain protected in portrait, centred 4:5 and centred
+square checks and must not collide with active subtitles, labels, hooks or primary branding.
+Moving subjects need decoded start, middle, end and motion-extremum samples; shot boundaries also
+need decoded transition-in and transition-out samples. Bind every proof and the human review to
+the current export hash. A re-encode invalidates them.
+
+`verify_feed_layout.py` checks receipt completeness, file hashes, persistent-brand timeline
+coverage, declared glyph size, crop-transform arithmetic, safe bounds and declared collisions.
+It does not see pixels or establish logo legibility, subject completeness, composition or
+platform behavior. A named human must review the decoded full, 4:5 and square samples at phone
+size and explicitly pass logo legibility/prominence, subtitles, source completeness, essential
+faces/actions, motion extrema and transitions. Missing review is INCOMPLETE; a human hold/fail is
+FAIL even when the geometry passes.
+
+## 0.5 Whole-shot Adrian tracking and full-head feed safety — CM-080 (Adrian, 2026-09-08)
+
+The final mixed export declares every end-exclusive Adrian A-roll interval. The release check
+decodes every frame inside those intervals with scored YuNet eye landmarks. B-roll faces are not
+speaker evidence. Missing rows and missing detections remain in the denominator and fail; the
+checker may not delete positional outliers, accept a partial coverage percentage or fall back to
+Haar/collar boxes. More than one face candidate is identity-ambiguous and needs a repaired shot or
+explicitly safer source/crop before it can pass the automated lane.
+
+All declared A-roll frames share one reel-wide eye anchor. Apply the internal eye band, maximum
+reel-wide deviation and adjacent-frame movement values from `reel-layout-standard.json`; do not
+use a median or p90 summary to hide a short edge exit. These values are SS production acceptance
+thresholds, not platform guarantees. Tracking must be smooth and feasible within the actual
+source edges; interpolation may not manufacture head room that is absent in the source.
+
+For each A-roll interval, save current-export decoded proofs at start, middle, end, leftmost,
+rightmost, topmost and bottommost eye positions, maximum adjacent movement, and relevant shot
+transitions. In portrait, centred 4:5 and centred square, a named human confirms Adrian's identity,
+complete head and hair, visible eyes, source-edge feasibility, smooth movement and deliberate
+composition, then completes the normal-speed audiovisual and muted watches. Assistant still review
+does not count as this named human pass. Bind every proof, transform and review to the current
+export hash. A re-encode invalidates the receipt. The report separates `technical_status` from
+`human_status`; technical PASS with human INCOMPLETE is still not releasable. Run:
+
+`~/reel-tools/verify_speaker_tracking.py SPEAKER-TRACKING.json --standard /Users/adriantaffinder/Documents/Adrian-Vault/canonical/concepts/reel-layout-standard.json --report SPEAKER-TRACKING-REPORT.json`
+
+The legacy `verify_eyeline.py` is diagnostic only for mixed reels: it uniformly samples B-roll,
+allows missing detections, rejects positional outliers and reports median/p90 movement. Those
+behaviours allowed Adrian's real edge wander to disappear from the release evidence. The new
+checker validates measurements and receipt completeness; it cannot identify Adrian, see missing
+hair, judge motion quality or replace a normal-speed audiovisual and muted watch.
+
+## 0.6 Documented subtractive filler edits — R-006 (Adrian, 2026-09-08)
+
+Choose one continuous source passage. Retained speech remains exact and in source order, but an
+editor may remove an individually reviewed redundant discourse filler such as an “erm” or “yeah”.
+This is not a blanket word list: acknowledgements, qualifiers, negation, emphasis, emotion,
+repetition and pauses that carry meaning or musical cadence stay. Cover the visual jump with
+B-roll, preserve natural audio cadence and never reorder, rewrite or regenerate Adrian's speech.
+
+The cut receipt binds the source, original word timing and edited speech artifact hashes. It maps
+each retained word and removed source range, proves monotonic source and cut order, and records a
+named human decision for every removal plus the complete cadence/meaning review. Even an uncut
+passage records one retained span and an empty removal list; a legacy or missing receipt does not
+silently pass. `verify_subtractive_cut.py` checks this evidence and arithmetic. It does not decide
+whether a word is semantically expendable or whether the edit sounds natural; the named human
+review remains mandatory.
+
+Candidate selection also records why the exact story is useful to serial or spiritually minded
+entrepreneurs in business, identity, relationships or inner work. Job and interview material may
+qualify when that link is real. A topic label alone neither qualifies nor excludes it.
 
 ## 1. THE TEAM MODEL
 
@@ -312,7 +398,7 @@ Step by step, source → deliver. **Every step ends with a verification gate. Th
    - *Verify:* every generated clip is 9:16 (`reframe` if not); open each hero asset and confirm it matches the line. No "coffee scene"-vague prompt failures — prompts are subject+action+style+camera-move specific.
 
 7. **ASSEMBLY** — Team 4 composites: face-anchored crop / punch-ins / pan-scan / filler cuts / asset overlay via ffmpeg + `composite()`.
-   - *Verify:* extract sample frames across the timeline. Confirm NO bisected logo, NO double caption, captions synced to the (silent-to-most-viewers) VO, hook centered. This is the frame-level check that prevents both original failures.
+   - *Verify:* extract decoded start/middle/end, motion-extremum and transition samples for every shot. Map each whole-head/meaning-bearing-action source box through the actual crop transform. Confirm primary branding remains prominent and readable, essential faces/actions remain composed in full/4:5/square views, no text or brand collision, NO double caption, captions synced to the (silent-to-most-viewers) VO, and hook centered. Run the §0.4 receipt gate; its geometry result does not replace human viewing.
 
 8. **CAPTION** — render the kinetic phrase-chunk caption track (skipped entirely for Class C; forbidden in the detected caption region for any class).
    - *Verify:* a sampled caption frame is legible sound-off (stroke + drop shadow), chunk is 2–4 words, held ≥600 ms.
@@ -331,7 +417,7 @@ Step by step, source → deliver. **Every step ends with a verification gate. Th
 1a. **Classify the source screen before framing.** `green`, `blue`, `none` or `uncertain`; chroma needs an intentional treatment and a full-resolution, hash-bound final human review of edges, spill, skin, shirt, hands, matte holes and feed crops.
 2. **`already_produced` is a hard gate.** ≥2 of {burned captions, logo, true-9:16} with temporal hysteresis → PASS-THROUGH. Never double-caption, never re-crop a finished reel.
 3. **Never crop on a fixed offset.** Kill `x_off=246`. Crop box = face/subject center, bounds-clamped, EMA-smoothed with deadband + max-velocity clamp.
-4. **Never bisect a logo.** Once `logo_bbox` is known, the crop includes it whole or excludes it whole.
+4. **Keep primary branding intentionally prominent and readable throughout.** The endcard is not a substitute. Measure the tight visible mark, protect it in every crop, adapt its shot placement when needed and obtain the §0.4 phone-preview human pass; do not shrink it into a collision-avoidance bug.
 5. **Whisper-OCR match clinches the caption verdict.** Lower-third text that fuzzy-matches the transcript at the same timestamp IS a speech caption → definitively skip re-captioning.
 6. **The word-level transcript is the master clock.** Every visual decision keys off `(word, t_start, t_end)`.
 7. **Hook-first, always.** First 0–3s = a researched, center-framed, oversized, mixed-case kinetic hook card. Weak hook → swap before spend.

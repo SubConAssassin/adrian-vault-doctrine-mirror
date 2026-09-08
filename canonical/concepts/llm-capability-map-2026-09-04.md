@@ -48,7 +48,10 @@ Total cash cost **$0** — every lane used is a subscription we already pay for.
    answer is a confirmed negative, checked across five separate first-party Anthropic pages: only
    one `claude-opus-5` snapshot has ever existed and no `claude-opus-5-x` appears anywhere. The
    post-July capability bump is **Fable 5.1**, a different model. Opus 5 stays the default tier.
-2. **GPT-6 Astra is NOT coming to our Codex lane, and the reason is the plan, not the rollout.**
+2. ⚠️ **SUPERSEDED 2026-09-05/09-08 — Astra IS live on our Codex lane now.** Adrian moved the
+   account to **Pro** and `gpt-6-astra` is in the catalogue, is the `config.toml` default at
+   `xhigh`, and CLI is 0.153.4. Read §2.2's green RESOLVED block, not the red one. Original
+   headline, kept for the record: **GPT-6 Astra is NOT coming to our Codex lane, and the reason is the plan, not the rollout.**
    A live probe returns HTTP 400: *"The 'gpt-6-astra' model is not supported when using Codex with
    a ChatGPT account."* Our `~/.codex/auth.json` reports **`chatgpt_plan_type: plus`**, and
    OpenAI's own help page says Astra is Pro $100 / Pro $200 / Business / Enterprise and is
@@ -294,6 +297,17 @@ codex exec -m gpt-6-astra  →  HTTP 400
 > **Do not write Astra into the engine board and do not plan around it.** If he does upgrade, note that Codex reportedly
 > does **not** apply the >272K long-context multiplier and does not charge cache writes, which
 > would make Astra's 96.3% MRCR retrieval in the 512K–1M band genuinely useful rather than theatre.
+
+> ✅ **RESOLVED 2026-09-05, RE-VERIFIED LIVE 2026-09-08. THE PLAN *WAS* THE BLOCKER — `prolite` was
+> not the end state.** Everything above this line is superseded on the Astra question and is kept
+> only as the record of how it was diagnosed. Ground truth on this machine, 2026-09-08 13:26 WITA:
+> `~/.codex/auth.json` id_token now decodes to **`chatgpt_plan_type: pro`** (not `plus`, not
+> `prolite`); **`gpt-6-astra` is present in `~/.codex/models_cache.json`** alongside `gpt-reserve`,
+> `gpt-5.6-sol/terra/luna`, `gpt-5.5`, `gpt-5.4-mini`, `gpt-5.3-codex-spark`; and
+> `~/.codex/config.toml` already sets `model = "gpt-6-astra"` with `model_reasoning_effort = "xhigh"`
+> as the CLI default. Codex CLI is **0.153.4**, so D16's version drift is also closed.
+> **Astra IS on the board and IS routable.** §9's "Plus → Pro?" open question is answered and closed.
+> Memory: `gpt6-astra-blocked-by-plan-tier-not-rollout.md` (confirmed live twice, 2026-09-05).
 
 ### 2.3 Capabilities that are new and that we do not use
 
