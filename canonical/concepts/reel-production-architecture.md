@@ -18,7 +18,7 @@
 
 **Status:** Canonical operating doctrine for the Subconscious Surgery (SS) short-form video production operation.
 **Operator:** Adrian Taffinder / "Subconscious Surgery" — spiritual / mindset / manifestation niche. Wordmark logo, handle `@adrian_taffinder`.
-**Last updated:** 2026-09-07 (caption visibility amendment; older architecture retained)
+**Last updated:** 2026-09-08 (source-screen and chroma review gate; earlier architecture retained)
 **Source:** Synthesised from 6 verified research dimensions (shot_analysis + audio_to_video), each adversarially verified. Confidence HIGH on architecture; numeric thresholds flagged as TUNABLES to calibrate on Adrian's real corpus before being trusted as hard gates.
 **Existing code spine:** `working/reels-build/2026-06-21-ss-batch/yt_reel.py` (452 lines: `portrait_crop`, `transcribe`, `make_hook_card`, `make_caption_pngs`, `cut_portrait_video` filler-cut, `composite`).
 
@@ -81,6 +81,29 @@ Evidence: [original Facebook screenshot](../../working/session-images/01a07a11-0
 Authority: Adrian's direct correction in Codex task `01a07a11-0db6-7f31-9fca-3327a478e52a`, 2026-09-08. Classification: user-directed clarification and enforcement of the reel CTA requirement, not an amendment to AGENTS.md or authority to publish.
 
 ---
+
+## 0.3 Source-screen classification and chroma treatment — Adrian, 2026-09-08
+
+Every video source is classified from actual source frames as `green`, `blue`, `none`, or
+`uncertain` before framing. The classification describes the screen or backdrop behind the
+subject. It must not be inferred from a green object, plant, garment, wall detail or natural
+background. Record the human basis, reviewer, time, source hash and hash-bound frame evidence in
+`source-screen-review.json`; run `~/reel-tools/verify_source_screen.py classify RECEIPT` before
+crop or framing. `uncertain`, `pending`, `hold`, stale hashes and incomplete receipts block work.
+
+A `green` or `blue` source requires an intentional treatment plan and background description.
+Choose the key and background treatment for that actual source, lighting, subject and clothing;
+there is no universal key threshold in this doctrine. After composite, a human reviews decoded
+frames at full export resolution for edge detail, spill, skin tone, shirt integrity, hand
+integrity and matte holes. The same receipt carries hash-bound evidence for those checks and for
+portrait 9:16, feed 4:5 and square 1:1 views, then
+`~/reel-tools/verify_source_screen.py final RECEIPT` must pass on the current export. Re-encoding
+requires renewed final evidence and hash binding.
+
+The executable verifies that the declared review is complete and applies to the files on disk.
+It does not detect a screen, inspect pixels, choose thresholds or establish a visual pass. Human
+review remains the visual gate. This section adds to the factual, method, caption, creative and
+normal-speed audiovisual gates; it does not replace them.
 
 ## 1. THE TEAM MODEL
 
@@ -150,7 +173,7 @@ The operation is six concrete capability clusters ("teams"). Each is a defined s
 
 ## 2. THE INPUT DECISION-TREE (load-bearing)
 
-Every source enters here. The classifier runs in Team 2 (Shot-Analysis), BEFORE any crop or caption. There are three input classes and three different paths.
+Every source enters here. The classifier runs in Team 2 (Shot-Analysis), BEFORE any crop or caption. There are three input classes and three different paths. For every video source, the orthogonal source-screen review in §0.3 runs before the Class B framing path: `none` continues normally; `green` or `blue` continues only with an intentional treatment plan; `uncertain` blocks.
 
 ```
 INGEST(src)
@@ -177,6 +200,7 @@ The dominant SS path (real Adrian audio from the 325+ MP4 corpus is the brand). 
 
 ### CLASS B — Raw talking-head footage → EDITORIAL REFRAME OVER RUNNING VO
 A real shot of Adrian, unbranded, uncaptioned. The job is editorial: reframe to 9:16, punch in on emphasis, pan-scan to follow the face, cut on silence, cut away to B-roll where the line wants visual support — all over the running voiceover.
+- **Source screen:** complete §0.3 classification before framing. Green/blue screen footage takes its recorded key/background path and later full-resolution subject/matte review; `none` takes the ordinary footage path. Do not infer chroma from scene colour.
 - **Reframe:** face-anchored crop (MediaPipe center, bounds-clamped, EMA-smoothed) — NEVER a fixed offset. If a logo bbox exists, include-it-whole-or-exclude-it-entirely; never bisect.
 - **Punch-in:** zoom 1.0→~1.08 over each acoustic-emphasis word (RMS above local rolling mean).
 - **Cut-on-silence:** RMS below threshold for >X ms (acoustic, upgrading the existing lexical `find_filler_spans`).
@@ -269,6 +293,9 @@ Step by step, source → deliver. **Every step ends with a verification gate. Th
 1. **INGEST + CLASSIFY** — run the §2 decision-tree. `detect_existing_production` on any video stream.
    - *Verify:* read back the video-level header. If `already_produced`, STOP and route to pass-through/deploy. Pull 3 sample frames and confirm the logo + caption that triggered the verdict are really there before discarding the clip from reprocessing.
 
+1a. **SOURCE-SCREEN CLASSIFICATION** — inspect the actual backdrop and record `green`, `blue`, `none` or `uncertain` in the hash-bound §0.3 receipt before any crop/framing. For chroma, record the intended key/background treatment.
+   - *Verify:* `verify_source_screen.py classify` exits 0. A green object or natural background is not a screen verdict. Do not claim pixel inspection from the executable result.
+
 2. **SHOT ANALYSIS** — PySceneDetect shots → per-shot face/OCR/audio passes → write `shot_analysis.json`.
    - *Verify:* confirm `shot_count` is sane (1 for raw talking-head), every shot has a `crop_box` inside source bounds, and no `crop_box` bisects `logo_bbox`. Render one cropped sample frame and EYEBALL it.
 
@@ -301,6 +328,7 @@ Step by step, source → deliver. **Every step ends with a verification gate. Th
 ## 6. THE TOP RULES — CHECKLIST
 
 1. **Read the frames before you touch them.** Shot-analysis runs BEFORE any crop or caption. No exceptions. (Constitutional — this is the fix.)
+1a. **Classify the source screen before framing.** `green`, `blue`, `none` or `uncertain`; chroma needs an intentional treatment and a full-resolution, hash-bound final human review of edges, spill, skin, shirt, hands, matte holes and feed crops.
 2. **`already_produced` is a hard gate.** ≥2 of {burned captions, logo, true-9:16} with temporal hysteresis → PASS-THROUGH. Never double-caption, never re-crop a finished reel.
 3. **Never crop on a fixed offset.** Kill `x_off=246`. Crop box = face/subject center, bounds-clamped, EMA-smoothed with deadband + max-velocity clamp.
 4. **Never bisect a logo.** Once `logo_bbox` is known, the crop includes it whole or excludes it whole.
