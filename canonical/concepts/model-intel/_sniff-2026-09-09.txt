@@ -1,0 +1,1 @@
+- [402pts] Google DeepMind Releases AlphaGenome Atlas  (https://blog.google/innovation-and-ai/models-and-research/google-deepmind/alphagenome-atlas/)
