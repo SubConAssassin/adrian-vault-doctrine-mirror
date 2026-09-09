@@ -18,7 +18,7 @@
 
 **Status:** Canonical operating doctrine for the Subconscious Surgery (SS) short-form video production operation.
 **Operator:** Adrian Taffinder / "Subconscious Surgery" — spiritual / mindset / manifestation niche. Wordmark logo, handle `@adrian_taffinder`.
-**Last updated:** 2026-09-08 (source-screen, feed composition, speaker tracking and subtractive-cut gates; earlier architecture retained)
+**Last updated:** 2026-09-09 (editorial selection and finished-master source hierarchy added; earlier architecture retained)
 **Source:** Synthesised from 6 verified research dimensions (shot_analysis + audio_to_video), each adversarially verified. Confidence HIGH on architecture; numeric thresholds flagged as TUNABLES to calibrate on Adrian's real corpus before being trusted as hard gates.
 **Existing code spine:** `working/reels-build/2026-06-21-ss-batch/yt_reel.py` (452 lines: `portrait_crop`, `transcribe`, `make_hook_card`, `make_caption_pngs`, `cut_portrait_video` filler-cut, `composite`).
 
@@ -273,6 +273,52 @@ is understandable.
 
 Classification: mechanism extension / new production gate. It preserves CM-079, CM-080, R-006,
 the 60/40 creative target and all source, claim, privacy, audio and human-review requirements.
+
+## 0.10 Finished-master and dedicated-audio source hierarchy — Adrian, 2026-09-09
+
+For every recording family, seek the **final edited master first**: Adrian's stitched multicamera edit with the intended Zoom/H6 or lavalier mix and any completed RX restoration. If it contains the selected passage, use that master as the source candidate before rebuilding from a camera file. A `final`, `finished` or `edit` filename is discovery evidence, not proof by itself; confirm recording-family identity, exact passage coverage, duration, reachable path, file hash when available and track layout.
+
+Only when the preferred final master is absent, inaccessible for the current review, does not contain the passage or is explicitly rejected with a recorded reason may the source hunt move to components. Enumerate the whole event family: all camera angles, Zoom/H6 files, dedicated lavalier or isolated tracks, and room audio. Treat camera audio as a synchronization/reference source by default rather than the programme-audio default. Do not infer that a left/right track is Adrian's lav from its filename alone.
+
+For an external-audio substitution, preserve source copies and record the chosen video and audio hashes, track/channel roles, measured offset, drift over multiple anchors including the beginning and end, mapping method and residual error. Compare candidate tracks at matched intelligible speech level. Technical measurements, waveform correlation and a successful sync do not establish clean sound; actual listening remains required under §0.8. Multi-camera angles and companion recorder tracks remain one parent recording for source-diversity and one-parent-per-publication-week checks.
+
+Every source audit records `preferred_final_master`, `external_lav`, `tracks` and `sync_status`. Each carries a status such as `confirmed`, `inferred`, `absent`, `unreviewed` or `inaccessible`, plus the evidence supporting it. Missing media or detection cannot become a pass. A user-rejected export remains withdrawn; finding a better master creates a new source-qualified review candidate and does not silently reinstate the rejected version. Consent, privacy, claim, duplicate, payoff and current-offer gates still apply.
+
+Classification: additive source-ingest clarification. It preserves the existing source-hunt, audio-quality, one-parent-per-week and original-preservation rules.
+
+## 0.11 Upfront editorial meaning and visual-story gate — Adrian, 2026-09-09
+
+Before a source is admitted to storyboarding or artwork, write one sentence naming the viewer's
+recognisable problem and the specific takeaway delivered by the exact spoken passage. The excerpt
+must open without missing prior context, reach a complete insight, choice or practical payoff, and
+fit the present Mastermind or Subconscious Surgery audience and offer. A technically valid clip is
+not useful merely because it contains a topic keyword. Illustration, captions and CTA cannot supply
+meaning that the spoken excerpt does not contain.
+
+Apply §0.10 first: use the strongest applicable final edited master, or prove the selected
+Zoom/H6/lavalier track and its sync. Compare source audio before expensive creative work. Keep one
+parent recording per publication week. Remove only clean fillers and long dead pauses under R-006,
+preserving meaningful hesitation, emphasis, qualifiers, cadence and an exact source cut map.
+
+The storyboard starts with a literal, immediately recognisable situation or object before using an
+abstract metaphor. Align each reveal and consequence to the exact phrase that introduces it; do not
+show the answer early. Every visual beat needs a concrete action, consequence or change that advances
+the spoken point. Repeated boxes, generic props, decorative motion and unrelated cinematic polish do
+not create meaning. Vary visual form to suit the source rather than imposing one formula. A literal
+parachute sequence can be right for Adrian's specific leap-of-faith story when the jump, failed build
+and survival land on their corresponding words; it is an example for that passage, not a universal
+house style.
+
+Record the selection and storyboard assessment in an editorial receipt, then run
+`python3 /Users/adriantaffinder/reel-tools/verify_editorial_selection.py RECEIPT.json`. The helper
+checks that the accountable editorial decisions and source hierarchy are present and fail closed; it does
+not decide whether the passage is meaningful, hear the audio or judge the pictures. A failed or
+incomplete editorial receipt blocks production even when caption, layout, tracking, audio-metric or
+render checks pass. Actual source listening and normal-speed/muted review remain separate gates.
+
+Classification: editorial selection and storyboard admission gate. The production editor may record
+this assessment; it is not an added Adrian approval step and it grants no publication or consent
+permission. It preserves the existing claim, privacy, duplicate, demonstration and layout requirements.
 
 ## 1. THE TEAM MODEL
 
