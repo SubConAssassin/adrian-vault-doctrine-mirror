@@ -1,0 +1,2 @@
+- [388pts] DeepSeek launching v4.1 flash cheaper and more capable than v4 pro  (https://news.ycombinator.com/item?id=49624603)
+- [371pts] ChatGPT Images 2.5  (https://openai.com/index/introducing-chatgpt-images-2-5/)
