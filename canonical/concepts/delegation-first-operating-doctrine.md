@@ -155,9 +155,35 @@ memory-free with disk-free: the Mini has read 89% memory-free on a nearly full b
 returns) · any call carrying `--image` · any call with an explicit `CLI_ASK_CODEX`/`CLI_ASK_GROK` binary
 override · anything that reads M1's own state.
 
-**NODE FAN-OUT IS NOT POOL FAN-OUT.** Studio's codex and M1's codex are the same
-`subconassassin144@gmail.com` Pro account behind one shared wall. Moving a lane to another box moves **RAM
-and CPU**, never quota. Do not plan capacity as though it bought more.
+**NODE FAN-OUT IS NOT POOL FAN-OUT.** M1, Studio and the Mini all run codex on **one** ChatGPT Pro
+account behind **one** shared wall. Moving a lane to another box moves **RAM and CPU**, never quota. Do not
+plan capacity as though it bought more.
+
+⚠️ **THE ALIAS TRAP — this fooled a session on 2026-09-10, verify before you "discover" extra capacity.**
+Decoding the `id_token` in `~/.codex/auth.json` returns **`ukphotonutilities@ymail.com` on the Mini** and
+**`subconassassin144@gmail.com` on M1 and Studio**. **These are the SAME Google account** (Adrian-direct):
+it was originally the UK Photon address and was later renamed, so both strings resolve to one identity and
+one token pool. A session read the two decodes side by side, concluded the Mini had its own Pro pool, and
+told Adrian capacity had doubled. It had not. **Two different email strings are not evidence of two
+accounts.** Unrelated and not to be confused with it: the protected **Claude** "UK Photon" profile, which
+is a different vendor and a genuinely separate reserve.
+
+**HOW WIDE THE MINI GOES — MEASURED 2026-09-11, not estimated.** One codex client costs **0.21 GB and 3
+processes**. **Twelve concurrent returned 12/12 clean in 43s wall**, peaking at **2.28 GB across 14
+processes, load1 3.05, memory-free unmoved at 89%, swap unchanged, zero transport failures.** At that width
+the Mini is using ~16% of its free memory and ~20% of its own load threshold, so **12 is comfortable, not a
+ceiling** — the box was not the binding constraint at any point.
+
+**The binding constraint is the shared ChatGPT account, and it is deliberately NOT probed.** All three
+machines draw on one Pro account behind one wall, and reflexive ceiling-hunting on that lane cost a full
+week's lockout on 2026-09-04. Budget wall-clock and account pacing, not box capacity.
+**Working cap: 12 per node.** Raise it only against a fresh measurement, never against a remembered figure.
+
+⚠️ **sshd is a real ceiling on any wider fan-out, and it is not the Mini's fault.** Defaults are
+`MaxSessions 10` and `MaxStartups 10:30:100`; beyond 10 *concurrent unauthenticated* connections sshd
+starts randomly refusing. Key auth completes fast enough that 12 separate connections never touched it, but
+a genuinely simultaneous burst above ~10 would, and it would present as sporadic exit 125s rather than a
+lane fault.
 
 **A BINARY IS NOT A LANE.** Route only where a credential is present. A node that has the binary and no
 credential starts the process and then fails on auth — slower and less legible than not having it at all.
