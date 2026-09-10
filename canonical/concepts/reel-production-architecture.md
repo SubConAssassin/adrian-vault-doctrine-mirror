@@ -295,6 +295,27 @@ fit the present Mastermind or Subconscious Surgery audience and offer. A technic
 not useful merely because it contains a topic keyword. Illustration, captions and CTA cannot supply
 meaning that the spoken excerpt does not contain.
 
+For psychological and behavioural teaching, convert the source into a causal human story:
+**trigger → interpretation → protective reaction → effect on the other person or goal → alternative
+choice → observable changed outcome**. Preserve spoken qualifiers. Before choosing the visual
+context, consider two or three recognisable situations and record why the selected one or small set
+best fits the audience and words. This is context selection, not a requirement to put two examples
+in every reel.
+
+Show the dynamic through action, relationship, body language and consequence. Track character and
+prop state before and after every beat. A motivated return may revisit a setting only when the
+picture carries a changed state; a new crop, caption, camera move, asset name or decorative motion
+does not create story progression. Let speech and emotion set the cadence. Where the voice teaches
+kindness, repair or another alternative, show a corresponding bounded action and observable
+immediate effect, without asserting a guaranteed relationship or business result.
+
+Record this in a story-progression plan and run
+`/Users/adriantaffinder/reel-tools/verify_story_progression.py` before artwork and again against the
+actual rendered asset sequence. The executable verifies declared causal coverage, state continuity,
+reused-state justification and plan/render correspondence. It cannot judge psychology,
+recognisability, body language, art or motion quality; actual asset and normal-speed video review
+remain required.
+
 Apply §0.10 first: use the strongest applicable final edited master, or prove the selected
 Zoom/H6/lavalier track and its sync. Compare source audio before expensive creative work. Keep one
 parent recording per publication week. Remove only clean fillers and long dead pauses under R-006,
