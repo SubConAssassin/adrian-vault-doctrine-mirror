@@ -4076,3 +4076,11 @@ human at the physical machine.** Worth knowing before spending time hunting for 
 time this happens. (Resolved this instance: the PC was back and back in active use ~8 hours later,
 per a later session's PC-claim file — most likely Adrian power-cycled it after being told, though
 that specific action wasn't independently confirmed.)
+
+### LL-2026-09-12-001 — a copied CLI profile does not transfer macOS secure-storage authentication
+`tags: [tool-gotcha, claude, macos, authentication, fleet]`
+Copying a Claude CLI profile from one Mac to another left the target signed out even though its
+configuration files were present. The usable token was held in host-local macOS secure credential
+storage, so the target Mac needed its own native OAuth exchange. **Rule: when moving a subscription
+CLI between fleet nodes, authenticate on the target host, verify identity with the CLI's live auth
+status, then run one bounded end-to-end call. Never infer authentication from copied files alone.**
