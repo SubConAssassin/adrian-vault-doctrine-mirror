@@ -1,0 +1,1 @@
+- [303pts] GrapheneOS' rewritten Messages app is released  (https://github.com/GrapheneOS/Messaging/releases/tag/13)
