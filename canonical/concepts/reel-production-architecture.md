@@ -200,11 +200,14 @@ B-roll, preserve natural audio cadence and never reorder, rewrite or regenerate 
 
 The cut receipt binds the source, original word timing and edited speech artifact hashes. It maps
 each retained word and removed source range, proves monotonic source and cut order, and records a
-named human decision for every removal plus the complete cadence/meaning review. Even an uncut
-passage records one retained span and an empty removal list; a legacy or missing receipt does not
-silently pass. `verify_subtractive_cut.py` checks this evidence and arithmetic. It does not decide
-whether a word is semantically expendable or whether the edit sounds natural; the named human
-review remains mandatory.
+named human decision for every removal plus the complete cadence/meaning review **at final release**.
+For the explicitly amended SS24 workflow above, candidate production records the editor's individual
+removal rationale, actual machine/AI evidence and limitations, with human review pending; it does
+not wait for Adrian to authorise each already-requested redundant-filler cut. Even an uncut passage
+records one retained span and an empty removal list; a legacy or missing receipt does not silently
+pass. `verify_subtractive_cut.py` is a release evidence/arithmetic check, not a candidate-production
+stop: it does not decide whether a word is semantically expendable or whether the edit sounds
+natural, and any outstanding named human review must still block release rather than be fabricated.
 
 Candidate selection also records why the exact story is useful to serial or spiritually minded
 entrepreneurs in business, identity, relationships or inner work. Job and interview material may
