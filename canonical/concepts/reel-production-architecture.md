@@ -1,5 +1,9 @@
 # Reel Production Architecture — The Operating Doctrine
 
+## SS24 stage correction — Adrian-direct, 12 September 2026, resumed production
+
+Classification: explicitly authorised SS workflow amendment. Adrian answered **“Yes—keep production moving; I give final approval”** to moving human playback from between edits to final approval. Complete one flagged edit through feasible machine and AI/editorial checks and immediate correction of known defects; record it as **candidate-checked, awaiting Adrian playback/approval**, then start the next edit. Actual human listening, video playback and composition review remain pending until performed and remain release requirements. Record what the AI actually inspected and its limitations; no invented watch/listen receipts. This supersedes earlier internal human-review stop language for this SS24 commission only. It does not waive final exact-file/copy approval, human release review, source, creative, privacy, account or spend gates. Decision and owner record: `working/handoffs/2026-09-12-codex-ss-production-resumed.md`; project commission `work/RESUMPTION-20260912.md` in the SS24 task.
+
 ## Current SS commission amendment — Adrian, 12 September 2026
 
 Classification: user-directed operational amendment to SS craft and acceptance; no publication, privacy or paid-API permission is broadened. Adrian explicitly requested skill hardening after reviewing the original `SS-24-reel-recovery-20260911` bundle.
