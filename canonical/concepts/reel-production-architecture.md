@@ -1,5 +1,20 @@
 # Reel Production Architecture — The Operating Doctrine
 
+## Current SS commission amendment — Adrian, 12 September 2026
+
+Classification: user-directed operational amendment to SS craft and acceptance; no publication, privacy or paid-API permission is broadened. Adrian explicitly requested skill hardening after reviewing the original `SS-24-reel-recovery-20260911` bundle.
+
+**Subsequent direct instructions on 12 September:** new SS batches are 28 scripts/plain source excerpts for Adrian's selection approval before expensive creative work; then sequential production and separate final approval. Show recording age/quality and use final engineered masters. Preserve all originals and immutable approval identities. Existing individually approved, publication-cleared reels must be scheduled twice daily now; do not wait for the rest of 24. This later scheduling request supplies publication authority for that approved buffer, not paid promotion or bypassing failed gates. Current management plan: `working/content-machine/2026-09-07-six-month-strategy/SS-CONTENT-CONTROL.md`. This new selection-approval step supersedes the older statement in §0.11 that no Adrian selection step is added.
+
+- Meaningful visual changes every 2–3 seconds are now the explicit house requirement for this commission. Deliberate pan/scan, reframing, perspective changes, B-roll and developing animated events should follow the words. This supersedes the older timing interpretation below where it conflicts. Do not excuse a long unedited shot as expressive; integrate the change without hiding or interrupting essential action.
+- On-camera editing must punctuate meaning: close on the hook, release after a point, push in for renewed emphasis and progressively tighten for successive points, then reset. Keep full heads/hands and source quality. A small landscape inset over enlarged blur is not an acceptable default portrait treatment.
+- No plain text-placeholder body, static illustrated body, jittered poster or repeated decorative loop may be supplied as a finished or approval-ready reel. The complete storyboard must depict a coherent situation, desire, choice/action and consequence, with continuity and speech-specific B-roll.
+- Lock final-master speech and reviewed filler cuts before deriving verbatim captions and shot times. Verify against the final encoded audio. Guessed timing, wrong intermediate audio and silent word truncation fail.
+- Bind approvals to candidate/source identity and exact export, never reel number alone. Preserve approved originals. Archive the old hand demonstration from active selection; permanently exclude the specific meditation-exit excerpts rejected as original Reels 10 and 12. Replace those slots to retain 24 deliverables.
+- Keep each flagged reel active through correction and all internal checks before the next flagged reel. Missing full audiovisual review remains incomplete. Establish review capability before promising unattended completion; no still-sheet or transcription substitute for an unperformed listen.
+
+Implementation detail: `/Users/adriantaffinder/.codex/skills/ss-reel-production/references/production-contract.md`. Exact user verdicts and original bundle mapping: `/Users/adriantaffinder/Documents/Codex/2026-09-11/can-you-give-me-a-full/work/REVIEW-CORRECTIONS-20260912.md`. These paths preserve the decision; the actual current source/export evidence governs acceptance.
+
 ## MANDATORY CREATIVE GATE — 60/40 coverage and speech-led visual rhythm
 
 **Adrian-direct correction, 2026-09-07. Read before selecting, storyboarding, delegating or rendering any reel. This is a pivotal acceptance requirement, not optional inspiration. It applies before presenting an approval draft as well as before publication.**
