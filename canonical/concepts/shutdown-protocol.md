@@ -4,11 +4,11 @@ type: protocol
 status: canonical
 tier: 2
 firewall_class: working-internal
-version: 2.4
+version: 2.5
 applies_to: [claude, antigravity]
 created: 2026-04-21
-updated: 2026-08-11
-last_updated: 2026-08-11
+updated: 2026-09-13
+last_updated: 2026-09-13
 supersedes:
   - canonical/concepts/session-shutdown-protocol.md
   - procedural/workflows/session-shutdown.md
@@ -246,6 +246,12 @@ This makes shutdown activity visible to the launchd watcher and to future `u` sw
 
 ### Step 10 — save-vault
 
+> **⚠️ SAFEGUARD, added 2026-09-13 — run this BEFORE save-vault, every time.** `save-vault` commits and pushes the **entire tracked whitelist to a PUBLIC GitHub repository**, not just this session's files. If another session has uncommitted edits in the same working tree (tools, `AGENTS.md`, anything tracked), they are published under a generic commit message along with yours. This happened on 2026-09-13: a shutdown pushed another session's in-progress routing scripts. That time it contained no secrets, but nothing in the step would have stopped a key.
+>
+> 1. Run `git status --short` and compare every modified path against what THIS session actually changed.
+> 2. If any path is not yours, **do not run save-vault.** Commit only your own paths explicitly (`git add <your paths> && git commit && git push`), and tell the owning session through `tools/fleet.py msg` that it has uncommitted work in the tree.
+> 3. Before any push to the public mirror, scan the staged diff's added lines for secret patterns (`sk_live_`, `re_`, `sbp_`, `eyJhbGciOi`, `AIza`, `ghp_`, private-key headers) and for personal identifiers. A secret that reaches a public remote must be treated as compromised and rotated, and force-pushing does not un-publish it.
+
 **Correction, 2026-08-11 (verified, not assumed — two sessions read this differently on the same day, resolved by direct test).** `save-vault` (`~/bin/save-vault`) is real and works — confirmed live via direct test. It was independently reported as "not found" the same day from an M2-side check; root cause is almost certainly that `~/bin` is only on PATH in a shell that sources `~/.zshrc`, which a bare/non-interactive check (e.g. over `ssh`) will not do by default. **This is exactly why the osascript wrapper below explicitly sources `.zshrc` first — always invoke it that way, never as a bare command**, and don't conclude the script is missing from a `which`/`type` check run outside that context.
 
 **What it actually does, and what it doesn't.** This repo (`~/Documents/Adrian-Vault/.git`) is a narrow, deny-by-default **public mirror** — `.gitignore` whitelists only `canonical/concepts/**` plus a handful of root files (`AGENTS.md`, `CLAUDE.md`, `.gitignore`, `raw/.gitkeep`, a few `wiki/` files). It pushes to a **public GitHub remote, hourly**, via a separate auto-sync job that already runs independently of this protocol. `save-vault` commits and pushes that same whitelisted scope. It is **not** a general vault backup — `working/`, `companies/`, `episodic/`, and everything else outside the whitelist is untouched by it and has no git-tracked copy at all (verified: `working/drafts-pending/`, `working/handoffs/`, and this protocol's own archive/handoff/Secretary writes are all gitignored). Vault-wide backup is a separate, non-git layer — see `vault-backup-architecture` in memory/lessons if this matters for what's being closed out.
@@ -438,6 +444,8 @@ Commit f3a2c19 pushed.
 ---
 
 ## Change log
+
+- **v2.5 (2026-09-13):** Step 10 gains a mandatory pre-push safeguard. `save-vault` publishes every session's uncommitted tracked work to the public mirror, not only the closing session's; check `git status` for other sessions' paths, commit only your own if any exist, and scan added lines for secrets before any public push. Found when a shutdown pushed another session's in-progress scripts (no secrets that time).
 
 - **2026-04-21 (v1)** — Initial canonical version. Paired with Dispatcher Protocol v1. Installed in response to Adrian's "shutdown protocol" command.
 - **2026-05-04 (v1.1)** — Secretary integration added as Step 0.5 (mandatory action capture via Lior Ben-David).
