@@ -82,6 +82,7 @@ If you need a rule, go to its home. If you find the same rule stated somewhere e
 | **The bootup read order** | **CLAUDE.md §2** | AGENTS §11.1, ceo §5.1, global CLAUDE.md |
 | One-shot metered-API protocol (+ the 1,053-call war story) | **CLAUDE.md §4** | global CLAUDE.md |
 | Hardware / fleet / remote control | **CLAUDE.md §5** | — |
+| **WHICH NODE a CLI lane or a new session runs on** | **delegation-doctrine §5.1** | ⚠️ added 2026-09-10. Distinct from the row above: CLAUDE.md §5 owns hardware FACTS, §5.1 owns execution ROUTING. §5's fleet map and §1a's routing line were corrected in the same change. |
 | Delegate-by-default; the Decision Gate | **delegation §1 + §7** | ceo §4.1, AGENTS §3 |
 | The accountant ritual / budget states | **delegation §2** | — |
 | Team roster + invocation | **delegation §4** | — |
@@ -90,6 +91,7 @@ If you need a rule, go to its home. If you find the same rule stated somewhere e
 | Flat-rate vs metered; throttle ceiling | **delegation §11** | AGENTS §11.5, ceo §4.1 |
 | Council-ask default | **delegation §12** | — |
 | **Model routing / which engine / effort / prompting law** | **delegation §14** | §1b and §13 are historical layers under it |
+| **Claude-first subscription priority + Codex→strategy split (2026-09-10 → review 2026-10-10); 2026-09-13 M2/OSB-only CLI route, UK Photon reserved for Adrian** | **delegation §16** | pointers: AGENTS §7.2, `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, codex-entrypoint |
 | Engine specs, prices, benchmarks, per-engine prompting | **llm-capability-map-2026-07-25.md** | (read on demand) |
 | Cross-venture short-form editing/content-strategy doctrine (evidence-graded universal floor + per-venture craft divergence, all 6 ventures) | **editing-doctrine-2026-07-29.md** | `companies/subconscious-surgery/content/*` (SS-specific hook/reel playbooks — narrower, cross-link up to this file, don't duplicate) |
 | Claude's role; anti-patterns; tentative-posture ban | **ceo §1 + §4** | AGENTS §3, §12.3 |

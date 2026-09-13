@@ -4084,3 +4084,51 @@ configuration files were present. The usable token was held in host-local macOS 
 storage, so the target Mac needed its own native OAuth exchange. **Rule: when moving a subscription
 CLI between fleet nodes, authenticate on the target host, verify identity with the CLI's live auth
 status, then run one bounded end-to-end call. Never infer authentication from copied files alone.**
+
+### LL-2026-09-13-001 — an unauthenticated endpoint that creates a user and emails that address is an open mailer
+`tags: [discovery, security, email, web]`
+A sign-in form upserted a user for any submitted address, then emailed that address a sign-in link from a verified sending domain. Automated traffic used it to send mail to addresses of its own choosing. Per-address rate limits did not help, because each address was used exactly once. **Rule: no unauthenticated path may both create a mailable account and send to it. Look accounts up rather than creating them, and gate the send on an account that a payment, enrolment or operator created.**
+
+### LL-2026-09-13-002 — a fixed response floor cannot mask a variable amount of work
+`tags: [mistake, security, timing]`
+To stop a sign-in endpoint revealing whether an address had an account, the "no account" branch was padded to a fixed delay. Measured, that made the leak worse: the two branches' timing ranges no longer overlapped at all. Padding both branches still leaked whenever the real work (a database insert, an outbound email) ran past the floor. **Rule: make both branches do identical request-path work. Move variable work such as inserts and sends into a deferred task, so response time stops depending on which branch ran.**
+
+### LL-2026-09-13-003 — a rate limit keyed on a client-supplied forwarded-for header is decorative
+`tags: [mistake, security, rate-limiting]`
+Every rate limit in an application took the client IP from the first element of `X-Forwarded-For`. The caller controls that value, so a forged header placed each request in a bucket of the attacker's choosing and every per-IP bound did nothing. The same value was also passed to a third-party analytics API. **Rule: in production trust only the header your hosting platform sets and overwrites (for example `x-vercel-forwarded-for`), and fail closed into one shared bucket, never into a caller-controlled one.**
+
+### LL-2026-09-13-004 — a feature flag checked as `!== "false"` is on when it is unset
+`tags: [discovery, configuration, security]`
+An email feature was guarded by `process.env.FLAG !== "false"`. The variable had never been set in production, so the condition was true and the feature was live while everyone believed it was off. **Rule: guard any risky feature with an explicit opt-in (`=== "true"`), so an unset, misspelt or fresh environment means off.**
+
+### LL-2026-09-13-005 — compare role and enum strings normalised, not raw
+`tags: [mistake, security, authorization]`
+An authorization rule refused one non-paying role by checking the stored role string against a list. A row holding `Prospect` or ` prospect` was not in the list, so it was treated as paying. The column had no database constraint, so a variant was one data accident away. **Rule: trim and lowercase before comparing string roles, and prove it with a test that fails when the normalisation is removed.**
+
+### LL-2026-09-13-006 — a gate that scans source must discover its targets and be proven to bite
+`tags: [mistake, testing, ci-gates]`
+A test enforcing "only these routes may opt in to a wider limit" scanned a hardcoded list of eight files, so a new route that opted in was never seen. Once changed to discover route files, its regex matched double quotes only, so a single-quoted opt-in slipped through. Adversarial reviewers found both bypasses; the tests did not. **Rule: a source-scanning gate must discover what it checks rather than read a list, match every syntax the language allows, and be proven to fail by adding a real offender.**
+
+### LL-2026-09-13-007 — prove email paths on production with a sink, never an unverified internal address
+`tags: [mistake, email, deliverability]`
+To prove a sign-in fix on production, real sign-in emails were sent to internal addresses on the sending domain that turned out not to be real mailboxes. One hard-bounced and one was suppressed, adding to the bounce record of the reputation the work was meant to protect. A reviewer had already said to use the provider's test sink. **Rule: prove email on production with the provider's sink address (for Resend, `delivered@resend.dev`) or a mailbox proven to exist, never an internal address whose mailbox is unverified.**
+
+### LL-2026-09-13-008 — removing one reference to a published asset does not unpublish it
+`tags: [discovery, content, compliance]`
+A video was trimmed to remove a passage that must not be published, and the trimmed cut replaced it on one page. The untrimmed original stayed live because a second page embedded the same recording from a video platform and a third page listed it. Separately, retired image files stayed publicly served after the last page stopped referencing them. **Rule: a content removal is complete only when every surface has been searched for the asset's identifiers (file hash, platform video id, filename) and the asset itself is withdrawn, not just one reference to it.**
+
+### LL-2026-09-13-009 — parallel reviewers sharing one working tree corrupt each other's measurements
+`tags: [process-change, multi-agent, testing]`
+Several adversarial reviewers ran at once against the same git working tree and the same tracked SQLite test database. One reviewer's run collided with another's writes and produced a spurious unique-constraint crash that looked exactly like a real defect. **Rule: give each concurrent reviewer an isolated extraction (`git archive` into its own scratch directory) and its own database file, and have it say so in its report.**
+
+### LL-2026-09-13-010 — use exact counts, not planner estimates, before a destructive decision
+`tags: [tool-gotcha, postgres, data]`
+Before deleting junk accounts, a table-size check used Postgres `pg_stat_user_tables.n_live_tup`, which reported zero rows for a table that actually held seven. Estimates are fine for sizing and wrong for deciding what to delete. **Rule: before deleting or classifying data, run `count(*)` on every table involved, and back the rows up first.**
+
+### LL-2026-09-13-011 — a polished form can store nothing
+`tags: [discovery, web, forms]`
+An application form looked complete and accepted submissions, but its submit endpoint was an empty string, so every answer was discarded. A second flow told users their answers had been sent when they had not. **Rule: trace every form to where the data actually lands, and prove the path with one real, clearly labelled submission end to end before trusting it.**
+
+### LL-2026-09-13-012 — a CLI production deploy from a stale clone silently removes commits
+`tags: [discovery, deploy, git]`
+A production deploy ran from a local clone seven weeks behind the real main branch. It shipped cleanly and silently removed weeks of later commits from production, security fixes included, with no error. **Rule: before a CLI production deploy, confirm the working tree contains the commit currently in production, deploy only from an up-to-date main, and push to main in the same change.**

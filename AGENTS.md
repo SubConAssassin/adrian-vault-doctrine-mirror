@@ -131,6 +131,7 @@ reason past. **This clause therefore ships with a mechanism, not just a rule.**
     SuperGrok web bridges · the Antigravity IDE · local models on the fleet (Ollama, whisper,
     MLX) · anything procedural on our own hardware (PIL, ffmpeg, Blender, and the PC's local
     ComfyUI + Wan-Alpha stack at `C:\ML\video-gen\`).
+    *Priority among flat-rate lanes, 2026-09-10 → review 2026-10-10 (Adrian-direct, §8 class: pointer only, no rule changed here): the paid Claude 20x subscriptions come first; builds/legwork go to Claude lanes, Codex does strategy/decisions/integration/acceptance. Full text: `canonical/concepts/delegation-first-operating-doctrine.md` §16.*
   - **METERED — real money. FORBIDDEN without Adrian's explicit per-job approval:** anything
     using `OPENAI_API_KEY` (incl. gpt-image-2, sora-2), `GEMINI_API_KEY` /
     generativelanguage.googleapis.com (incl. Veo, Imagen), `ANTHROPIC_API_KEY`,

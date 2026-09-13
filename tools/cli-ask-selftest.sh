@@ -10,7 +10,8 @@ PASS=0; FAIL=0
 ok(){ printf '  \033[32m✅ %s\033[0m\n' "$1"; PASS=$((PASS+1)); }
 no(){ printf '  \033[31m❌ %s\033[0m\n' "$1"; FAIL=$((FAIL+1)); }
 
-MOCKDIR="$(mktemp -d -t cliaskmock.XXXXXX)"; trap 'rm -rf "$MOCKDIR" /tmp/cliask_flaky_state /tmp/PWNED_*' EXIT
+MOCKDIR="$(mktemp -d -t cliaskmock.XXXXXX)"; TELEMETRY_PATH="$(mktemp -t cliasktele.XXXXXX)"
+trap 'rm -rf "$MOCKDIR" /tmp/cliask_flaky_state /tmp/PWNED_* "$TELEMETRY_PATH"' EXIT
 # echo-mock: emulates grok/codex/agy — pulls the prompt from -p / --prompt-file / positional, echoes a marker.
 cat >"$MOCKDIR/echo-mock" <<'EOF'
 #!/usr/bin/env bash
@@ -32,6 +33,11 @@ EOF
 printf '#!/usr/bin/env bash\nexit 0\n'                 >"$MOCKDIR/empty-mock"   # exit 0, prints nothing
 printf '#!/usr/bin/env bash\nprintf .\n'               >"$MOCKDIR/onebyte-mock" # 1 byte
 printf '#!/usr/bin/env bash\nsleep 30\necho late\n'    >"$MOCKDIR/slow-mock"    # hangs past any short timeout
+cat >"$MOCKDIR/exhaust-mock" <<'EOF'
+#!/usr/bin/env bash
+echo "API error: Individual quota reached" >&2
+exit 1
+EOF
 cat >"$MOCKDIR/flaky-mock" <<'EOF'
 #!/usr/bin/env bash
 f=/tmp/cliask_flaky_state
@@ -105,6 +111,77 @@ err=$(CLI_ASK_LEGACY_GROK_REROUTE=1 CLI_ASK_GROK="$MOCKDIR/echo-mock" "$ASK" agy
 printf '%s' "$err" | grep -q "LEGACY reroute to grok" \
   && ok "P14b CLI_ASK_LEGACY_GROK_REROUTE=1 restores the old behaviour" \
   || no "P14b legacy escape hatch (stderr: $(printf '%s' "$err" | tr -d '\n' | head -c 90))"
+
+echo "=== lane defaults + overrides + telemetry checks ==="
+rm -f "$TELEMETRY_PATH"
+out=$(CLI_ASK_TASK_ID=TASK-default CLI_ASK_CODEX="$MOCKDIR/echo-mock" CLI_ASK_TELEMETRY_PATH="$TELEMETRY_PATH" "$ASK" codex --retries 0 "hello default" 2>/dev/null)
+rec=$(tail -n 1 "$TELEMETRY_PATH")
+if printf '%s' "$rec" | python3 -c 'import json,sys; j=json.loads(sys.stdin.read());
+assert j["requested_lane"]=="codex" and j["model"]=="gpt-5.6-terra" and j["effort"]=="low" and j["exit_code"]==0' ; then
+  ok "P15 default bare codex lands on terra with low effort and records telemetry"
+else
+  no "P15 default bare codex telemetry"
+fi
+
+rm -f "$TELEMETRY_PATH"
+out=$(CLI_ASK_TASK_ID=TASK-override CLI_ASK_CODEX="$MOCKDIR/echo-mock" CLI_ASK_TELEMETRY_PATH="$TELEMETRY_PATH" "$ASK" codex --model gpt-5.6-sol --effort ultra --retries 0 "explicit override" 2>/dev/null)
+rec=$(tail -n 1 "$TELEMETRY_PATH")
+if printf '%s' "$rec" | python3 -c 'import json,sys; j=json.loads(sys.stdin.read());
+assert j["requested_lane"]=="codex" and j["model"]=="gpt-5.6-sol" and j["effort"]=="ultra"' ; then
+  ok "P16 explicit --model/--effort override is respected and recorded"
+else
+  no "P16 explicit override telemetry"
+fi
+
+rm -f "$TELEMETRY_PATH"
+out=$(CLI_ASK_TASK_ID=TASK-spark CLI_ASK_CODEX="$MOCKDIR/echo-mock" CLI_ASK_TELEMETRY_PATH="$TELEMETRY_PATH" "$ASK" codex-spark --retries 0 "spark alias" 2>/dev/null)
+rec=$(tail -n 1 "$TELEMETRY_PATH")
+if printf '%s' "$rec" | python3 -c 'import json,sys; j=json.loads(sys.stdin.read());
+assert j["requested_lane"]=="codex-spark" and j["model"]=="gpt-5.3-codex-spark"' ; then
+  ok "P17 codex-spark alias forwards to gpt-5.3-codex-spark and records requested lane"
+else
+  no "P17 codex-spark alias telemetry"
+fi
+
+rm -f "$TELEMETRY_PATH"
+err=$(CLI_ASK_CODEX="$MOCKDIR/exhaust-mock" CLI_ASK_TELEMETRY_PATH="$TELEMETRY_PATH" "$ASK" codex --retries 2 "quota" 2>&1 >/dev/null)
+rc=$?
+rec=$(tail -n 1 "$TELEMETRY_PATH")
+if [ "$rc" -ne 0 ] && printf '%s' "$err" | grep -q "explicit quota-exhaustion pattern" && [ -s "$TELEMETRY_PATH" ]; then
+  if printf '%s' "$rec" | python3 -c 'import json,sys; j=json.loads(sys.stdin.read()); assert j["exit_code"]==1' ; then
+    ok "P18 explicit exhaustion pattern stops retry"
+  else
+    no "P18 explicit exhaustion pattern recorded with nonzero"
+  fi
+else
+  no "P18 explicit exhaustion pattern stops retry"
+fi
+
+rm -f "$TELEMETRY_PATH"
+if CLI_ASK_CODEX="$MOCKDIR/empty-mock" CLI_ASK_TELEMETRY_PATH="$TELEMETRY_PATH" "$ASK" codex --retries 0 "thin" >/dev/null 2>&1; then
+  no "P19 failed call is logged and exits 3"
+else
+  c=$(wc -l < "$TELEMETRY_PATH" | tr -d ' ')
+  rec=$(tail -n 1 "$TELEMETRY_PATH")
+  if [ "$c" = 1 ] && printf '%s' "$rec" | python3 -c 'import json,sys; j=json.loads(sys.stdin.read()); assert j["exit_code"]==3'; then
+    ok "P19 failed thin call logs exactly one receipt with exit_code=3"
+  else
+    no "P19 thin failure logging count/code"
+  fi
+fi
+
+rm -f "$TELEMETRY_PATH"
+out=$(CLI_ASK_CODEX="$MOCKDIR/echo-mock" CLI_ASK_TELEMETRY_PATH="$TELEMETRY_PATH" "$ASK" codex --retries 0 "hello default" 2>/dev/null)
+rec=$(tail -n 1 "$TELEMETRY_PATH")
+if [ -s "$TELEMETRY_PATH" ]; then
+  if grep -q "hello default" "$TELEMETRY_PATH"; then
+    no "P20 telemetry contains raw prompt content"
+  else
+    ok "P20 telemetry contains no raw prompt content"
+  fi
+else
+  no "P20 telemetry contains no raw prompt content"
+fi
 
 if [ "${1:-}" = "--live" ]; then
   echo; echo "=== LIVE smoke (3 real bounded calls, \$0) ==="

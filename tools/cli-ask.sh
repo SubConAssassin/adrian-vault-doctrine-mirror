@@ -13,13 +13,13 @@
 #   - hang -> hard --timeout (default 360s) -> exit 124
 #
 # Usage:
-#   cli-ask.sh <codex|grok|agy> [--timeout N] [--retries R] [--min-bytes B] "prompt"
-#   cli-ask.sh <codex|grok|agy> [--timeout N] --stdin < prompt.txt
+#   cli-ask.sh <codex|claude|grok|agy> [--timeout N] [--retries R] [--min-bytes B] "prompt"
+#   cli-ask.sh <codex|claude|grok|agy> [--timeout N] --stdin < prompt.txt
 # Exit: 0 ok | 2 usage | 3 empty/thin after retries | 124 timeout | else = the CLI's own code.
 # Binaries overridable via env: CLI_ASK_CODEX / CLI_ASK_GROK / AGY_BIN (the self-test injects mocks).
 #
 # 2026-07-10 model-upgrade lanes (additive; bare codex/grok/agy behaviour unchanged):
-#   codex-sol | codex-terra | codex-luna  -> codex exec -m gpt-5.6-{sol|terra|luna}
+#   codex-sol | codex-terra | codex-luna | codex-spark  -> codex exec -m gpt-5.6-{sol|terra|luna}|gpt-5.3-codex-spark
 #   composer                              -> grok-composer-2.5-fast when listed; otherwise a loud live-Grok fallback
 #   grok-web                              -> grok-4.5 RESEARCH mode: live web search ON, citations required,
 #                                            --max-turns 8 (still no plan/subagents/file-writes)
@@ -28,7 +28,7 @@
 set -uo pipefail
 
 MODEL="${1:-}"; shift 2>/dev/null || true
-[ -n "$MODEL" ] || { echo "usage: cli-ask.sh <codex|codex-sol|codex-terra|codex-luna|grok|grok-web|composer|agy|qwen|deepseek|local|local-vision> [--timeout N] [--retries R] [--min-bytes B] [--model M] [--effort E] [--image FILE] \"prompt\"|--stdin" >&2; exit 2; }
+[ -n "$MODEL" ] || { echo "usage: cli-ask.sh <codex|claude|codex-sol|codex-terra|codex-luna|codex-spark|grok|grok-web|composer|agy|qwen|deepseek|local|local-vision> [--timeout N] [--retries R] [--min-bytes B] [--model M] [--effort E] [--image FILE] \"prompt\"|--stdin" >&2; exit 2; }
 # ---- COMPOSER PIN RESOLUTION (added 2026-08-27) ----
 # `grok-composer-2.5-fast` disappeared from this account's xAI catalogue without a published
 # retirement notice or named Composer successor. The account now lists only grok-4.6 / grok-4.5, so the
@@ -62,38 +62,30 @@ _resolve_composer() {
   printf ''
 }
 
-# ── PLAN STATE: ChatGPT is on PRO 5x as of 2026-09-04 (Adrian-direct) ─────────
-# "ChatGPT is now on a Pro 5X so we've got phenomenally more usage ... let's utilize
-#  that fully." The `codex` lane is therefore the BIGGEST pool in the team, not the
-#  smallest. Do NOT ration it, do NOT keep it to a ~10% batch share, and do NOT treat
-#  gpt-5.6-sol as scarce. Measured 2026-09-04: 20 concurrent codex clients produced
-#  ZERO provider throttles; the binding constraint is LATENCY and the box, not quota.
-#  ⚠️ agy is the ONE lane that must never be saturated: once its WEEKLY cap is hit,
-#  five-hour refills stop until the displayed weekly reset (potentially multiple days; doctrine §11.4).
-#
-# ── TOP-MODEL DEFAULTS (Adrian-direct 2026-09-04) ──────────────────────────────
-# "In all cases on the CLI lanes I would prefer you use the top model. Usage isn't
-#  necessarily an issue because we hardly use them anyway." + "use the top models and
-#  start utilizing them fully ... until they throttle with their subscription".
-# So each lane now defaults to its BEST model, not a mid tier. Override via env or --model.
-#   codex : gpt-5.6-sol is the strongest model in the $0 team. (Bare codex already resolved
-#           to Sol via provider default; pinning it makes that explicit so it cannot drift.)
+# ── TOP-MODEL DEFAULTS (Adrian-direct 2026-09-07) ──────────────────────────────
+# Default `codex` uses terra with low effort for routine work.
+# Alias routing remains explicit:
+#  - codex-terra  -> gpt-5.6-terra (routine)
+#  - codex-spark  -> gpt-5.3-codex-spark (low-cost execution)
+#  - codex-sol    -> gpt-5.6-sol (complex implementation)
+#  - codex-luna   -> gpt-5.6-luna (strategy / judgment)
+# No hidden extra-node pool is implied; each lane tracks its own reported quota bucket.
 #   qwen  : qwen3.8-max (2.4T MoE, 1M ctx) rather than bl's own default.
 #   grok  : deliberately NOT pinned. Unpinned serves xAI's server-side newest, which IS the
 #           top model; a hard-coded slug here goes stale silently (see the grok block below).
 #   agy   : pinned in tools/agy-ask.py (gemini-3.8-flash-high), not here.
-# Effort: codex defaults to xhigh, the top tier that is not documented as overthinking-prone
-#   ("max" can overthink per delegation-doctrine §14.3; "ultra" spawns subagents). Override
-#   with --effort at any call site.
-CLI_ASK_CODEX_MODEL="${CLI_ASK_CODEX_MODEL:-gpt-5.6-sol}"
+CLI_ASK_CODEX_MODEL="${CLI_ASK_CODEX_MODEL:-gpt-5.6-terra}"
+CLI_ASK_CLAUDE_MODEL="${CLI_ASK_CLAUDE_MODEL:-sonnet}"
 CLI_ASK_QWEN_MODEL="${CLI_ASK_QWEN_MODEL:-qwen3.8-max}"
-CLI_ASK_DEFAULT_EFFORT="${CLI_ASK_DEFAULT_EFFORT:-xhigh}"
+CLI_ASK_DEFAULT_EFFORT="${CLI_ASK_DEFAULT_EFFORT:-low}"
 
 PIN_MODEL=""; CODEX_EFFORT=""; GROK_WEB=0
+REQUESTED_LANE="$MODEL"
 case "$MODEL" in
-  codex|grok|agy|gemini|qwen|deepseek|local|localvision) ;;
+  codex|claude|grok|agy|gemini|qwen|deepseek|local|localvision) ;;
   codex-sol)   MODEL=codex; PIN_MODEL="gpt-5.6-sol" ;;
   codex-terra) MODEL=codex; PIN_MODEL="gpt-5.6-terra" ;;
+  codex-spark) MODEL=codex; PIN_MODEL="gpt-5.3-codex-spark" ;;
   codex-luna)  MODEL=codex; PIN_MODEL="gpt-5.6-luna" ;;
   composer)    MODEL=grok;  PIN_MODEL="__RESOLVE_COMPOSER__" ;;
   grok-web)    MODEL=grok;  GROK_WEB=1 ;;
@@ -102,7 +94,7 @@ case "$MODEL" in
   qwen-plus)   MODEL=qwen;  PIN_MODEL="qwen3.7-plus" ;;
   local-fast)  MODEL=local; PIN_MODEL="qwen3.5:9b" ;;
   local-vision) MODEL=localvision; PIN_MODEL="${CLI_ASK_VISION_MODEL:-qwen2.5-vl-7b}" ;;
-  *) echo "cli-ask: unknown model '$MODEL' (codex|codex-sol|codex-terra|codex-luna|grok|grok-web|composer|agy|qwen|deepseek|local|local-vision)" >&2; exit 2;;
+  *) echo "cli-ask: unknown model '$MODEL' (codex|claude|codex-sol|codex-terra|codex-luna|codex-spark|grok|grok-web|composer|agy|qwen|deepseek|local|local-vision)" >&2; exit 2;;
 esac
 [ "$PIN_MODEL" = "__RESOLVE_COMPOSER__" ] && PIN_MODEL="$(_resolve_composer)"
 
@@ -112,6 +104,7 @@ esac
 # because the arg loop below assigns PIN_MODEL after this point.
 case "$MODEL" in
   codex) [ -z "$PIN_MODEL" ] && PIN_MODEL="$CLI_ASK_CODEX_MODEL" ;;
+  claude) [ -z "$PIN_MODEL" ] && PIN_MODEL="$CLI_ASK_CLAUDE_MODEL" ;;
   qwen)  [ -z "$PIN_MODEL" ] && PIN_MODEL="$CLI_ASK_QWEN_MODEL" ;;
 esac
 # Top-effort default for codex. Set AFTER the alias case but BEFORE the arg loop would be
@@ -196,6 +189,14 @@ esac
 IMAGE=""
 TIMEOUT=360; RETRIES="${CLI_ASK_RETRIES:-1}"; MIN_BYTES="${CLI_ASK_MIN_BYTES:-20}"; USE_STDIN=0
 PROMPT_ARG=""; PROMPT_CAPTURED=0
+# --no-tools (2026-09-13, opt-in, claude lane ONLY): every built-in tool and every MCP server is
+# removed on the CLI itself (--tools "" --strict-mcp-config), for untrusted-data prompts such as
+# member feedback. Absent the flag, nothing below changes. Callers detect support via this line:
+CLI_ASK_CLAUDE_NO_TOOLS_SUPPORTED=1; CLAUDE_NO_TOOLS=0
+# Remote bounding (2026-09-13): a --no-tools inference runs on the Mini under cli-ask-nt-watchdog.py
+# (wall deadline TIMEOUT-8s, process-group kill, one-at-a-time flock). Killing M1's ssh parent does
+# not stop the Mini process, so the far side must bound and serialise itself. Callers detect it here:
+CLI_ASK_CLAUDE_NO_TOOLS_BOUNDED=1
 while [ $# -gt 0 ]; do
   case "$1" in
     --timeout) TIMEOUT="${2:?--timeout needs a value}"; shift 2;;
@@ -206,6 +207,7 @@ while [ $# -gt 0 ]; do
     --web) GROK_WEB=1; shift;;
     --image) IMAGE="${2:?--image needs a path}"; shift 2;;
     --stdin) USE_STDIN=1; shift;;
+    --no-tools) CLAUDE_NO_TOOLS=1; shift;;
     --) shift; break;;
     *)
       # 2026-08-03 FIX: flags placed AFTER the prompt used to be silently dropped —
@@ -231,10 +233,76 @@ if [ "$USE_STDIN" = 1 ]; then PROMPT="$(cat)"; else PROMPT="$PROMPT_ARG"; fi
 # `set -o pipefail` turns that into a false "empty prompt" (only for big --stdin
 # payloads; small ones finished before the pipe closed). Pure-builtin glob, no pipe.
 case "$PROMPT" in *[![:space:]]*) ;; *) echo "cli-ask: empty prompt" >&2; exit 2;; esac
+if [ "$CLAUDE_NO_TOOLS" = 1 ] && [ "$MODEL" != claude ]; then echo "cli-ask: --no-tools is supported for the claude lane only" >&2; exit 2; fi
+# The >BIG_MAX file-read idiom needs the Read tool, so a no-tools call refuses rather than re-enabling it.
+if [ "$CLAUDE_NO_TOOLS" = 1 ] && [ "${#PROMPT}" -gt "${CLI_ASK_BIG_MAX:-100000}" ]; then echo "cli-ask: --no-tools prompt exceeds ${CLI_ASK_BIG_MAX:-100000} chars; refusing" >&2; exit 2; fi
+# A busy or timed-out Mini lane is never retried: exactly one inference attempt, and the far-side
+# deadline needs room to kill and confirm its process group before node-exec's own TIMEOUT alarm.
+if [ "$CLAUDE_NO_TOOLS" = 1 ]; then
+  RETRIES=0
+  case "$TIMEOUT" in ''|*[!0-9]*) echo "cli-ask: --no-tools needs an integer --timeout" >&2; exit 2;; esac
+  [ "$TIMEOUT" -ge 20 ] || { echo "cli-ask: --no-tools needs --timeout >= 20" >&2; exit 2; }
+fi
 
 GROK="${CLI_ASK_GROK:-$HOME/.local/bin/grok}"
 CODEX="${CLI_ASK_CODEX:-/opt/homebrew/bin/codex}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+
+# ── NODE ROUTING: run the lane OFF M1 (added 2026-09-10, Adrian-direct) ───────────────────────
+# "any CLIs are run on the Mini and/or Studio when Mini reaches capacity."
+# M1 was measured at load 110-226 with 1628 processes while a sibling lane's renders were being
+# SIGTERMed by the memory guardian three nights running. A CLI client is ~200-400MB resident plus
+# a scheduler slot; hosting the whole team on the operator's laptop is the pressure itself.
+#
+# node-exec.sh picks mini -> studio -> local from a LIVE probe (memory, load, swap, binary present,
+# credential present). It NEVER silently swaps engines - only the machine the engine runs on. If no
+# node can serve the lane it says so loudly on stderr and returns local, so behaviour degrades to
+# exactly what it was before this block existed.
+#
+# Lanes deliberately NOT routed here:
+#   local/local-fast/local-vision - already remote: they speak HTTP to Studio/PC, never a local binary
+#   deepseek                      - METERED. Its spend gate (metered-guard.py) lives on M1 and must
+#                                   stay in the call path. cli-ask must never become a way around it.
+#   qwen                          - the `bl` CLI is installed on M1 only
+#   agy                           - needs tools/agy-ask.py, which lives in this vault (M1 only)
+CLI_NODE=local
+# An explicit binary override is a LOCAL-PATH instruction and must pin execution to M1. The
+# self-test injects mock binaries this way; routing them to a remote node would resolve the real
+# CLI on PATH instead and turn a hermetic test into a live billed call. Same for --image, whose
+# file only exists here.
+if [ -n "${CLI_ASK_CODEX:-}" ] || [ -n "${CLI_ASK_GROK:-}" ]; then CLI_ASK_FORCE_LOCAL=1; fi
+if [ -n "$IMAGE" ]; then CLI_ASK_FORCE_LOCAL=1; fi
+if [ "${CLI_ASK_FORCE_LOCAL:-0}" != "1" ] && [ -f "$HERE/node-exec.sh" ]; then
+  case "$MODEL" in
+    codex|claude|grok) CLI_NODE="$(bash "$HERE/node-exec.sh" pick "$REQUESTED_LANE" 2>/dev/null || echo local)" ;;
+  esac
+fi
+# Adrian-direct 2026-09-13: M2 Original Siberian Blue only. UK Photon is
+# reserved for Adrian; never spill this lane to the Mini or primary Mac.
+if [ "$MODEL" = "claude" ] && [ "$CLI_NODE" != "studio" ]; then
+  echo "cli-ask: Claude M2 OSB lane unavailable, unauthenticated or at capacity; refusing account fallback." >&2
+  exit 75
+fi
+# Binary resolution differs per node: M1 pins absolute paths, remote nodes resolve on PATH
+# (codex is ~/.local/bin/codex on the Mini but /opt/homebrew/bin/codex on the Studio - an absolute
+# path taken from M1 would be wrong on one of them, and silently wrong on both after any reinstall).
+if [ "$CLI_NODE" = local ]; then CODEX_BIN="$CODEX"; GROK_BIN="$GROK"; CLAUDE_BIN=claude; else CODEX_BIN=codex; GROK_BIN=grok; CLAUDE_BIN=claude; fi
+[ "$CLI_NODE" != local ] && echo "cli-ask: lane '$REQUESTED_LANE' -> executing on $CLI_NODE (M1 stays free)" >&2
+
+# _stage: copy a local file to the exec node and print the path that is valid THERE.
+# Without this, every file-based idiom below hands a remote CLI an M1 path it cannot see - the
+# prompt-file, the >100K data file, and grok's large-payload read file.
+_stage() {
+  if [ "$CLI_NODE" = local ]; then printf '%s\n' "$1"
+  else bash "$HERE/node-exec.sh" stage "$CLI_NODE" "$1" || printf '%s\n' "$1"; fi
+}
+# _E: run argv on the exec node under the same timeout contract as bound().
+# Remote calls carry their own far-side watchdog, so a hang cannot outlive its timeout on the very
+# node we moved the work to.
+_E() {
+  if [ "$CLI_NODE" = local ]; then bound "$@"
+  else NODE_EXEC_PINNED_NODE="$CLI_NODE" bash "$HERE/node-exec.sh" run "$REQUESTED_LANE" --timeout "$TIMEOUT" -- "$@"; fi
+}
 
 # OVERSIZED-PROMPT HANDLING (rewritten 2026-07-25 — see the defect note below).
 # agy/codex take the prompt as a single argv arg and degrade/stall on very large inputs.
@@ -259,12 +327,14 @@ BIGFILE=""
 # and actively harmful there — it would ask a non-agentic endpoint to "read a file" it cannot see.
 if [ "${#PROMPT}" -gt "$BIG_MAX" ] && [ "$MODEL" != grok ] && [ "$MODEL" != local ] && [ "$MODEL" != deepseek ]; then
   if [ "${CLI_ASK_LEGACY_GROK_REROUTE:-0}" = "1" ]; then
+    # On a remote node the engine cannot see an M1 path, so stage it and reference the far-side copy.
+    BIGREF="$(_stage "$BIGFILE")"
     echo "cli-ask: prompt ${#PROMPT} chars > $BIG_MAX — LEGACY reroute to grok (CLI_ASK_LEGACY_GROK_REROUTE=1)." >&2
     MODEL=grok
   else
     BIGFILE="$(mktemp -t cliaskdata.XXXXXX)"; printf '%s' "$PROMPT" >"$BIGFILE"
     echo "cli-ask: prompt ${#PROMPT} chars > $BIG_MAX — staying on ${MODEL}, delivering via file-read idiom ($BIGFILE)." >&2
-    PROMPT="OUTPUT MODE — READ FIRST: The file at ${BIGFILE} contains your COMPLETE task and all source material. It may be large. FIRST use your file-reading tool to read ${BIGFILE} IN FULL (the entire file, not a preview). THEN carry out the instructions it contains and write your COMPLETE answer as plain text to standard output as your final message. Do NOT enter plan mode. Do NOT spawn subagents. Do NOT create, write, or edit ANY files — your only tool use is reading that one file."
+    PROMPT="OUTPUT MODE — READ FIRST: The file at ${BIGREF} contains your COMPLETE task and all source material. It may be large. FIRST use your file-reading tool to read ${BIGREF} IN FULL (the entire file, not a preview). THEN carry out the instructions it contains and write your COMPLETE answer as plain text to standard output as your final message. Do NOT enter plan mode. Do NOT spawn subagents. Do NOT create, write, or edit ANY files — your only tool use is reading that one file."
   fi
 fi
 
@@ -283,7 +353,43 @@ bound() { python3 "$HERE/run-bounded.py" "$TIMEOUT" "$@"; }
 # Engine stderr now lands in $ERRF and its last meaningful line is appended to the failure message.
 # stdout handling is unchanged, so this is diagnostic-only.
 ERRF="$(mktemp -t cliaskerr.XXXXXX)"
-trap 'rm -f "$ERRF"' EXIT
+START_UTC=""
+START_EPOCH=""
+attempts=0
+
+_cleanup_files() {
+  rm -f "$OUT" "$ERRF" ${BIGFILE:+"$BIGFILE"}
+}
+
+trap _cleanup_files EXIT
+
+_quota_exhausted() {
+  [ -s "$ERRF" ] || return 1
+  grep -iqE 'usage limit reached|weekly limit|individual quota reached|balance exhausted' "$ERRF"
+}
+
+_append_telemetry() {
+  local rc="$1" nonws="$2" attempts_made="$3" end_epoch="$4" end_utc="$5"
+  local elapsed=$(( end_epoch - START_EPOCH ))
+  python3 "$HERE/lane_telemetry.py" --append \
+    --run-id "${CLI_ASK_TELEMETRY_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)}" \
+    --task-id "${CLI_ASK_TASK_ID:-${FLEET_SESSION_ID:-UNKNOWN}}" \
+    --account-pool "${CLI_ASK_ACCOUNT_POOL:-UNKNOWN}" \
+    --requested-lane "$REQUESTED_LANE" \
+    --actual-engine "$MODEL" \
+    --model "$PIN_MODEL" \
+    --effort "${CODEX_EFFORT:-$CLI_ASK_DEFAULT_EFFORT}" \
+    --start-utc "$START_UTC" \
+    --end-utc "$end_utc" \
+    --elapsed-seconds "$elapsed" \
+    --exit-code "$rc" \
+    --attempts "$attempts_made" \
+    --prompt-chars "${#PROMPT}" \
+    --output-bytes "$nonws" \
+    --acceptance "unreviewed" >/dev/null 2>&1
+  [ $? -ne 0 ] && echo "cli-ask: WARNING failed to append telemetry" >&2
+}
+
 errtail() {  # last non-empty, non-noise stderr line, trimmed for one-line display
   [ -s "$ERRF" ] || return 0
   local line
@@ -299,10 +405,41 @@ run_once() {  # $1 = output file; returns the CLI's exit code (anything >128 i.e
   case "$MODEL" in
     codex)
       # shellcheck disable=SC2086
-      bound "$CODEX" exec --skip-git-repo-check \
+      _E "$CODEX_BIN" exec --skip-git-repo-check \
         ${PIN_MODEL:+-m "$PIN_MODEL"} \
         -c model_reasoning_effort="${CODEX_EFFORT:-$CLI_ASK_DEFAULT_EFFORT}" \
         "$PROMPT" </dev/null >"$out" 2>>"$ERRF"; rc=$? ;;
+    claude)
+      # Verify the pool immediately before inference. A valid Claude login on the wrong
+      # subscription is a hard failure, not permission to consume it.
+      cstatus="$(NODE_EXEC_PINNED_NODE=studio bash "$HERE/node-exec.sh" run claude --timeout 15 -- "$CLAUDE_BIN" auth status 2>>"$ERRF")"
+      if ! printf '%s' "$cstatus" | grep -q '"loggedIn": true' || \
+         ! printf '%s' "$cstatus" | grep -q '"email": "originalsiberianblue@gmail.com"'; then
+        echo "cli-ask: M2 Claude identity check failed; expected Original Siberian Blue account." >>"$ERRF"
+        rc=77
+      elif [ "$CLAUDE_NO_TOOLS" = 1 ]; then
+        # No-inference argv probe over the SAME exec route: the empty --tools value must arrive
+        # intact on the node (a dropped "" would let the next token become the tool list).
+        probe="$(_E /usr/bin/printf '[%s]' --tools "" --strict-mcp-config </dev/null 2>>"$ERRF")"
+        if [ "$probe" != "[--tools][][--strict-mcp-config]" ]; then
+          echo "cli-ask: --no-tools argv probe failed on $CLI_NODE; refusing inference." >>"$ERRF"
+          rc=78
+        elif ! nt_wd="$(cat "$HERE/cli-ask-nt-watchdog.py" 2>/dev/null)" || [ -z "$nt_wd" ]; then
+          echo "cli-ask: --no-tools watchdog $HERE/cli-ask-nt-watchdog.py missing; refusing inference." >>"$ERRF"
+          rc=78
+        else
+          # The watchdog source crosses as argv data (never a remote shell string) and holds the
+          # Mini lock for the life of the call; 75 = another no-tools inference is still running.
+          _E /usr/bin/python3 -c "$nt_wd" --deadline "$(( TIMEOUT - 8 ))" -- \
+            "$CLAUDE_BIN" --print --model "$PIN_MODEL" --permission-mode auto \
+            --tools "" --strict-mcp-config \
+            --no-session-persistence "$PROMPT" </dev/null >"$out" 2>>"$ERRF"; rc=$?
+          [ "$rc" = 75 ] && echo "cli-ask: Mini no-tools lane busy (previous inference still running); refusing, no retry." >>"$ERRF"
+        fi
+      else
+        _E "$CLAUDE_BIN" --print --model "$PIN_MODEL" --permission-mode auto \
+          --no-session-persistence "$PROMPT" </dev/null >"$out" 2>>"$ERRF"; rc=$?
+      fi ;;
     grok)
       g="$(mktemp -t grokprompt.XXXXXX)"
       # grok-build is a coding AGENT: on long "produce a document" prompts it goes agentic (plan / write-a-file)
@@ -319,7 +456,8 @@ run_once() {  # $1 = output file; returns the CLI's exit code (anything >128 i.e
       # agentic-drift 0-byte failure mode. Final answer must land on stdout.
       if [ "$GROK_WEB" = 1 ]; then
         { printf '%s\n\n' 'OUTPUT MODE — READ FIRST: This is a live-web RESEARCH task. Use your web search tools to ground the answer, then write your COMPLETE answer as plain text to standard output as your final message. Cite a source URL for every factual claim; write [NOT FOUND] for anything you cannot verify. Do NOT create/write/edit any files. Do NOT enter plan mode. Do NOT spawn subagents.'; printf '%s' "$PROMPT"; } >"$g"
-        bound "$GROK" --no-plan --no-subagents --max-turns 8 ${PIN_MODEL:+-m "$PIN_MODEL"} --prompt-file "$g" </dev/null >"$out" 2>>"$ERRF"; rc=$?
+        gr="$(_stage "$g")"
+        _E "$GROK_BIN" --no-plan --no-subagents --max-turns 8 ${PIN_MODEL:+-m "$PIN_MODEL"} --prompt-file "$gr" </dev/null >"$out" 2>>"$ERRF"; rc=$?
       else
         # Non-web grok. Delivery mode is SIZE-GATED (2026-07-18 root-cause fix):
         #   SMALL (<= GROK_INLINE_MAX): inline single-turn (--max-turns 1). Proven reliable; no agentic drift.
@@ -336,11 +474,14 @@ run_once() {  # $1 = output file; returns the CLI's exit code (anything >128 i.e
         GROK_INLINE_MAX="${CLI_ASK_GROK_INLINE_MAX:-40000}"
         if [ "${#PROMPT}" -le "$GROK_INLINE_MAX" ]; then
           { printf '%s\n\n' 'OUTPUT MODE — READ FIRST: This is a pure WRITING/ANALYSIS task. Write your COMPLETE answer as plain text to standard output now. Do NOT use any tools. Do NOT create/write/edit any files. Do NOT enter plan mode. Do NOT spawn subagents. Just write the full answer as text.'; printf '%s' "$PROMPT"; } >"$g"
-          bound "$GROK" --no-plan --no-subagents --disable-web-search --max-turns 1 ${PIN_MODEL:+-m "$PIN_MODEL"} --prompt-file "$g" </dev/null >"$out" 2>>"$ERRF"; rc=$?
+          gr="$(_stage "$g")"
+          _E "$GROK_BIN" --no-plan --no-subagents --disable-web-search --max-turns 1 ${PIN_MODEL:+-m "$PIN_MODEL"} --prompt-file "$gr" </dev/null >"$out" 2>>"$ERRF"; rc=$?
         else
           d="$(mktemp -t grokdata.XXXXXX)"; printf '%s' "$PROMPT" >"$d"
-          { printf 'OUTPUT MODE — READ FIRST: The file at %s contains your COMPLETE task and all source material. It may be large. FIRST use your Read tool to read %s IN FULL (read the entire file, not a preview). THEN carry out the instructions it contains and write your COMPLETE answer as plain text to standard output as your final message. Do NOT enter plan mode. Do NOT spawn subagents. Do NOT create, write, or edit ANY files — your only tool use is reading that one file.\n' "$d" "$d"; } >"$g"
-          bound "$GROK" --no-plan --no-subagents --disable-web-search --permission-mode bypassPermissions --max-turns 12 ${PIN_MODEL:+-m "$PIN_MODEL"} --prompt-file "$g" </dev/null >"$out" 2>>"$ERRF"; rc=$?
+          dr="$(_stage "$d")"   # stage BEFORE writing $g: the remote path goes inside the instruction text
+          { printf 'OUTPUT MODE — READ FIRST: The file at %s contains your COMPLETE task and all source material. It may be large. FIRST use your Read tool to read %s IN FULL (read the entire file, not a preview). THEN carry out the instructions it contains and write your COMPLETE answer as plain text to standard output as your final message. Do NOT enter plan mode. Do NOT spawn subagents. Do NOT create, write, or edit ANY files — your only tool use is reading that one file.\n' "$dr" "$dr"; } >"$g"
+          gr="$(_stage "$g")"
+          _E "$GROK_BIN" --no-plan --no-subagents --disable-web-search --permission-mode bypassPermissions --max-turns 12 ${PIN_MODEL:+-m "$PIN_MODEL"} --prompt-file "$gr" </dev/null >"$out" 2>>"$ERRF"; rc=$?
           rm -f "$d"
         fi
       fi
@@ -445,16 +586,30 @@ sys.stdout.write(d["choices"][0]["message"]["content"])
   return $rc
 }
 
-OUT="$(mktemp -t cliask.XXXXXX)"; trap 'rm -f "$OUT" ${BIGFILE:+"$BIGFILE"}' EXIT
+OUT="$(mktemp -t cliask.XXXXXX)"
+START_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+START_EPOCH="$(date -u +%s)"
 attempt=0
 while :; do
   run_once "$OUT"; rc=$?
   nonws=$(tr -d '[:space:]' <"$OUT" | wc -c | tr -d ' ')
-  if [ "$rc" -eq 0 ] && [ "$nonws" -ge "$MIN_BYTES" ]; then cat "$OUT"; exit 0; fi
+  attempts=$((attempt + 1))
+  now_epoch="$(date -u +%s)"; now_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  if [ "$rc" -eq 0 ] && [ "$nonws" -ge "$MIN_BYTES" ]; then
+    _append_telemetry "$rc" "$nonws" "$attempts" "$now_epoch" "$now_utc"
+    cat "$OUT"; exit 0
+  fi
+
+  if _quota_exhausted; then
+    _append_telemetry "$rc" "$nonws" "$attempts" "$now_epoch" "$now_utc"
+    echo "cli-ask: $MODEL explicit quota-exhaustion pattern$(errtail)" >&2
+    cat "$OUT"; exit "$rc"
+  fi
   # 2026-06-12: a hard TIMEOUT (124) is NOT a transient flake — retrying re-pays the full --timeout wall
   # (the 18-min double-wait that wasted the 185KB run). A genuinely oversized prompt will just time out
   # again, so fail fast and tell the caller to chunk. (Set CLI_ASK_RETRY_TIMEOUT=1 to restore old behaviour.)
   if [ "$rc" -eq 124 ] && [ "${CLI_ASK_RETRY_TIMEOUT:-0}" != "1" ]; then
+    _append_telemetry "$rc" "$nonws" "$attempts" "$now_epoch" "$now_utc"
     echo "cli-ask: $MODEL hard-timed-out at ${TIMEOUT}s — NOT retrying (oversized prompt? chunk it, or raise --timeout)" >&2
     cat "$OUT"; exit 124
   fi
@@ -462,12 +617,18 @@ while :; do
   # A tool-use failure with substantive output is NOT a transient flake — retrying burns the
   # compute-weighted subscription quota for no gain. Fast-fail if agy produced output but exited non-zero.
   if [ "$MODEL" = "agy" ] && [ "$rc" -ne 0 ] && [ "$nonws" -ge "$MIN_BYTES" ]; then
+    _append_telemetry "$rc" "$nonws" "$attempts" "$now_epoch" "$now_utc"
     echo "cli-ask: agy exited $rc (tool-use failure?) with ${nonws} bytes output — NOT retrying$(errtail)" >&2
     cat "$OUT"; exit "$rc"
   fi
   if [ "$attempt" -ge "$RETRIES" ]; then
-    if [ "$rc" -ne 0 ]; then echo "cli-ask: $MODEL exited $rc after $((attempt+1)) attempt(s)$(errtail)" >&2; cat "$OUT"; exit "$rc"; fi
-    echo "cli-ask: $MODEL returned only ${nonws} non-space bytes (min ${MIN_BYTES}) after $((attempt+1)) attempt(s) — FAILURE, not a silent pass$(errtail)" >&2
+    if [ "$rc" -ne 0 ]; then
+      _append_telemetry "$rc" "$nonws" "$attempts" "$now_epoch" "$now_utc"
+      echo "cli-ask: $MODEL exited $rc after $attempts attempt(s)$(errtail)" >&2
+      cat "$OUT"; exit "$rc"
+    fi
+    _append_telemetry "3" "$nonws" "$attempts" "$now_epoch" "$now_utc"
+    echo "cli-ask: $MODEL returned only ${nonws} non-space bytes (min ${MIN_BYTES}) after $attempts attempt(s) — FAILURE, not a silent pass$(errtail)" >&2
     cat "$OUT"; exit 3
   fi
   attempt=$((attempt+1)); echo "cli-ask: $MODEL thin/failed (rc=$rc bytes=${nonws})$(errtail); retry ${attempt}/${RETRIES}..." >&2; sleep 2
