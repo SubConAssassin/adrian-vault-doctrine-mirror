@@ -4140,3 +4140,15 @@ An on-demand transcription wrapper searched the whole command line for `Blender`
 ### LL-2026-09-15-002 — unattended bridge daemons should pin a proven LTS runtime
 `tags: [tool-gotcha, node, launchd, reliability]`
 The Ashta callback path repeatedly crashed inside Node 26.3.0's bundled Undici with `assert(!this.paused)`, while the identical targeted round trip passed on Node 22.23.2. **Rule: pin unattended structural daemons to the exact proven LTS binary in their service definition; do not inherit whichever newer runtime happens to be first on PATH.**
+
+### LL-2026-09-15-003 — headless media publishers must pin and read back their runtime environment
+`tags: [tool-gotcha, launchd, publishing, media]`
+A publishing runner passed its tests interactively but its first service definition inherited only the system PATH, omitting the media binaries it calls. The service was corrected to pin its Python runtime and explicitly include the media-tool paths, then verified through the installed service's own environment read-back. **Rule: for every headless media job, treat the service definition as a separate runtime: pin the interpreter, set PATH explicitly, lint it, reload it, and read the live service back before calling it installed.**
+
+### LL-2026-09-15-004 — decode-clean is not review-ready; candidate and composition gates catch different defects
+`tags: [process-change, video, validation, publishing]`
+A reel decoded cleanly and had valid dimensions/audio, yet the candidate validator found overlong static intervals and an uncovered tail; after those were fixed, the layout verifier found essential focal content outside feed/square safe areas. Several revisions were required before both gates were clean. **Rule: never present or queue a reel from decode evidence alone. Require an exact-export candidate-manifest pass and a fresh layout report with zero failures, while keeping human playback/approval explicitly pending.**
+
+### LL-2026-09-15-005 — long silent model calls need bounded artifact scopes and explicit ceilings
+`tags: [tool-gotcha, claude, orchestration, reliability]`
+Two broad evidence-building calls wrote nothing before the default six-minute timeout. Splitting the work into one small artifact set per call and giving each a deliberate bounded ceiling completed reliably, while file checks proved no partial output was being mistaken for progress. **Rule: when a coordinated model call is silent, narrow its permitted outputs and acceptance command before extending its timeout; inspect durable artifacts, and never describe elapsed time alone as progress.**
