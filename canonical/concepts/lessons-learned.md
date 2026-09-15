@@ -4132,3 +4132,11 @@ An application form looked complete and accepted submissions, but its submit end
 ### LL-2026-09-13-012 — a CLI production deploy from a stale clone silently removes commits
 `tags: [discovery, deploy, git]`
 A production deploy ran from a local clone seven weeks behind the real main branch. It shipped cleanly and silently removed weeks of later commits from production, security fixes included, with no error. **Rule: before a CLI production deploy, confirm the working tree contains the commit currently in production, deploy only from an up-to-date main, and push to main in the same change.**
+
+### LL-2026-09-15-001 — resource admission must match exact executable names
+`tags: [mistake, process-control, local-inference]`
+An on-demand transcription wrapper searched the whole command line for `Blender` and treated the unrelated `blender-mcp` service as an active render, delaying every job. **Rule: resource-admission gates must match exact executable/process names and be proven against similarly named background services before deployment.**
+
+### LL-2026-09-15-002 — unattended bridge daemons should pin a proven LTS runtime
+`tags: [tool-gotcha, node, launchd, reliability]`
+The Ashta callback path repeatedly crashed inside Node 26.3.0's bundled Undici with `assert(!this.paused)`, while the identical targeted round trip passed on Node 22.23.2. **Rule: pin unattended structural daemons to the exact proven LTS binary in their service definition; do not inherit whichever newer runtime happens to be first on PATH.**
