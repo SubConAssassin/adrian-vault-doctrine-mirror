@@ -4152,3 +4152,23 @@ A reel decoded cleanly and had valid dimensions/audio, yet the candidate validat
 ### LL-2026-09-15-005 — long silent model calls need bounded artifact scopes and explicit ceilings
 `tags: [tool-gotcha, claude, orchestration, reliability]`
 Two broad evidence-building calls wrote nothing before the default six-minute timeout. Splitting the work into one small artifact set per call and giving each a deliberate bounded ceiling completed reliably, while file checks proved no partial output was being mistaken for progress. **Rule: when a coordinated model call is silent, narrow its permitted outputs and acceptance command before extending its timeout; inspect durable artifacts, and never describe elapsed time alone as progress.**
+
+### LL-2026-09-17-001 — a submit button disabled until a third-party token arrives is a dead button, and it can hide for weeks
+`tags: [mistake, web, forms, onboarding]`
+Ashta's invitation and apply forms kept their submit button disabled until Cloudflare Turnstile returned a token, with no message on screen. Inside WhatsApp and Instagram in-app browsers the token often never came, so invited people saw a button that did nothing. Production recorded zero new members for two weeks and nobody noticed until a friend said so; several earlier audits passed because none of them walked the literal link, signed out, in an in-app browser. **Rule: disable a submit button only while its own request is in flight; every other blocked state must put words on screen. Pre-launch audits start from the exact URL that gets shared, signed out, in a phone-class or in-app browser, and a signup count that stops moving is an alarm, not a quiet day.**
+
+### LL-2026-09-17-002 — a queued callback captures stale values; pass them at send time
+`tags: [discovery, react, forms]`
+The first fix stored the form's submit function and called it when the captcha token arrived. The stored function had captured the render in which the button was pressed, so it always sent an empty token (and the old email if the person had edited it). Three independent reviewers caught it before deploy. **Rule: a deferred submit must receive the token and field values as arguments at the moment it fires (or read them from refs), and any edit while it is queued must cancel it.**
+
+### LL-2026-09-17-003 — a bypass gated by a fail-open rate limiter is no gate
+`tags: [mistake, security, rate-limit]`
+A tokenless fallback for devices where the human check cannot run was first gated only by rate limits, but the shared limiter deliberately fails open when its salt is unset, its migration is missing or its RPC errors, which would have made the fallback unlimited in exactly those environments. **Rule: when a limiter is the only thing standing between a request and an unprotected action, require proof that it actually evaluated (fail closed); keep fail-open behaviour for courtesy throttles only.**
+
+### LL-2026-09-17-004 — never ship code that reads columns from an unapplied migration; release from the production-safe base
+`tags: [process-change, deploy, database]`
+The branch everyone had been working on contained observer-seat commits that select a column from a migration not applied in production; deploying it would have broken every session read and room token. The launch release was cut from the last production-equivalent commit instead, with the observer line held back. **Rule: before any production deploy, run a read-only live-schema check that every table and column the code selects exists in production (`npm run check:schema:live`), and when a feature needs unapplied migrations, release without it rather than applying migrations under launch pressure.**
+
+### LL-2026-09-17-005 — fleet.py claim accepts only specific actor names and a ttl of at most 1440 minutes
+`tags: [tool-gotcha, fleet]`
+`tools/fleet.py claim` refused `FLEET_ACTOR=claude` (valid: adrian, antigravity, automation, claude-headless, claude-live, external, jobqueue) and refused `--ttl 43200` (minutes, range 1..1440). **Rule: live Claude sessions claim with `FLEET_ACTOR=claude-live` and a ttl in minutes no greater than 1440, renewing for longer jobs.**
