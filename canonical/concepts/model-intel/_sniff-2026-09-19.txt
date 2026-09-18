@@ -1,0 +1,1 @@
+- [317pts] Jemalloc 5.4.0  (https://github.com/jemalloc/jemalloc/releases/tag/5.4.0)
