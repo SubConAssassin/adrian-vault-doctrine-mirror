@@ -163,7 +163,7 @@ without being asked twice:**
 |---|---|---|---|
 | M1 Max MacBook 64GB | local | Adrian's workstation. Fleet's **LARGE-model seat** during grind windows — the only node with enough unified memory for a ~70B-class quantized model (higher quality, slower, ~10 tok/s). Orchestrator (Claude runs here). | Shard 3/5, PRESENT/GRIND-gated per this doctrine — the only node whose grind participation is conditional |
 | M2 Max Studio 32GB | `ssh studio` | Headless, always-on. **Grind orchestrator** — per Adrian's stated protocol, M2 is the node that should be managing i7 + m4 mini + PC so M1 doesn't have to reconfigure the rest of the fleet when it steps in/out of PRESENT. (Orchestrator role is a standing designation; the steal-based sharding already means no active reshard command is needed when M1 leaves — see §7.) | Always grinding, own shard, unconditional |
-| i7 Intel MacBook 2014 16GB | `ssh i7` | Specialist offload — CPU transcription, ffmpeg encode, janitor/backup-staging. No Metal/MLX, cannot run local LLM inference. | Always grinding, own shard, unconditional |
+| ~~i7 Intel MacBook 2014 16GB~~ | ~~`ssh i7`~~ | **RETIRED 2026-09-17, Adrian-direct: "the i7 is retired not fit for use."** Not a fleet node; route nothing to it. (Former role: CPU transcription, ffmpeg encode, janitor/backup-staging.) | None |
 | M2 Pro Mac mini 16GB | `ssh m4` | GPU transcription node (mlx). | Always grinding, own shard, unconditional |
 | Windows RTX 5080 PC | `ssh pc` | Fleet's **FAST-model seat** — Qwen3.5-9B at ~135 tok/s on the RTX 5080, llama-server OpenAI-compatible endpoint. CUDA transcription shard also live. | Always grinding once the shard 4/5 wiring is confirmed, unconditional |
 
