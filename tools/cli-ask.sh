@@ -109,7 +109,10 @@ case "$MODEL" in
 esac
 # Top-effort default for codex. Set AFTER the alias case but BEFORE the arg loop would be
 # wrong (--effort must win), so it is applied lazily at call time in the codex block instead.
-LOCAL_HOST="${LOCAL_HOST:-${CLI_ASK_LOCAL_HOST:-http://192.168.1.2:11434}}"   # M2 Studio grunt lane
+# 2026-09-20: LAN IP drifts under DHCP with no reservation (192.168.1.2 -> .18, found dead
+# this session — see memory/lan-dhcp-no-reservations-root-cause.md). Default now points at
+# Studio's Tailscale IP instead, which does not move when the LAN address changes.
+LOCAL_HOST="${LOCAL_HOST:-${CLI_ASK_LOCAL_HOST:-http://100.67.6.112:11434}}"   # M2 Studio grunt lane (Tailscale)
 
 # ---- AGY CONCURRENCY GATE (added 2026-06-12 after the 5-wide overnight wedge) ----
 # agy hangs ALL lanes when >2 concurrent clients run (documented 2026-06-07, re-proven
