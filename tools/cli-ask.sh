@@ -277,11 +277,13 @@ if [ "${CLI_ASK_FORCE_LOCAL:-0}" != "1" ] && [ -f "$HERE/node-exec.sh" ]; then
     codex|claude|grok) CLI_NODE="$(bash "$HERE/node-exec.sh" pick "$REQUESTED_LANE" 2>/dev/null || echo local)" ;;
   esac
 fi
-# Adrian-direct 2026-09-13: M2 Original Siberian Blue only. UK Photon is
-# reserved for Adrian; never spill this lane to the Mini or primary Mac.
-if [ "$MODEL" = "claude" ] && [ "$CLI_NODE" != "studio" ]; then
-  echo "cli-ask: Claude M2 OSB lane unavailable, unauthenticated or at capacity; refusing account fallback." >&2
-  exit 75
+# Adrian-direct 2026-09-13: Mini OSB reel profile is explicitly opt-in.
+# Default Studio behaviour remains unchanged. Neither profile may fall back.
+if [ "$MODEL" = "claude" ]; then
+  case "${CLI_ASK_CLAUDE_PROFILE:-studio-osb}:$CLI_NODE" in
+    studio-osb:studio|mini-osb-reels:mini) ;;
+    *) echo "cli-ask: Claude OSB profile unavailable, unauthenticated or at capacity; refusing fallback." >&2; exit 75 ;;
+  esac
 fi
 # Binary resolution differs per node: M1 pins absolute paths, remote nodes resolve on PATH
 # (codex is ~/.local/bin/codex on the Mini but /opt/homebrew/bin/codex on the Studio - an absolute
@@ -412,7 +414,7 @@ run_once() {  # $1 = output file; returns the CLI's exit code (anything >128 i.e
     claude)
       # Verify the pool immediately before inference. A valid Claude login on the wrong
       # subscription is a hard failure, not permission to consume it.
-      cstatus="$(NODE_EXEC_PINNED_NODE=studio bash "$HERE/node-exec.sh" run claude --timeout 15 -- "$CLAUDE_BIN" auth status 2>>"$ERRF")"
+      cstatus="$(NODE_EXEC_PINNED_NODE="$CLI_NODE" bash "$HERE/node-exec.sh" run claude --timeout 15 -- "$CLAUDE_BIN" auth status 2>>"$ERRF")"
       if ! printf '%s' "$cstatus" | grep -q '"loggedIn": true' || \
          ! printf '%s' "$cstatus" | grep -q '"email": "originalsiberianblue@gmail.com"'; then
         echo "cli-ask: M2 Claude identity check failed; expected Original Siberian Blue account." >>"$ERRF"
