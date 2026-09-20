@@ -85,9 +85,9 @@ For every substantial dispatch, choose a lane in this order:
    stranded. Claude is evaluated separately on its 5-hour and weekly windows; the constraining
    window wins.
 4. **Reserve gate fourth.** Hold a minimum 5% of each individual pool for contingency. Do not
-   cross it outside the pool's final two wall-clock hours before its own reset, unless Adrian
+   cross it outside the pool's final four wall-clock hours before its own reset, unless Adrian
    explicitly authorises it.
-5. **Intentional final drain.** In the final two hours, a pool may be drained below 5% only when
+5. **Intentional final drain.** In the final four hours, a pool may be drained below 5% only when
    there is no queued or predictable task requiring that specific model before reset. Record the
    reason and the expected reset time in the routing plan.
 
@@ -121,7 +121,7 @@ account identity or its live quota cannot be verified.
 
 ### Acceptance checks
 
-1. A pool below 5% and outside its final two-hour window refuses non-contingency work.
+1. A pool below 5% and outside its final four-hour window refuses non-contingency work.
 2. A stale or missing observation is `UNKNOWN`, not a plausible capacity estimate.
 3. A fallback between accounts is visible in the routing plan.
 4. The main ChatGPT weekly burn is compared with time remaining in its week and flags early if its
