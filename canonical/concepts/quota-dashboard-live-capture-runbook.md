@@ -65,3 +65,66 @@ and re-captures on a timer. That is a real, separate security-shape decision (pe
 account session state for automated reads) and needs an explicit go from Adrian, not a default
 assumed under a general "keep the dashboard current" instruction. Until that's decided, these two
 pools are refreshed by an explicit request routed through the manual procedure above.
+
+## Quota-aware routing policy (Adrian-direct, 2026-09-20)
+
+The dashboard is not merely a capacity display. It is the evidence source for an explicit routing
+decision. The goal is to use subscriptions before their own reset deadlines without exhausting a
+model that may be needed for a model-specific, time-sensitive task.
+
+### Decision order
+
+For every substantial dispatch, choose a lane in this order:
+
+1. **Model fit first.** A task must meet the lane's capability and authority requirements; a
+   near-reset pool is never a reason to use an unfit model.
+2. **Fresh vendor evidence second.** Use an authenticated observation from the current routing
+   cycle. `UNKNOWN` is unavailable for autonomous allocation; never infer that a reset occurred
+   because a calendar time passed.
+3. **Cycle pressure third.** Prefer an equally-fit pool that resets sooner or would otherwise be
+   stranded. Claude is evaluated separately on its 5-hour and weekly windows; the constraining
+   window wins.
+4. **Reserve gate fourth.** Hold a minimum 5% of each individual pool for contingency. Do not
+   cross it outside the pool's final two wall-clock hours before its own reset, unless Adrian
+   explicitly authorises it.
+5. **Intentional final drain.** In the final two hours, a pool may be drained below 5% only when
+   there is no queued or predictable task requiring that specific model before reset. Record the
+   reason and the expected reset time in the routing plan.
+
+The 5% rule is per account and per reset window, never a fleet-wide average. It protects against
+the misleading case where aggregate capacity looks healthy while the one required model is spent.
+
+### Account roles
+
+- **Main ChatGPT account:** orchestration, decisions, acceptance, and concise user-facing work.
+  It is budgeted to last the entire weekly cycle and must not quietly absorb bulk generation.
+- **Claude 20x accounts:** use the more expiring viable Claude pool for implementation/review work,
+  while preserving the 5% reserve. Treat each Claude account's 5-hour and weekly windows as
+  distinct constraints. A weekly reset on one account can make it the preferred near-term work
+  lane even if another has more raw remaining capacity.
+- **Grok, Gemini, and other subscription CLIs:** use for tasks they fit when their authenticated
+  quota is fresh and they reduce avoidable consumption of the primary orchestration account.
+- **DeepSeek prepaid API pool:** route only behind its metered-spend gate and ledger-backed balance;
+  it is not a subscription quota and must never be used as an unbounded fallback.
+
+### Scheduling and visibility
+
+One routing authority writes a compact, human-readable plan before dispatching material work:
+`task → selected lane → fit rationale → remaining/reset evidence → reserve state → fallback`.
+The plan must name any account fallback; no account or host fallback is silent. Simultaneous
+dispatches read the same fresh snapshot and are serialised through that authority so two machines
+cannot allocate against the same apparent headroom.
+
+Flag, rather than execute, any auto-purchase, usage-credit activation, usage reset, account upgrade,
+or cross-account login. Adrian alone authorises those actions. A routing pass fails closed when the
+account identity or its live quota cannot be verified.
+
+### Acceptance checks
+
+1. A pool below 5% and outside its final two-hour window refuses non-contingency work.
+2. A stale or missing observation is `UNKNOWN`, not a plausible capacity estimate.
+3. A fallback between accounts is visible in the routing plan.
+4. The main ChatGPT weekly burn is compared with time remaining in its week and flags early if its
+   projected path would exhaust before reset.
+5. A completed week's log can reconstruct why each substantial task went to its selected lane from
+   stored vendor observations and recorded fit/routing rationale.
