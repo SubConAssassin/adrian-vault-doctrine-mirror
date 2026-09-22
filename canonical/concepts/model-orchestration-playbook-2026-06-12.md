@@ -28,7 +28,7 @@ metadata:
 | Never-reread-the-universe / compress-after-work | **Already law** — STATE-OF-STACK + handoffs + memory + ChromaDB are the compressed-state layer. PROJECT_STATE.md/TASKS.md per-repo pattern = optional, use where a repo already has it; the VAULT files remain canonical (same reconciliation as the cluster roadmap). |
 | **The proactive secretary (monitors Claude's conduct)** | **NEW — BUILT 2026-06-12.** `tools/delegation-sentinel.py`: scans live session transcripts (30-min window), classifies every tool call DIRECT-labour vs DELEGATED (cli-ask/subagent/workflow), scores, and injects a nudge banner into EVERY prompt via UserPromptSubmit hook when Claude is labouring (AMBER ≥30 direct + ratio<12% · RED ≥60 + <5%). GREEN = silent. Self-heals (re-scores when >10min stale). This is the enforcement mechanism the doctrine lacked — the accountant watches tokens; the secretary watches behaviour. |
 
-**Conductor's tier matrix — REFRESHED 2026-07-25 against the current engine board.** Roles unchanged; the engines behind them moved. Full specs: [[llm-capability-map-2026-07-25]]; binding law: delegation-doctrine **§14**.
+**Conductor's tier matrix — current-reference pointer updated 2026-09-22.** Roles unchanged; the engines behind them move. Full specs: [[llm-capability-map-2026-09-22]]; binding law: delegation-doctrine **§14**.
 
 | Role | Model/effort (current) | Used for |
 |---|---|---|

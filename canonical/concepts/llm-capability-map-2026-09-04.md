@@ -3,11 +3,11 @@ name: llm-capability-map-2026-09-04
 title: The LLM Capability Map — every engine in the stack, what it is best at, and how to prompt it
 type: doctrine
 tier: 1
-status: CURRENT
+status: SUPERSEDED
 date: 2026-09-04
 author: Claude (Opus 5) — CEO-of-the-stack, with a full 8-way CLI team fan-out + a 30-agent verification workflow
 as_of_utc: 2026-09-04T05:20:00Z
-updated: 2026-09-04
+updated: 2026-09-22
 grounding_mode: web_assisted + engine_native_probe
 supersedes:
   - canonical/concepts/llm-capability-map-2026-07-25.md
@@ -21,6 +21,8 @@ cross_references:
 ---
 
 # The LLM Capability Map — 2026-09-04
+
+> **SUPERSEDED 22 September 2026.** Use [llm-capability-map-2026-09-22.md](llm-capability-map-2026-09-22.md) for current routing and model facts. This file remains an evidence-preserving historical snapshot; its launch, availability, default-model, benchmark, price, and CLI-version assertions are not current unless independently revalidated.
 
 **Why this exists.** Between 28 August and 3 September 2026 four frontier models shipped in six
 days: **Claude Fable 5.1** (1 Sep), **Gemini 3.8 Flash** (2 Sep), **Meta Muse Spark 1.3** (2 Sep)

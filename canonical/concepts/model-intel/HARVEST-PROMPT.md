@@ -27,7 +27,7 @@ This is the standing instruction the weekly harvest agent runs. `tools/model-int
 **For each finding:** one line — *what* + *why it matters* + *source link*.
 
 **Then two delta sections (the load-bearing output):**
-- **→ ROUTING DELTAS:** does any finding change a routing decision in [model-routing-engine.md §3](../model-routing-engine.md)? (e.g. a new cheaper/better model for a job we currently route elsewhere; a model now on the API key; a capability that moves a task between surfaces.) List explicitly, or "none this week."
+- **→ ROUTING DELTAS:** does any finding change a routing decision in [model-routing-engine-2026-09-22.md](../model-routing-engine-2026-09-22.md) or [llm-capability-map-2026-09-22.md](../llm-capability-map-2026-09-22.md)? (e.g. a new cheaper/better model for a job we currently route elsewhere; a model now on the API key; a capability that moves a task between surfaces.) List explicitly, or "none this week."
 - **→ TACTIC DELTAS:** anything that should change the Meta/funnel/SEO strategy in [meta-ads-api-strategy](../../companies/subconscious-surgery/meta-ads-api-strategy-2026-05-29.md) or the master monetisation strategy? List, or "none."
 
 **Discipline:** flag confident-vs-inferred. Source-link everything. Tight, no hype. If a "fact" can't be sourced, mark it unverified. Write the digest to `canonical/concepts/model-intel/{date}-digest.md` and surface ROUTING/TACTIC DELTAS to Adrian only when non-empty.
