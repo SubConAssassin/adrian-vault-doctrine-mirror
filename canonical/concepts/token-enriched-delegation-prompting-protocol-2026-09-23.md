@@ -27,6 +27,22 @@ Historical routing engines, dated capability maps, harvest digests, delivery-har
 
 The conductor owns objective, routing, authority boundaries, acceptance, and state. A worker owns only the bounded task. The worker does not silently widen scope, choose a paid route, publish, alter an account, or make a strategy decision.
 
+## Direct-work circuit breaker
+
+**Adrian-direct, 23 September 2026. Classification: operational enforcement added to the existing routing home; no spending, account, publication, or safety permission changes.**
+
+For a task that contains research, extraction, code changes, file mining, bulk drafting, or any other deferrable legwork, the conductor must make one compact task card and dispatch it to the authorised worker route before performing the legwork inline. The return receipt, or the exact fail-closed route error, is the routing record.
+
+If that worker route is unavailable, the conductor may perform only the bounded diagnosis needed to establish the failure. It must not replace the failed worker with an extended premium-model implementation, repeat the same long prompt, or start an autonomous prompt/monitoring loop. It either routes a separately authorised, available flat-rate worker or reports the failed route and preserves the task card for that worker.
+
+Codex and Claude retain direct work only for the decision, task card, narrowly necessary live verification, acceptance, and final synthesis. A second direct implementation pass on the same deferrable leg requires a new, concrete acceptance failure; otherwise stop and delegate. Periodic work must use deterministic detection/checkpoints and invoke a model only for a new actionable event.
+
+The accountant must surface, separately from vendor quota, the recent-session count, cumulative session tokens, high-token sessions, and—where the session source exposes it—a direct-versus-dispatched signal. Those are conduct alarms, not subscription-balance estimates.
+
+**Codex Desktop checkpoint (23 September 2026):** At substantive-turn entry and before every new direct-legwork batch, run `python3 /Users/adriantaffinder/Documents/Adrian-Vault/tools/delegation-sentinel.py --check-codex`. The gate selects the current rollout using `CODEX_THREAD_ID` (or an explicit verified `--session-id`), validates its identity, and reads Desktop `response_item` tool calls plus the latest session token counter. It returns exit **2 / DISPATCH_ONLY** at 1,000,000 cumulative session tokens or 30 direct-tool proxy operations in 30 minutes; dispatch attempts never erase these thresholds. Exit **3 / UNKNOWN** holds new direct legwork when telemetry is absent, malformed or ambiguous. Exit **0 / PASS** is telemetry clearance only: task-card and delegation obligations still apply. Never restart or fork a task to evade the checkpoint. Decisions, dispatch, bounded acceptance and reporting the unavailable route remain permitted when held.
+
+The check is read-only and invokes no models, wakeups or remote services. Tool counts are conservative proxies, not proof of labour or successful delegation; quoted routing strings do not count as successful dispatch. Its nonzero exit and mandatory global instruction make the signal actionable for a cooperating caller. No Codex Desktop pre-tool interception is installed: this is **agent-followed checkpoint enforcement**, not an automatic execution block, account limit or guarantee that an already-running task obeys updated instructions. The accountant's aggregate alarm remains separate historical conduct evidence and is not presented as live vendor quota.
+
 This protocol separates four facts which must never be collapsed:
 
 `constitutional task authorisation → vendor capability → documented interface → authenticated lane access evidence → same-fixture evaluation → independent acceptance → authorised route-owner decision`
