@@ -1,12 +1,14 @@
 ---
 title: Hive-Mind Model Routing Engine — current
-status: CURRENT
+status: SUPERSEDED
 date: 2026-09-22
 supersedes: canonical/concepts/model-routing-engine.md
 companion: canonical/concepts/llm-capability-map-2026-09-22.md
 ---
 
 # Hive-Mind Model Routing Engine — 22 September 2026
+
+> **SUPERSEDED 23 September 2026.** Use [llm-capability-map-2026-09-23.md](llm-capability-map-2026-09-23.md) and [token-enriched-delegation-prompting-protocol-2026-09-23.md](token-enriched-delegation-prompting-protocol-2026-09-23.md). Opus 5.5 and GPT-6 Sol/Luna released after this document was prepared.
 
 ## The routing decision
 

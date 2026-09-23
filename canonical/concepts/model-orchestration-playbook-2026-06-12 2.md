@@ -1,7 +1,7 @@
 ---
 name: model-orchestration-playbook-2026-06-12
 description: ChatGPT-synthesised conductor/worker model-routing playbook (Conductor/Architect/Builder/Auditor/Scribe + effort tiering + task cards). ADOPTED with reconciliation — extends, does not replace, delegation-first doctrine. Enforced by the delegation-sentinel proactive secretary.
-status: ADOPTED_RECONCILED
+status: RETIRED_DUPLICATE
 metadata:
   type: doctrine
   source: ChatGPT synthesis for Adrian, 2026-06-12 (Adrian-direct: "proactive secretary which monitors you… you sometimes default into doing the work you should be delegating")
@@ -13,6 +13,8 @@ metadata:
 ---
 
 # Model Orchestration Playbook (Conductor doctrine)
+
+> **RETIRED DUPLICATE — 23 September 2026.** Do not use this file for current assignments, model names, effort, or prompt architecture. The canonical role playbook is [model-orchestration-playbook-2026-06-12.md](model-orchestration-playbook-2026-06-12.md); current routing and prompting live only in [token-enriched-delegation-prompting-protocol-2026-09-23.md](token-enriched-delegation-prompting-protocol-2026-09-23.md). The remainder is retained solely as a historical snapshot.
 
 ## Reconciliation header (Claude, 2026-06-12)
 

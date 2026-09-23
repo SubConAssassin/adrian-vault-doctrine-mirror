@@ -12,8 +12,10 @@ C. VENTURE TACTICS — what's working RIGHT NOW in Meta ads, SEO, and subscripti
    (relevant to a $99–$699/mo personal-development subscription + e-commerce).
 
 For each finding: 1-line what + why-it-matters + source link. Then:
-→ ROUTING DELTAS: does anything change a routing decision in model-routing-engine.md §3? (e.g. a new
-   cheaper/better model for a job we currently route elsewhere). List explicitly, or "none this week."
+→ ROUTING DELTAS: does anything change a routing decision in
+   [token-enriched-delegation-prompting-protocol-2026-09-23.md](../token-enriched-delegation-prompting-protocol-2026-09-23.md)
+   or its [capability map](../llm-capability-map-2026-09-23.md)? A vendor release or catalogue entry
+   is a candidate only; state whether authenticated-lane and same-fixture evidence exist. List explicitly, or "none this week."
 → TACTIC DELTAS: anything that should change our Meta/funnel strategy? List, or "none."
 
 Raw HN signal already collected: see /Users/adriantaffinder/Documents/Adrian-Vault/canonical/concepts/model-intel/2026-09-23-raw-signal.md

@@ -1,12 +1,14 @@
 # Cross-Model Automation Protocol
 
-**Status:** ACTIVE — audit-grounded 2026-05-29 (Opus 4.8 / 1M-context, 6-agent workflow audit `wf_a691ad22`).
+**Status:** ACTIVE for transport/automation mechanics; historical for model selection and prompt profiles — audit-grounded 2026-05-29 (Opus 4.8 / 1M-context, 6-agent workflow audit `wf_a691ad22`).
 **Authority:** This is the reconciling source of truth for how Claude, Antigravity, ChatGPT, Grok and Gemini talk to each other and how subscription depth flows into the vault. Where it conflicts with older docs, **this wins** and the older doc must be corrected:
 - Supersedes the transport claims in `canonical/concepts/bridge-protocols.md` (the Google Drive courier is RETIRED — GitHub is the live bridge).
 - Supersedes the AG-control-reliability framing in `canonical/concepts/hive-architecture-v3.md §5` (the AG CLI/SDK control plane is NOT built; the GUI keystroke feeder is the only live AG driver).
 - Narrows/clarifies `canonical/concepts/u-protocol.md` (the cross-model `u` meaning Adrian engineered was dropped — see Backlog T2).
 
 **Last updated:** 2026-05-29T23:55:00+08:00
+
+> **Current routing/prompting authority:** [Token-Enriched Delegation and Prompting Protocol — 23 September](token-enriched-delegation-prompting-protocol-2026-09-23.md), with its [capability map](llm-capability-map-2026-09-23.md). This document owns transport only; it is not a second model board.
 
 ---
 

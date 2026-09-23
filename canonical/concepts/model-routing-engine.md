@@ -11,12 +11,12 @@ extends: memory/full-stack-capability-map.md (task→tool matrix). THIS doc adds
 
 # Hive-Mind Model Routing Engine
 
-> **SUPERSEDED 22 September 2026.** Use [model-routing-engine-2026-09-22.md](model-routing-engine-2026-09-22.md) with [llm-capability-map-2026-09-22.md](llm-capability-map-2026-09-22.md). This document is retained for the original routing rationale and harvester history only. Its named models, prices, limits and route defaults are historical.
+> **SUPERSEDED 23 September 2026.** Use [the Token-Enriched Delegation and Prompting Protocol](token-enriched-delegation-prompting-protocol-2026-09-23.md) for current operating rules and [the LLM Capability Map](llm-capability-map-2026-09-23.md) for the compact evidence board. This document is retained for original routing rationale and harvester history only. Its named models, prices, limits and route defaults are historical.
 
 > ⚠️ **PARTIALLY SUPERSEDED 2026-07-25.** Every model name, price and capability claim below is from
 > **2026-05-29** and is now wrong: it predates Claude Fable 5 (9 Jun), Sonnet 5 (30 Jun), **Opus 5
 > (24 Jul)**, GPT-5.6 Sol/Terra/Luna (9 Jul), Gemini 3.6 Flash (21 Jul) and Grok 4.5 (8 Jul).
-> **For any current routing or pricing question use [llm-capability-map-2026-09-22.md](llm-capability-map-2026-09-22.md).**
+> **For any current routing or pricing question use [the 23 September protocol](token-enriched-delegation-prompting-protocol-2026-09-23.md) and [capability map](llm-capability-map-2026-09-23.md).**
 > (`canonical/concepts/llm-capability-map-2026-07-25.md`) and delegation-doctrine **§14**.
 > What is still valid here is the *conceptual framework* — the LIVE-vs-FROZEN × DEEP-vs-SHALLOW
 > routing axis and the auto-refresh loop. Read it for the reasoning, never for the numbers.

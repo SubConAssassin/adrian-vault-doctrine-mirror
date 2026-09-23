@@ -2,7 +2,7 @@
 **Status:** Tier-2 reference (operational). **Created:** 2026-07-18 (Adrian-commissioned after the grok-audit truncation). **Owner:** Claude.
 **Companion to:** [[delegation-first-operating-doctrine]] §4/§6/§13, `tools/cli-ask.sh`, [[feedback-bounded-cli-prompting]].
 
-> **Current-model addendum — 22 September 2026.** Model availability and routing now live in [llm-capability-map-2026-09-22.md](llm-capability-map-2026-09-22.md) and [model-routing-engine-2026-09-22.md](model-routing-engine-2026-09-22.md). The delivery mechanics below remain operational evidence. Treat its dated model IDs, limits, plan status, prices, and benchmark figures as historical unless re-probed. Grok 4.7 is released; its 4.5/4.6 delivery observations carry forward only as a testable harness hypothesis.
+> **Current-model addendum — 23 September 2026.** Model availability and routing now live in [llm-capability-map-2026-09-23.md](llm-capability-map-2026-09-23.md) and [token-enriched-delegation-prompting-protocol-2026-09-23.md](token-enriched-delegation-prompting-protocol-2026-09-23.md). The delivery mechanics below remain operational evidence. Treat its dated model IDs, limits, plan status, prices, and benchmark figures as historical unless re-probed. Grok 4.7 is released; its 4.5/4.6 delivery observations carry forward only as a testable harness hypothesis.
 
 ## The question that produced this
 Grok failed 3× to audit a 116 KB source bundle, then succeeded on a 22 KB cross-audit. Adrian asked: *is this a bundling or a prompting problem, and can we bundle so grok accepts it?* Answered **empirically on-box**, not by asking an LLM.
@@ -42,7 +42,7 @@ The non-web grok branch is now **size-gated** (`CLI_ASK_GROK_INLINE_MAX`, defaul
 
 ## 2026-07-25 UPDATE — the prompting law inverted, and the current engine strings
 
-Companion: **[llm-capability-map-2026-09-22.md](llm-capability-map-2026-09-22.md)** (current routing and model facts) + delegation-doctrine **§14**.
+Companion: **[llm-capability-map-2026-09-23.md](llm-capability-map-2026-09-23.md)** and [token-enriched-delegation-prompting-protocol-2026-09-23.md](token-enriched-delegation-prompting-protocol-2026-09-23.md) + delegation-doctrine **§14**.
 
 **The big inversion: STOP OVER-PROMPTING.** Everything above about *delivery idioms* still holds — but the guidance on *how much* to instruct has flipped for the frontier models. Every vendor published the same finding in Q3-2026. **OpenAI measured that stating each instruction exactly once and deleting repeated rules raises scores 10–15% while cutting tokens up to 66%.** Anthropic's Opus 5 guidance says to *remove* "verify everything" / "double-check" / "use a subagent to verify" outright. The §6 prescriptive-prompt law is **not** repealed — it exists because agy/grok confabulate without exact paths and grounding clauses — but it should now be applied as **structure, not volume**: exact paths, exact output format, one grounding clause. Not the same rule three times.
 

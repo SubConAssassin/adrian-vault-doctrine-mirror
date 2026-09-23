@@ -1,6 +1,6 @@
 # Multi-Session Orchestration & Cloud/Local Routing
 
-**Status:** Tier-1 doctrine. **Created:** 2026-06-01 from hard lessons in the 2026-05-31→06-01 uplift-campaign session (multi-window collisions, CLI over-crawl, a near-miss file archive, RAM-blind routing). Read this before launching any workflow, CLI burn, or heavy/local job. Companion to `cross-model-automation-protocol.md` (transport) and `model-routing-engine.md` (cognitive routing).
+**Status:** Tier-1 coordination doctrine. **Created:** 2026-06-01 from hard lessons in the 2026-05-31→06-01 uplift-campaign session (multi-window collisions, CLI over-crawl, a near-miss file archive, RAM-blind routing). Read this before launching any workflow, CLI burn, or heavy/local job. Companion to `cross-model-automation-protocol.md` (transport). It does **not** own cognitive/model routing: use `token-enriched-delegation-prompting-protocol-2026-09-23.md` and its capability map for that.
 
 ## 0. The core problem
 Adrian runs many parallel sessions (Cowork desktop, Mac terminal, mobile, headless `claude -p`, + sibling sessions) and each can spawn workflows + CLI burns. With no coordination they **collide**: SOS edit-collisions, CLI/RAM contention, duplicated or competing work, near-miss destructive ops. This file is the coordination contract.

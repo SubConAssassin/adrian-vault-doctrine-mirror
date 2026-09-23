@@ -28,15 +28,17 @@ metadata:
 | Never-reread-the-universe / compress-after-work | **Already law** — STATE-OF-STACK + handoffs + memory + ChromaDB are the compressed-state layer. PROJECT_STATE.md/TASKS.md per-repo pattern = optional, use where a repo already has it; the VAULT files remain canonical (same reconciliation as the cluster roadmap). |
 | **The proactive secretary (monitors Claude's conduct)** | **NEW — BUILT 2026-06-12.** `tools/delegation-sentinel.py`: scans live session transcripts (30-min window), classifies every tool call DIRECT-labour vs DELEGATED (cli-ask/subagent/workflow), scores, and injects a nudge banner into EVERY prompt via UserPromptSubmit hook when Claude is labouring (AMBER ≥30 direct + ratio<12% · RED ≥60 + <5%). GREEN = silent. Self-heals (re-scores when >10min stale). This is the enforcement mechanism the doctrine lacked — the accountant watches tokens; the secretary watches behaviour. |
 
-**Conductor's tier matrix — current-reference pointer updated 2026-09-22.** Roles unchanged; the engines behind them move. Full specs: [[llm-capability-map-2026-09-22]]; binding law: delegation-doctrine **§14**.
+**Conductor's tier matrix — current-reference pointer updated 2026-09-23.** Roles unchanged; the engines behind them move. Current route board: [llm-capability-map-2026-09-23.md](llm-capability-map-2026-09-23.md); per-model prompt mechanics and evaluation gate: [token-enriched-delegation-prompting-protocol-2026-09-23.md](token-enriched-delegation-prompting-protocol-2026-09-23.md); binding law: delegation-doctrine **§14**. The dated table below is historical role rationale, not a current model pin.
 
-| Role | Model/effort (current) | Used for |
+| Role | Route posture | Used for |
 |---|---|---|
-| Conductor | **Opus 5** @ `high` (the default) | intent, task cards, routing, merge, state |
-| Architect | **Opus 5** @ `xhigh` — **Fable 5** only for genuinely hours-long runs | architecture, strategy, hard debugging, ambiguity, final verification |
-| Builder | **Sonnet 5** @ `medium` / team CLI (**agy = Gemini 3.6 Flash**) | implementation after the plan is decided; never re-architects |
-| Auditor | different family from builder (**codex-sol** / grok / agy vs Claude) | acceptance-criteria check; receives task card + diff, NOT chat history |
-| Scribe | **Haiku 4.5** | changelogs, summaries, state compression, handoffs |
+| Conductor | Current frontier candidate per the operational SSOT; explicit model/effort and live-lane evidence required | intent, task cards, routing, merge, state |
+| Architect | Opus 5.5 at `medium` is the first evaluation baseline; escalate only after a recorded task failure | architecture, strategy, hard debugging, ambiguity, final verification |
+| Builder | Assigned Claude builder or GPT-6 Sol after live evaluation; receives bounded work, never re-architects | implementation after the plan is decided |
+| Auditor | Different family from builder; receives task card + artifact, not chat history | acceptance-criteria check |
+| Scribe | Lowest evaluated schema-capable route | changelogs, summaries, state compression, handoffs |
+
+> **Historical rationale below.** The dated benchmark, price, effort, and model-version statements after this table are retained for provenance only. Do not use them to route a current task; the operational SSOT above wins.
 
 **Three changes worth naming, because they invert prior habits:**
 1. **Sonnet 5 earned the Builder tier on merit, not price.** It beats *Opus 4.8* on Terminal-Bench 2.1 (80.4% vs 74.6%) at $3/$15 vs $5/$25. Routing a build to Sonnet 5 is no longer a quality compromise — it is the correct call, and it is the largest single cost win available inside Claude.

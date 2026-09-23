@@ -2,7 +2,7 @@
 title: LLM Capability Map — verified refresh
 type: doctrine-reference
 tier: 1
-status: CURRENT
+status: SUPERSEDED
 date: 2026-09-22
 supersedes:
   - canonical/concepts/llm-capability-map-2026-09-04.md
@@ -10,6 +10,8 @@ purpose: Current model facts, authenticated lane state, and routing eligibility
 ---
 
 # LLM Capability Map — 22 September 2026
+
+> **SUPERSEDED 23 September 2026.** Use [llm-capability-map-2026-09-23.md](llm-capability-map-2026-09-23.md). Opus 5.5 and GPT-6 Sol/Luna released after this map was prepared.
 
 ## Read this first
 
