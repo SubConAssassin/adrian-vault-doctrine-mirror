@@ -13,7 +13,7 @@
 #   - hang -> hard --timeout (default 360s) -> exit 124
 #
 # Usage:
-#   cli-ask.sh <codex|claude|grok|agy> [--timeout N] [--retries R] [--min-bytes B] "prompt"
+#   cli-ask.sh <codex|claude|grok|agy> [--timeout N] [--retries R] [--min-bytes B] [--output-receipt PATH] "prompt"
 #   cli-ask.sh <codex|claude|grok|agy> [--timeout N] --stdin < prompt.txt
 # Exit: 0 ok | 2 usage | 3 empty/thin after retries | 124 timeout | else = the CLI's own code.
 # Binaries overridable via env: CLI_ASK_CODEX / CLI_ASK_GROK / AGY_BIN (the self-test injects mocks).
@@ -25,10 +25,19 @@
 #                                            --max-turns 8 (still no plan/subagents/file-writes)
 #   --model M   pin any model id on the underlying CLI (codex -m / grok -m)
 #   --effort E  codex reasoning effort: low|medium|high|xhigh|max|ultra (5.6 adds max/ultra)
+#
+# 2026-09-25 muse lane (Adrian-direct: "add it on the $5 plan"): Meta Muse Code, `muse exec`, on the
+#   Mini's browser sign-in (flat $5/month Everyday plan, 10-50 prompts per 5h). Default model
+#   muse-spark-1.3 (standard). Contributor models are refused: Meta trains on those. --effort maps
+#   to --reasoning-effort (none|minimal|low|medium|high|xhigh|max|ultra). No M1 install by design.
 set -uo pipefail
 
 MODEL="${1:-}"; shift 2>/dev/null || true
-[ -n "$MODEL" ] || { echo "usage: cli-ask.sh <codex|claude|codex-sol|codex-terra|codex-luna|codex-spark|grok|grok-web|composer|agy|qwen|deepseek|local|local-vision> [--timeout N] [--retries R] [--min-bytes B] [--model M] [--effort E] [--image FILE] \"prompt\"|--stdin" >&2; exit 2; }
+[ -n "$MODEL" ] || { echo "usage: cli-ask.sh <codex|claude|codex-sol|codex-terra|codex-luna|codex-spark|grok|grok-web|composer|agy|qwen|deepseek|local|local-vision|muse|cloud> [--timeout N] [--retries R] [--min-bytes B] [--model M] [--effort E] [--image FILE] \"prompt\"|--stdin" >&2; exit 2; }
+# ---- cloud lane (added 2026-09-25, Adrian-direct) ----
+# Claude Code cloud sessions, paid by a one-time cloud-session credit. Asynchronous by nature, so it
+# has its own dispatcher with a spend floor and expiry cutoff: tools/cloud-lane.py (see its header).
+[ "$MODEL" = cloud ] && exec python3 "$(cd "$(dirname "$0")" && pwd)/cloud-lane.py" ask "$@"
 # ---- COMPOSER PIN RESOLUTION (added 2026-08-27) ----
 # `grok-composer-2.5-fast` disappeared from this account's xAI catalogue without a published
 # retirement notice or named Composer successor. The account now lists only grok-4.6 / grok-4.5, so the
@@ -77,12 +86,13 @@ _resolve_composer() {
 CLI_ASK_CODEX_MODEL="${CLI_ASK_CODEX_MODEL:-gpt-5.6-terra}"
 CLI_ASK_CLAUDE_MODEL="${CLI_ASK_CLAUDE_MODEL:-sonnet}"
 CLI_ASK_QWEN_MODEL="${CLI_ASK_QWEN_MODEL:-qwen3.8-max}"
+CLI_ASK_MUSE_MODEL="${CLI_ASK_MUSE_MODEL:-muse-spark-1.3}"   # Meta Muse Code: STANDARD model only
 CLI_ASK_DEFAULT_EFFORT="${CLI_ASK_DEFAULT_EFFORT:-low}"
 
 PIN_MODEL=""; CODEX_EFFORT=""; GROK_WEB=0
 REQUESTED_LANE="$MODEL"
 case "$MODEL" in
-  codex|claude|grok|agy|gemini|qwen|deepseek|local|localvision) ;;
+  codex|claude|grok|agy|gemini|qwen|deepseek|local|localvision|muse) ;;
   codex-sol)   MODEL=codex; PIN_MODEL="gpt-5.6-sol" ;;
   codex-terra) MODEL=codex; PIN_MODEL="gpt-5.6-terra" ;;
   codex-spark) MODEL=codex; PIN_MODEL="gpt-5.3-codex-spark" ;;
@@ -94,7 +104,7 @@ case "$MODEL" in
   qwen-plus)   MODEL=qwen;  PIN_MODEL="qwen3.7-plus" ;;
   local-fast)  MODEL=local; PIN_MODEL="qwen3.5:9b" ;;
   local-vision) MODEL=localvision; PIN_MODEL="${CLI_ASK_VISION_MODEL:-qwen2.5-vl-7b}" ;;
-  *) echo "cli-ask: unknown model '$MODEL' (codex|claude|codex-sol|codex-terra|codex-luna|codex-spark|grok|grok-web|composer|agy|qwen|deepseek|local|local-vision)" >&2; exit 2;;
+  *) echo "cli-ask: unknown model '$MODEL' (codex|claude|codex-sol|codex-terra|codex-luna|codex-spark|grok|grok-web|composer|agy|qwen|deepseek|local|local-vision|muse|cloud)" >&2; exit 2;;
 esac
 [ "$PIN_MODEL" = "__RESOLVE_COMPOSER__" ] && PIN_MODEL="$(_resolve_composer)"
 
@@ -106,6 +116,7 @@ case "$MODEL" in
   codex) [ -z "$PIN_MODEL" ] && PIN_MODEL="$CLI_ASK_CODEX_MODEL" ;;
   claude) [ -z "$PIN_MODEL" ] && PIN_MODEL="$CLI_ASK_CLAUDE_MODEL" ;;
   qwen)  [ -z "$PIN_MODEL" ] && PIN_MODEL="$CLI_ASK_QWEN_MODEL" ;;
+  muse)  [ -z "$PIN_MODEL" ] && PIN_MODEL="$CLI_ASK_MUSE_MODEL" ;;
 esac
 # Top-effort default for codex. Set AFTER the alias case but BEFORE the arg loop would be
 # wrong (--effort must win), so it is applied lazily at call time in the codex block instead.
@@ -186,10 +197,11 @@ case "$MODEL" in
   deepseek) _gate_on "ask-deepseek.py" "${CLI_ASK_DEEPSEEK_MAX:-1}" DEEPSEEK ;;
   local)    _gate_on "cliask-local"    "${CLI_ASK_LOCAL_MAX:-3}"    LOCAL ;;
   localvision) _gate_on "cliask-localvision" 1 LOCALVISION ;;   # server crashes on concurrent image decode
+  muse)     _gate_on "node-exec.sh run muse" "${CLI_ASK_MUSE_MAX:-2}" MUSE ;;   # small flat plan: never burst it
 esac
 # ---- end gate ----
 
-IMAGE=""
+IMAGE=""; OUTPUT_RECEIPT=""
 TIMEOUT=360; RETRIES="${CLI_ASK_RETRIES:-1}"; MIN_BYTES="${CLI_ASK_MIN_BYTES:-20}"; USE_STDIN=0
 PROMPT_ARG=""; PROMPT_CAPTURED=0
 # --no-tools (2026-09-13, opt-in, claude lane ONLY): every built-in tool and every MCP server is
@@ -209,6 +221,9 @@ while [ $# -gt 0 ]; do
     --effort) CODEX_EFFORT="${2:?--effort needs a value}"; shift 2;;
     --web) GROK_WEB=1; shift;;
     --image) IMAGE="${2:?--image needs a path}"; shift 2;;
+    # Opt-in durable capture for callers whose terminal transport cannot be trusted to retain
+    # stdout after a remote lane completes. Never overwrite: the caller chooses a new path.
+    --output-receipt) OUTPUT_RECEIPT="${2:?--output-receipt needs a path}"; shift 2;;
     --stdin) USE_STDIN=1; shift;;
     --no-tools) CLAUDE_NO_TOOLS=1; shift;;
     --) shift; break;;
@@ -236,6 +251,11 @@ if [ "$USE_STDIN" = 1 ]; then PROMPT="$(cat)"; else PROMPT="$PROMPT_ARG"; fi
 # `set -o pipefail` turns that into a false "empty prompt" (only for big --stdin
 # payloads; small ones finished before the pipe closed). Pure-builtin glob, no pipe.
 case "$PROMPT" in *[![:space:]]*) ;; *) echo "cli-ask: empty prompt" >&2; exit 2;; esac
+[ -z "$OUTPUT_RECEIPT" ] || {
+  [ ! -e "$OUTPUT_RECEIPT" ] || { echo "cli-ask: --output-receipt refuses to overwrite an existing file" >&2; exit 2; }
+  receipt_dir="$(dirname "$OUTPUT_RECEIPT")"
+  [ -d "$receipt_dir" ] && [ -w "$receipt_dir" ] || { echo "cli-ask: --output-receipt parent directory is not writable" >&2; exit 2; }
+}
 if [ "$CLAUDE_NO_TOOLS" = 1 ] && [ "$MODEL" != claude ]; then echo "cli-ask: --no-tools is supported for the claude lane only" >&2; exit 2; fi
 # The >BIG_MAX file-read idiom needs the Read tool, so a no-tools call refuses rather than re-enabling it.
 if [ "$CLAUDE_NO_TOOLS" = 1 ] && [ "${#PROMPT}" -gt "${CLI_ASK_BIG_MAX:-100000}" ]; then echo "cli-ask: --no-tools prompt exceeds ${CLI_ASK_BIG_MAX:-100000} chars; refusing" >&2; exit 2; fi
@@ -247,6 +267,11 @@ if [ "$CLAUDE_NO_TOOLS" = 1 ]; then
   [ "$TIMEOUT" -ge 20 ] || { echo "cli-ask: --no-tools needs --timeout >= 20" >&2; exit 2; }
 fi
 
+# Meta Muse Code (added 2026-09-25, Adrian-direct): STANDARD models only. A *-contributor model id
+# lets Meta train future models on our prompts and completions, so it is refused outright.
+if [ "$MODEL" = muse ]; then
+  case "$PIN_MODEL" in *contributor*) echo "cli-ask: muse lane refuses '$PIN_MODEL': contributor models let Meta train on our data; standard models only" >&2; exit 2;; esac
+fi
 GROK="${CLI_ASK_GROK:-$HOME/.local/bin/grok}"
 CODEX="${CLI_ASK_CODEX:-/opt/homebrew/bin/codex}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -273,11 +298,11 @@ CLI_NODE=local
 # self-test injects mock binaries this way; routing them to a remote node would resolve the real
 # CLI on PATH instead and turn a hermetic test into a live billed call. Same for --image, whose
 # file only exists here.
-if [ -n "${CLI_ASK_CODEX:-}" ] || [ -n "${CLI_ASK_GROK:-}" ]; then CLI_ASK_FORCE_LOCAL=1; fi
+if [ -n "${CLI_ASK_CODEX:-}" ] || [ -n "${CLI_ASK_GROK:-}" ] || [ -n "${CLI_ASK_MUSE:-}" ]; then CLI_ASK_FORCE_LOCAL=1; fi
 if [ -n "$IMAGE" ]; then CLI_ASK_FORCE_LOCAL=1; fi
 if [ "${CLI_ASK_FORCE_LOCAL:-0}" != "1" ] && [ -f "$HERE/node-exec.sh" ]; then
   case "$MODEL" in
-    codex|claude|grok) CLI_NODE="$(bash "$HERE/node-exec.sh" pick "$REQUESTED_LANE" 2>/dev/null || echo local)" ;;
+    codex|claude|grok|muse) CLI_NODE="$(bash "$HERE/node-exec.sh" pick "$REQUESTED_LANE" 2>/dev/null || echo local)" ;;
   esac
 fi
 # Adrian-direct 2026-09-13: Mini OSB reel profile is explicitly opt-in.
@@ -292,6 +317,20 @@ fi
 # (codex is ~/.local/bin/codex on the Mini but /opt/homebrew/bin/codex on the Studio - an absolute
 # path taken from M1 would be wrong on one of them, and silently wrong on both after any reinstall).
 if [ "$CLI_NODE" = local ]; then CODEX_BIN="$CODEX"; GROK_BIN="$GROK"; CLAUDE_BIN=claude; else CODEX_BIN=codex; GROK_BIN=grok; CLAUDE_BIN=claude; fi
+# 2026-09-25: a prompt that says "read /Users/adriantaffinder/..." runs on the Mini/Studio, where that
+# path does not exist; grok then burns every turn searching for it and dies "max turns reached".
+# Warn loudly so the caller inlines the content instead of naming an M1-only path.
+if [ "$CLI_NODE" != local ]; then
+  for _p in $(printf '%s' "$PROMPT" | grep -oE '(/Users/adriantaffinder|/private/tmp|/tmp)/[^[:space:]"'"'"'`)]+' | sort -u | head -20); do
+    [ -e "$_p" ] && echo "cli-ask: WARNING: prompt names $_p, which exists on M1 but the call runs on $CLI_NODE; inline its content instead." >&2
+  done
+fi
+if [ "$CLI_NODE" = local ]; then MUSE_BIN="${CLI_ASK_MUSE:-$HOME/.local/bin/muse}"; else MUSE_BIN=muse; fi
+# M1 has no muse install by design (M1 decides, it does not execute). If no Mini/Studio node is
+# signed in and free, say so now instead of failing later on a missing binary.
+if [ "$MODEL" = muse ] && [ "$CLI_NODE" = local ] && [ ! -x "$MUSE_BIN" ]; then
+  echo "cli-ask: muse lane: no signed-in Mini/Studio node is free and M1 has no muse install; refusing." >&2; exit 77
+fi
 [ "$CLI_NODE" != local ] && echo "cli-ask: lane '$REQUESTED_LANE' -> executing on $CLI_NODE (M1 stays free)" >&2
 
 # _stage: copy a local file to the exec node and print the path that is valid THERE.
@@ -328,9 +367,10 @@ _E() {
 # behaviour if a regression ever shows up.
 BIG_MAX="${CLI_ASK_BIG_MAX:-100000}"
 BIGFILE=""
+MUSE_PF=""; MUSE_PF_LOCAL=""
 # local/deepseek deliver over HTTP (no argv limit), so the file-read idiom is unnecessary
 # and actively harmful there — it would ask a non-agentic endpoint to "read a file" it cannot see.
-if [ "${#PROMPT}" -gt "$BIG_MAX" ] && [ "$MODEL" != grok ] && [ "$MODEL" != local ] && [ "$MODEL" != deepseek ]; then
+if [ "${#PROMPT}" -gt "$BIG_MAX" ] && [ "$MODEL" != grok ] && [ "$MODEL" != local ] && [ "$MODEL" != deepseek ] && [ "$MODEL" != muse ]; then
   if [ "${CLI_ASK_LEGACY_GROK_REROUTE:-0}" = "1" ]; then
     # On a remote node the engine cannot see an M1 path, so stage it and reference the far-side copy.
     BIGREF="$(_stage "$BIGFILE")"
@@ -338,6 +378,11 @@ if [ "${#PROMPT}" -gt "$BIG_MAX" ] && [ "$MODEL" != grok ] && [ "$MODEL" != loca
     MODEL=grok
   else
     BIGFILE="$(mktemp -t cliaskdata.XXXXXX)"; printf '%s' "$PROMPT" >"$BIGFILE"
+    # The prompt file lives on M1.  When a lane executes remotely, give the agent
+    # the staged far-side path; without this assignment `set -u` aborts on
+    # `$BIGREF` before any inference is attempted (and a long Claude request
+    # can therefore be misreported as an empty successful transport result).
+    BIGREF="$(_stage "$BIGFILE")" || { echo "cli-ask: failed to stage oversized prompt for $CLI_NODE" >&2; exit 1; }
     echo "cli-ask: prompt ${#PROMPT} chars > $BIG_MAX — staying on ${MODEL}, delivering via file-read idiom ($BIGFILE)." >&2
     PROMPT="OUTPUT MODE — READ FIRST: The file at ${BIGREF} contains your COMPLETE task and all source material. It may be large. FIRST use your file-reading tool to read ${BIGREF} IN FULL (the entire file, not a preview). THEN carry out the instructions it contains and write your COMPLETE answer as plain text to standard output as your final message. Do NOT enter plan mode. Do NOT spawn subagents. Do NOT create, write, or edit ANY files — your only tool use is reading that one file."
   fi
@@ -363,14 +408,14 @@ START_EPOCH=""
 attempts=0
 
 _cleanup_files() {
-  rm -f "$OUT" "$ERRF" ${BIGFILE:+"$BIGFILE"}
+  rm -f "$OUT" "$ERRF" ${BIGFILE:+"$BIGFILE"} ${MUSE_PF_LOCAL:+"$MUSE_PF_LOCAL"}
 }
 
 trap _cleanup_files EXIT
 
 _quota_exhausted() {
   [ -s "$ERRF" ] || return 1
-  grep -iqE 'usage limit reached|weekly limit|individual quota reached|balance exhausted' "$ERRF"
+  grep -iqE 'usage limit reached|weekly limit|individual quota reached|balance exhausted|reached your plan|plan.s usage limit' "$ERRF"
 }
 
 _append_telemetry() {
@@ -445,6 +490,27 @@ run_once() {  # $1 = output file; returns the CLI's exit code (anything >128 i.e
         _E "$CLAUDE_BIN" --print --model "$PIN_MODEL" --permission-mode auto \
           --no-session-persistence "$PROMPT" </dev/null >"$out" 2>>"$ERRF"; rc=$?
       fi ;;
+    muse)
+      # Meta Muse Code (added 2026-09-25, Adrian-direct: "add it on the $5 plan").
+      # Billing: the node's browser sign-in = the flat $5/month Everyday plan. META_API_KEY outranks
+      # that sign-in and bills per token (a metered path, AGENTS.md §7.2), so it is stripped here.
+      # Headless and hermetic: no writes, no shell, never waits on approval, no session log, and
+      # none of the node's own agent rules or skills.
+      if [ "${#PROMPT}" -gt "$BIG_MAX" ]; then
+        if [ -z "$MUSE_PF" ]; then
+          MUSE_PF_LOCAL="$(mktemp -t cliaskmuse.XXXXXX)"; printf '%s' "$PROMPT" >"$MUSE_PF_LOCAL"
+          MUSE_PF="$(_stage "$MUSE_PF_LOCAL")" || { echo "cli-ask: failed to stage muse prompt for $CLI_NODE" >>"$ERRF"; return 1; }
+        fi
+        set -- --prompt-file "$MUSE_PF"
+      else
+        set -- "$PROMPT"
+      fi
+      _E /usr/bin/env -u META_API_KEY "$MUSE_BIN" exec \
+        --model "$PIN_MODEL" \
+        --reasoning-effort "${CODEX_EFFORT:-$CLI_ASK_DEFAULT_EFFORT}" \
+        --approval-mode never --disable-write --disable-shell \
+        --no-session-log --no-foreign-personal-context \
+        "$@" </dev/null >"$out" 2>>"$ERRF"; rc=$? ;;
     grok)
       g="$(mktemp -t grokprompt.XXXXXX)"
       # grok-build is a coding AGENT: on long "produce a document" prompts it goes agentic (plan / write-a-file)
@@ -476,7 +542,10 @@ run_once() {  # $1 = output file; returns the CLI's exit code (anything >128 i.e
         #     (116KB ~= 29K tokens vs grok-4.5's 500K window) — inline-offload truncation is. Override the gate
         #     with CLI_ASK_GROK_INLINE_MAX (bytes; default 40000 — safely above the 22KB that works inline and
         #     below the 116KB that truncates).
-        GROK_INLINE_MAX="${CLI_ASK_GROK_INLINE_MAX:-40000}"
+        # 2026-09-25: grok 1.0.5 truncates inline prompts somewhere between 16KB and 24KB (probe: 16KB
+        # answered correctly, 24KB reported "DATA block is truncated" and died on --max-turns 1).
+        # Default lowered 40000 -> 15000 so anything larger takes the read-the-file path below.
+        GROK_INLINE_MAX="${CLI_ASK_GROK_INLINE_MAX:-15000}"
         if [ "${#PROMPT}" -le "$GROK_INLINE_MAX" ]; then
           { printf '%s\n\n' 'OUTPUT MODE — READ FIRST: This is a pure WRITING/ANALYSIS task. Write your COMPLETE answer as plain text to standard output now. Do NOT use any tools. Do NOT create/write/edit any files. Do NOT enter plan mode. Do NOT spawn subagents. Just write the full answer as text.'; printf '%s' "$PROMPT"; } >"$g"
           gr="$(_stage "$g")"
@@ -592,6 +661,13 @@ sys.stdout.write(d["choices"][0]["message"]["content"])
 }
 
 OUT="$(mktemp -t cliask.XXXXXX)"
+persist_receipt() {
+  [ -z "$OUTPUT_RECEIPT" ] && return 0
+  ( umask 077; cp -n "$OUT" "$OUTPUT_RECEIPT" ) || {
+    echo "cli-ask: failed to persist requested output receipt" >&2
+    return 1
+  }
+}
 START_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 START_EPOCH="$(date -u +%s)"
 attempt=0
@@ -601,6 +677,7 @@ while :; do
   attempts=$((attempt + 1))
   now_epoch="$(date -u +%s)"; now_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   if [ "$rc" -eq 0 ] && [ "$nonws" -ge "$MIN_BYTES" ]; then
+    persist_receipt || exit 74
     _append_telemetry "$rc" "$nonws" "$attempts" "$now_epoch" "$now_utc"
     cat "$OUT"; exit 0
   fi
