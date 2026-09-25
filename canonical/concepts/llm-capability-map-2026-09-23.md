@@ -21,8 +21,9 @@ Use [the Token-Enriched Delegation and Prompting Protocol](token-enriched-delega
 | Grok 4.7 | First-party released 21 Sep; Build entitlement previously failed on a free-tier limit | Live-web challenger/cross-auditor and long-context candidate after access probe. |
 | Gemini 3.8 Flash | Existing multimodal static-analysis candidate | Structured multimodal analysis after lane verification. |
 | Gemini 3.8 Live / Extended Thinking | First-party released 15 Sep | Realtime dialogue specialist, not a static-context replacement. |
+| Meta Muse Spark 1.3 (Muse Code) | **Added 25 Sep, Adrian-direct.** `cli-ask.sh muse` runs on the Mini's sign-in, on the flat $5/month Everyday plan (a 5-hour window plus a weekly limit). Verified live: 2 real calls billed to the plan, $0 pay-as-you-go, and no payment method on the Model API account. Standard model only; `-contributor` is refused because Meta trains on it. | Different-family cross-check and second opinion, read-only. Small allowance, so never batch it. Anything wider needs the protocol's same-fixture evaluation. |
 | Local | Existing $0 deterministic lane | Bulk first-pass structured work. |
 
 **Default rule:** no press release, model catalogue, or benchmark changes a live pin. The promotion record in the prompting protocol is required.
 
-Sources: [Anthropic Opus 5.5](https://www.anthropic.com/claude-opus-5-5), [OpenAI changelog](https://developers.openai.com/api/docs/changelog), [xAI Grok 4.7](https://x.ai/news/grok-4-7).
+Sources: [Anthropic Opus 5.5](https://www.anthropic.com/claude-opus-5-5), [OpenAI changelog](https://developers.openai.com/api/docs/changelog), [xAI Grok 4.7](https://x.ai/news/grok-4-7), [Meta Muse Code](https://dev.meta.ai/docs/muse-code).
