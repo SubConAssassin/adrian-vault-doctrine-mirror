@@ -4172,3 +4172,7 @@ The branch everyone had been working on contained observer-seat commits that sel
 ### LL-2026-09-17-005 — fleet.py claim accepts only specific actor names and a ttl of at most 1440 minutes
 `tags: [tool-gotcha, fleet]`
 `tools/fleet.py claim` refused `FLEET_ACTOR=claude` (valid: adrian, antigravity, automation, claude-headless, claude-live, external, jobqueue) and refused `--ttl 43200` (minutes, range 1..1440). **Rule: live Claude sessions claim with `FLEET_ACTOR=claude-live` and a ttl in minutes no greater than 1440, renewing for longer jobs.**
+
+### LL-2026-09-18-001 — a plugin's "allowance exhausted" flag can be stale and mask an expired CLI login
+`tags: [tool-gotcha, claude-mem, auth]`
+claude-mem stopped saving memories on 2026-09-12 and reported "inference allowance exhausted", but that five-hour cooldown had ended the same day. The real blocker was the Claude Code CLI OAuth token in the macOS Keychain, which its headless observer could not refresh, and the plugin's own label ("Claude Desktop") sent the user looking for the wrong app. **Rule: when claude-mem stops saving, check `~/.claude-mem/oauth-stale.marker`, `observer-health.json` (consecutiveFailures, lastSuccessAt) and the Keychain token expiry before believing the quota message; the fix is a fresh interactive `claude` then `/login` on the same machine. Name it "the CLI's saved login", not "Claude Desktop".**
