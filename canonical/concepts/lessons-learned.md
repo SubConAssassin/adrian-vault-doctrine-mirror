@@ -4198,3 +4198,35 @@ Verified live: `POST {agency_biz}/client_pages` (page_id, permitted_tasks) is in
 Piping a value into `vercel env add NAME production` hung past two minutes because the CLI was still waiting on its sensitivity and confirmation prompts. **Rule: use `vercel env add NAME production --yes --non-interactive --sensitive` (or `--no-sensitive` for non-secrets) with the value on stdin, never on the command line. Retry once on "fetch failed", which is transient.** Session 165400ec.
 
 ---
+
+### LL-2026-09-18-002 — the acceptance test for a specified endpoint is the counterparty's own request
+`tags: [mistake, process-change, deploy, web]`
+Two sessions built the same tracking integration independently. One exposed the server call through a framework RPC helper, the other as a real HTTP route; the RPC version was merged and deployed. Every check on it looked at the browser half (script present, consent gate, build green) while nobody sent the client's specified request to the specified path, so production answered that path with the site's catch-all 404 for four days while the note on file read "live, verified". **Rule: before calling an integration live, replay the counterparty's own test (exact method, path and payload) against production and record the status codes; a verified browser leg says nothing about the server leg. When two builds of one feature exist, diff each against the written spec, not against each other.**
+
+### LL-2026-09-18-003 — TanStack Start server functions are not public URLs
+`tags: [tool-gotcha, tanstack, vercel]`
+`createServerFn` compiles to an internal RPC endpoint with a framework-chosen path, so it can never satisfy a spec that names a URL. A specified HTTP path needs a file route (`createFileRoute("/api/...")` with `server.handlers`). A new route file fails `tsc` (route not assignable) until a build regenerates the route tree, and the Nitro Vercel preset bundles every route into one serverless function, so a route cannot be located by looking for its own function file. Vercel preview URLs answer curl with 401 (deployment protection); test them from a signed-in browser.
+
+### LL-2026-09-18-004 — grep on a saved web page can print nothing at all
+`tags: [tool-gotcha, shell, verification]`
+`grep -o` on a curl-saved HTML page printed nothing on two separate occasions, which looked exactly like a tracking script vanishing from production; the file contained bytes grep treats as binary. Retrying with `grep -a` found every element. **Rule: an unexpected empty grep result on fetched web content is a tool result, not a finding; rerun with `-a` (or Python) before reporting anything missing.**
+
+### LL-2026-09-18-005 — a settings option is not a configured setting
+`tags: [mistake, verification, client-comms]`
+A reply to a client said an account "already supports email and password" because its login-settings page offered an Unlink option. The account in fact logged in only through Google, as the client's screenshot and a direct test of the login form later showed. A second draft offered a team seat that the account's plan tier does not include. **Rule: state what a login form or a tested request shows, never what a menu option implies, and check the plan tier before offering a seat, an export or an analytics view.**
+
+### LL-2026-09-18-006 — a draft is stale the moment a newer inbound message arrives
+`tags: [mistake, process-change, client-comms, drafts]`
+A client-facing draft written by a background watcher sat unsent for a week while four newer client emails arrived, and the client's last received message was a wrong one. A second draft added on the same thread trusted an unverified inference: an ID pasted from a chatbot was treated as a second dataset, and the draft would have invited the client to repoint live tracking at what was really a campaign-style ID. The first draft also began with a stray voice-to-text fragment that only a full read exposed. **Rule: a draft is ready only after every factual claim in it has been checked against the live system on the day it is offered; when a newer message lands on the thread, re-verify and replace the old draft instead of adding another, and read the whole body, not the first lines.**
+
+### LL-2026-09-18-007 — Gmail MCP: update_draft detaches the reply from its thread
+`tags: [tool-gotcha, gmail]`
+`update_draft` rewrites the draft as a new standalone message (new thread id, quoted history dropped), which also defeats any watcher that resolves a pending item by finding a SENT message on the original thread. To change a reply draft, `create_draft` with `replyToMessageId`, then `delete_draft` the old one. `list_drafts` with the full view on a large mailbox returns roughly 100,000 characters; always pass a `query`.
+
+### LL-2026-09-18-008 — Chrome control tools: what works today
+`tags: [discovery, tool-gotcha, browser]`
+When the claude-in-chrome extension is not connected, `mcp__Control_Chrome__*` still drives the user's real Chrome with their live logins, and `execute_javascript` works (an older note saying it is broken is out of date). Reads on a background tab time out until `switch_to_tab` brings it to the front; there is no screenshot tool, so read `document.body.innerText`. Opening a login URL in a tab that is already signed in redirects straight into the app, and every tab you open is yours to close.
+
+### LL-2026-09-18-009 — a restricted Meta dataset drops custom parameters, and chatbots paste wrong IDs
+`tags: [discovery, meta, tracking]`
+A Meta dataset in a restricted category shows "Data sharing restrictions applied / core setup" in Events Manager: custom event parameters and any URL path after the domain are not received. Meta's own assistant can also paste a campaign-style 18-digit ID as if it were a pixel ID. **Rule: read the dataset overview and its data-source count before accepting an ID from a chatbot, and do not rely on custom event parameters for optimisation on such a dataset.**
