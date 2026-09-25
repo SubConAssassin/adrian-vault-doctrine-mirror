@@ -43,6 +43,10 @@ The accountant must surface, separately from vendor quota, the recent-session co
 
 The check is read-only and invokes no models, wakeups or remote services. Tool counts are conservative proxies, not proof of labour or successful delegation; quoted routing strings do not count as successful dispatch. Its nonzero exit and mandatory global instruction make the signal actionable for a cooperating caller. No Codex Desktop pre-tool interception is installed: this is **agent-followed checkpoint enforcement**, not an automatic execution block, account limit or guarantee that an already-running task obeys updated instructions. The accountant's aggregate alarm remains separate historical conduct evidence and is not presented as live vendor quota.
 
+## Codex Cloud worker lane
+
+**Adrian-direct, 25 September 2026. Classification: bounded worker-route addition; existing authority, spending, publication, and account rules remain unchanged.** A $250 promotional cloud-session balance is available until the expiry displayed in the account UI. Use it as a GitHub-backed worker lane for a bounded implementation, review, or independent investigation with the compact task card and an acceptance result. A cloud session requires a GitHub repository and is not eligible for Projects or Routines; it is therefore not a route for projectless chat, generic research, recurring checks, or duplicate work. Each dispatch must retain the existing no-spend/no-publish boundary and return a branch, diff, test result, or grounded evidence receipt.
+
 This protocol separates four facts which must never be collapsed:
 
 `constitutional task authorisation → vendor capability → documented interface → authenticated lane access evidence → same-fixture evaluation → independent acceptance → authorised route-owner decision`
