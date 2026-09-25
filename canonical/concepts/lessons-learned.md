@@ -5,8 +5,8 @@ status: canonical
 tier: 2
 firewall_class: working-internal
 created: 2026-05-04
-updated: 2026-08-07
-last_updated: 2026-08-07
+updated: 2026-09-26
+last_updated: 2026-09-26
 tags: [adrian-os, learning, mitigations, infrastructure]
 related:
   - canonical/concepts/shutdown-protocol.md
@@ -4176,3 +4176,25 @@ The branch everyone had been working on contained observer-seat commits that sel
 ### LL-2026-09-18-001 — a plugin's "allowance exhausted" flag can be stale and mask an expired CLI login
 `tags: [tool-gotcha, claude-mem, auth]`
 claude-mem stopped saving memories on 2026-09-12 and reported "inference allowance exhausted", but that five-hour cooldown had ended the same day. The real blocker was the Claude Code CLI OAuth token in the macOS Keychain, which its headless observer could not refresh, and the plugin's own label ("Claude Desktop") sent the user looking for the wrong app. **Rule: when claude-mem stops saving, check `~/.claude-mem/oauth-stale.marker`, `observer-health.json` (consecutiveFailures, lastSuccessAt) and the Keychain token expiry before believing the quota message; the fix is a fresh interactive `claude` then `/login` on the same machine. Name it "the CLI's saved login", not "Claude Desktop".**
+
+### LL-2026-09-26-001 — a printed Graph response can leak Page tokens that outlive every token you revoke
+`tags: [mistake, meta, security, tokens]`
+While testing the Ashta Meta connection, a `me/accounts` response was printed with only the system token redacted, so a never-expiring Ashta Page access token went into the session transcript. Revoking the parent system-user token with `oauth/revoke` did not kill it, and removing then restoring the system user's Page role did not either: Page tokens derived from a system user stay valid while that system user holds the Page role. The only fix was a new employee system user and removing the old one from the Page (`DELETE {page}/agencies?business=` with a Page token). **Rule: redact every `access_token` value in any Graph output before printing, not just the token you passed in. If one leaks, rotate by moving the Page to a different system user, not by revoking.** Session 165400ec.
+
+### LL-2026-09-26-002 — Meta only lets you reply to messages that arrived while the Page was subscribed to your webhook
+`tags: [tool-gotcha, meta, instagram, messenger]`
+A reply to a DM sent minutes earlier failed with `(#10)` subcode 2534022 "outside of allowed window", even after the sender became an Instagram Tester. It still failed after the Page was subscribed. A new DM sent after the subscription was received by the webhook in about 3 seconds, and the reply went through. The error wording pointed at time and access level when the real cause was the subscription. **Rule: subscribe the app webhook (`POST {app}/subscriptions`) and the Page (`POST {page}/subscribed_apps`) before testing replies, and test with a message sent after that. Don't diagnose 2534022 as an access-level problem until a post-subscription message also fails.** Session 165400ec.
+
+### LL-2026-09-26-003 — filling in "Business details" is not submitting business verification
+`tags: [mistake, meta, verification, inherited-state]`
+A 15 Sep email and a 17 Sep coordination note both said Meta business verification had been "submitted, pending". What had actually happened was that the legal name, address, phone, website and tax ID were typed into Business info. The verification flow (Security Centre › Start verification, then documents and a confirmation code) had never been started, and later sessions repeated the claim. **Rule: the settling check is `GET /me/businesses?fields=verification_status` (`pending` means submitted, `not_verified` means not) plus Security Centre. For a UK sole trader, pick "Sole proprietorship", make the business name match the uploaded document exactly, and remember a utility bill proves only the address or phone, never the name.** Session 165400ec.
+
+### LL-2026-09-26-004 — Meta asset admin: what the API will and will not do
+`tags: [discovery, meta, business-manager]`
+Verified live: `POST {agency_biz}/client_pages` (page_id, permitted_tasks) is instantly CONFIRMED when one admin runs both portfolios. `POST {page}/assigned_users` works with the admin's user token. `DELETE {page}/assigned_users` is refused (#10); the only working removal is `DELETE {page}/agencies?business=` with a Page token. System-user tokens can be minted only with an ADMIN system-user token as caller (a user token gives "Unsupported request"). A brand-new system user cannot be given an app by API ("TOS-ing the app"): assign it once in Business Settings. `GET oauth/revoke` kills a system token immediately. **Rule: plan Meta asset changes around these limits. Removal is coarse (it drops the whole partner portfolio), so re-share and re-assign afterwards.** Session 165400ec.
+
+### LL-2026-09-26-005 — `vercel env add` hangs forever unless every prompt is pre-answered
+`tags: [tool-gotcha, vercel, deploy]`
+Piping a value into `vercel env add NAME production` hung past two minutes because the CLI was still waiting on its sensitivity and confirmation prompts. **Rule: use `vercel env add NAME production --yes --non-interactive --sensitive` (or `--no-sensitive` for non-secrets) with the value on stdin, never on the command line. Retry once on "fetch failed", which is transient.** Session 165400ec.
+
+---
