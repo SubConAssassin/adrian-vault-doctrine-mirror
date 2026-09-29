@@ -1,0 +1,2 @@
+- [623pts] GPT 6.1 Sol: Near-Astra intelligence for a fifth of the price  (https://openai.com/index/introducing-gpt-6-1-sol/)
+- [380pts] Dots: Always-on agents  (https://openai.com/index/introducing-dots/)
