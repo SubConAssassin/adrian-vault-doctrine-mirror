@@ -3,6 +3,7 @@ title: Token-Enriched Delegation and Prompting Protocol
 status: CURRENT-SSOT
 date: 2026-09-23
 effective_date: 2026-09-23
+last_factual_review: 2026-10-04
 owner: routing-and-prompting route owner
 type: operational-protocol
 purpose: CEO delegation, per-model prompting, token discipline, and acceptance evidence
@@ -43,7 +44,9 @@ The accountant must surface, separately from vendor quota, the recent-session co
 
 The check is read-only and invokes no models, wakeups or remote services. Tool counts are conservative proxies, not proof of labour or successful delegation; quoted routing strings do not count as successful dispatch. Its nonzero exit and mandatory global instruction make the signal actionable for a cooperating caller. No Codex Desktop pre-tool interception is installed: this is **agent-followed checkpoint enforcement**, not an automatic execution block, account limit or guarantee that an already-running task obeys updated instructions. The accountant's aggregate alarm remains separate historical conduct evidence and is not presented as live vendor quota.
 
-## Codex Cloud worker lane
+## Cloud worker lane — historical surface label qualified
+
+**Factual correction, 4 October 2026:** the live `cli-ask.sh cloud` route calls `tools/cloud-lane.py`, a **Claude Code cloud** dispatcher. The historical paragraph below called this Codex Cloud; it does not establish a second funded lane. Its original credit amount is historical, not a present balance. The status observed today reads a stale 28 September zero-balance record below its stop floor. No cloud dispatch or account change was made. Preserve the current adapter's floor, expiry, data and account gates; obtain fresh account evidence before considering it available.
 
 **Adrian-direct, 25 September 2026. Classification: bounded worker-route addition; existing authority, spending, publication, and account rules remain unchanged.** A $250 promotional cloud-session balance is available until the expiry displayed in the account UI. Use it as a GitHub-backed worker lane for a bounded implementation, review, or independent investigation with the compact task card and an acceptance result. A cloud session requires a GitHub repository and is not eligible for Projects or Routines; it is therefore not a route for projectless chat, generic research, recurring checks, or duplicate work. Each dispatch must retain the existing no-spend/no-publish boundary and return a branch, diff, test result, or grounded evidence receipt.
 
@@ -127,6 +130,10 @@ Parallelism is for independent legs only. Do not use multiple agents to repeat t
 
 **Prompt shape:** the compact task card, explicit model/effort, a structured deliverable, and only the relevant files. Use Responses for tool-using work. Do not give it Astra-specific persistence language unless the task genuinely needs it; evaluate effort and endpoint behavior on the live lane.
 
+### GPT-6.1 Sol — documented candidate, separate from the fleet alias
+
+Officially released 29 September for complex coding and professional work. Use the exact ID `gpt-6.1-sol`, Responses for tool calls, and supported reasoning effort. It does not support `none` effort. This is a vendor profile, not a production route promotion: Studio's inspected catalogue did not list it, and `codex-sol` still selects `gpt-5.6-sol`. No fallback or repin follows from this paragraph.
+
 ### GPT-6 Luna — high-volume preparation
 
 **Use for:** narrow extraction, classification, normalization, and first-pass preparation with a strict schema.
@@ -169,7 +176,15 @@ Store each record as a dated evaluation annex with its fixture, receipt referenc
 
 Every current document in this family must show an authority/status label, an effective or `as_of` date, and its redirect target if superseded. History preserves prior facts; specialist evidence preserves reusable methods; neither is a current route authority.
 
-## Current board implications — 23 September
+## Current factual checkpoint — 4 October 2026
+
+Read the [existing capability board](llm-capability-map-2026-09-23.md) for observed access. Sonnet 5.5 is a newly documented worker/conductor candidate; its API and native Claude Code effort defaults differ. Gemini 4 Argon has a restricted rollout announcement, not verified agy access. “28x” has not been resolved to an account-specific vendor tier.
+
+The initial Claude wrapper accepted an effort option for telemetry but omitted it from the CLI execution argv. The refresh repair package forwards explicit effort and records omitted effort as unknown; consult its receipt for deployment state. Record served effort as unknown unless independently observed; do not equate the telemetry field with applied effort. `composer` can substitute a model, so it cannot satisfy an exact-model/no-fallback task. The later repair appendix in the commissioned task authorises bounded reversible fixes, not model/account fallback or default repins.
+
+The recommendation and compact [prompt/receipt examples](../../working/_m2-staging/2026-10-04-model-refresh-01a102d2/PROMPTS-AND-RECEIPTS.md) are evaluation material. Current constitutional authority, account restrictions and default-promotion gates remain unchanged.
+
+## Historical board implications — 23 September
 
 - **Claude Opus 5.5** is the default frontier evaluation candidate. Anthropic documents 1M context, 128K output, `medium` default effort, $4/$20 per MTok, $0.20 cache reads, and always-on adaptive thinking. It claims Fable-level performance on most work; this remains vendor evidence pending a local fixture.
 - **GPT-6 Sol and Luna** released 22 September. OpenAI documents them as text-and-image reasoning models: Sol is the general tier and Luna the inexpensive high-volume tier. They are new candidates, not a reason to alter a live Codex pin without an authenticated lane probe and task evaluation.
@@ -186,3 +201,5 @@ Every current document in this family must show an authority/status label, an ef
 - [OpenAI API changelog: GPT-6 Sol and Luna](https://developers.openai.com/api/docs/changelog)
 - [xAI: Grok 4.7](https://x.ai/news/grok-4-7)
 - [xAI: Grok 4.7 model documentation](https://docs.x.ai/developers/models/grok-4.7)
+
+Factual refresh sources: [OpenAI 6.1 Sol release](https://developers.openai.com/api/docs/changelog), [Claude Code effort](https://code.claude.com/docs/en/model-config), [4 October evidence](../../working/_m2-staging/2026-10-04-model-refresh-01a102d2/REPORT.md).
