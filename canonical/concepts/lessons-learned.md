@@ -4242,3 +4242,19 @@ A style line saying "cobalt is the only saturated colour", added to non-crystal 
 ### LL-2026-10-06-003 — keep one room per scene by editing from one approved frame
 `tags: [discovery, higgsfield, continuity]`
 Generating each shot of a scene fresh changed the room between shots: the tablecloth, the seating and the layout drifted. Passing the approved frame's Higgsfield job id as the image reference, and asking only for the change, kept the room and the cast identical. **Rule: approve one master frame per location, derive every other shot of that scene as an edit of it, and key frames and job ids by shot title rather than by number, because numbers shift when a shot is cut.**
+
+### LL-2026-10-07-001 — before generating a real place, process or object, use the brand's own photos
+`tags: [mistake, image-generation, osb, research]`
+For the KGB lab in The Blue, two invented autoclave halls were rejected. The real photos ("autoclave for growing crystals", "string of freshly grown crystals") had been on the brand's own About page all along, and Adrian had to point to them. **Rule: before generating any depiction of a real place, process or product, search the brand's own website images (alt text included) and the photo catalogue, and pass what you find as image references. Invent only what no real photo shows.**
+
+### LL-2026-10-07-002 — Higgsfield MiniMax H3: concurrency, minimum length, preset bounces, silent timeouts
+`tags: [tool-gotcha, higgsfield, video]`
+MiniMax H3 accepts at most 8 running jobs per account (more return 429 rate_limit_reached), and 4-second jobs failed twice, so use 5 s and trim in the edit. Some submissions are bounced with a preset recommendation instead of a job: resubmit with `declined_preset_id`. A batch call can time out at the server without creating jobs. **Rule: keep 8 in flight and feed the queue as jobs finish; after a timeout, prove the outcome from the credit balance before resubmitting, so nothing is charged twice.**
+
+### LL-2026-10-07-003 — Wix editor: publish is greyed in text-edit mode, and unsaved edits vanish with the tab
+`tags: [tool-gotcha, wix]`
+Static Wix Editor pages (for example the siberian.blue About page) have no API route; edits go through the editor in the user's Chrome. Select the text box through Layers, then Edit Text, then select the exact range with JS in the editing iframe and type. Publish stays greyed while the box is still in edit mode, so click empty canvas first. An edit typed and not saved was gone when the tab closed. **Rule: finish, save and publish in one pass, then verify on the live page by fetch.**
+
+### LL-2026-10-07-004 — clean interview dialogue from a YouTube rip with Demucs on the Mini
+`tags: [discovery, audio, video]`
+The YouTube upload of Stephan's interview has music under some passages. Running Demucs (`htdemucs`, `--two-stems=vocals`) on the Mini over just the needed line clips, each with 1 s handles, took about 5 minutes for 64 clips. It removed music that sat about 10 dB above the clean passages and left the words intact, checked by transcription. **Rule: when the clean original recording is missing, separate vocals locally before asking for the original; venv at `~/the-blue-stems` on the Mini.**
