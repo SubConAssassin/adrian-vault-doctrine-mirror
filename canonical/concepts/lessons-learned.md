@@ -4230,3 +4230,15 @@ When the claude-in-chrome extension is not connected, `mcp__Control_Chrome__*` s
 ### LL-2026-09-18-009 — a restricted Meta dataset drops custom parameters, and chatbots paste wrong IDs
 `tags: [discovery, meta, tracking]`
 A Meta dataset in a restricted category shows "Data sharing restrictions applied / core setup" in Events Manager: custom event parameters and any URL path after the domain are not received. Meta's own assistant can also paste a campaign-style 18-digit ID as if it were a pixel ID. **Rule: read the dataset overview and its data-source count before accepting an ID from a chatbot, and do not rely on custom event parameters for optimisation on such a dataset.**
+
+### LL-2026-10-06-001 — a locked product element is not a likeness check: test the hero object against a real photo
+`tags: [mistake, higgsfield, image-generation, osb]`
+The Siberian Blue crystal was locked as a Higgsfield element made from Adrian's own 2021 footage. Every crystal shot still came back, in his words, "nothing like the real crystal", along with shots where the crystals were the wrong size. An element keeps a generated object consistent with itself; it does not make it accurate. **Rule: for a real product or a real object, pass real photos of it as image references in each shot, check every frame side by side with a real photo before showing it, and check its real size before staging it in a scene.**
+
+### LL-2026-10-06-002 — colour words in a shared style line bleed into every prop
+`tags: [mistake, image-generation, prompting]`
+A style line saying "cobalt is the only saturated colour", added to non-crystal shots, turned vases, phone cords, panels and motors blue. That diluted a story beat that depends on there being no blue except the crystal. **Rule: name the hero colour only in prompts where the hero object is in frame; everywhere else, ask for the absence of that colour.**
+
+### LL-2026-10-06-003 — keep one room per scene by editing from one approved frame
+`tags: [discovery, higgsfield, continuity]`
+Generating each shot of a scene fresh changed the room between shots: the tablecloth, the seating and the layout drifted. Passing the approved frame's Higgsfield job id as the image reference, and asking only for the change, kept the room and the cast identical. **Rule: approve one master frame per location, derive every other shot of that scene as an edit of it, and key frames and job ids by shot title rather than by number, because numbers shift when a shot is cut.**
