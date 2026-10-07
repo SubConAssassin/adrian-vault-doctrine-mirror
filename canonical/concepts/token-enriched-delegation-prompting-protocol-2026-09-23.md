@@ -3,7 +3,7 @@ title: Token-Enriched Delegation and Prompting Protocol
 status: CURRENT-SSOT
 date: 2026-09-23
 effective_date: 2026-09-23
-last_factual_review: 2026-10-04
+last_factual_review: 2026-10-08
 owner: routing-and-prompting route owner
 type: operational-protocol
 purpose: CEO delegation, per-model prompting, token discipline, and acceptance evidence
@@ -101,10 +101,12 @@ Parallelism is for independent legs only. Do not use multiple agents to repeat t
 - **Explicit control plane.** Pin model and effort for reproducible work. Record effort, elapsed time, output size, failures, and acceptance result when evaluating a new route.
 - **External evidence beats self-report.** Validate tool results and structured output outside the model. A model naming itself or declaring success is not evidence.
 - **Stable prefix, append-only tail.** Cache reusable standing context, tool schemas, and project facts. Add new context rather than editing earlier material when preserved reasoning is in use.
-- **Escalate effort, not prose.** Start at the lowest effort that has passed the task class; increase only after a declared-criterion failure recorded in the evaluation record or task handoff (for example: failed schema, missing coverage marker, validated factual error, tool failure, or acceptance-test failure). Longer prompts do not substitute for reasoning.
+- **Escalate effort, not prose.** Start at the lowest effort that has passed the task class; increase only after a declared-criterion failure recorded in the evaluation record or task handoff (for example: failed schema, missing coverage marker, validated factual error, tool failure, or acceptance-test failure). Longer prompts do not substitute for reasoning. **Final pass on critical or complex work runs at `xhigh`** (Adrian, 8 Oct 2026, live ruling `final-pass-xhigh-critical`: "we always take it to the super high extra high for the final final. Especially in critical and complex things."). Drafts and iterations escalate progressively from the cheaper model/effort; the final pass of strategy, legal, money, releases, published or customer-facing work, architecture and doctrine goes to the strongest available model at `xhigh` (its top tier where `xhigh` does not exist).
 - **Design for refusal and interruption.** A refusal, quota fault, missing source, invalid schema, or tool failure must become a structured outcome, not a fabricated completion.
 
 ## Per-model profiles
+
+Detail, sources, glitch-by-glitch fixes and the research method for every profile below: the [8 Oct field guide](model-prompting-field-guide-2026-10-08.md) (team research of vendor docs and practitioner forums, cross-family audited, 8 Oct 2026). Read it when writing a card for a specific engine; this section keeps only the rules.
 
 ### Claude Opus 5.5 — conductor and high-stakes architect
 
@@ -122,7 +124,7 @@ Parallelism is for independent legs only. Do not use multiple agents to repeat t
 
 **Prompt shape:** short, conditional skills; task-relevant pointers rather than a mandatory reading itinerary; precise authority boundary; explicit persistence and stop condition. Astra is sensitive to repository instructions and may stop when a reasonable assumption would suffice, so grant the safe workflow authority you intend it to use.
 
-**Token rule:** remove obsolete scaffolding that forces every file read, test, or re-check. Keep outcome-level acceptance checks. Do not use custom sampling controls that Astra does not support.
+**Token rule:** remove obsolete scaffolding that forces every file read, test, or re-check. Keep outcome-level acceptance checks. Do not use custom sampling controls that Astra does not support. Effort: the lanes default to `xhigh`, but OpenAI's GPT-6 guidance (11 Sep, 2 Oct 2026) is to test `low`/`medium` where Sol `high` used to suffice and keep `xhigh` only where an evaluation justifies it; Astra rejects `none`. That applies to drafts: the final pass of critical or complex work stays at `xhigh` (ruling `final-pass-xhigh-critical`). For machine-consumed output use `--output-schema` plus `-o <file>` and parse `--json` events separately; exit 0 is not acceptance. GPT-6 Sol / 6.1 Sol under ChatGPT sign-in need a newer Codex CLI than 0.153.x (HTTP 400 below the version gate).
 
 ### GPT-6 Sol — general production worker / technical arbitrator
 
@@ -146,11 +148,11 @@ Officially released 29 September for complex coding and professional work. Use t
 
 **Prompt shape:** source scope, citation format, contradictory-evidence requirement, and a separate `confidence`/`unverified` field. For repositories and large bundles, point to a file and require file/byte/marker coverage before conclusions. Use structured output/function calling where a downstream system consumes results.
 
-**Token rule:** start `high`; use `xhigh` only after a recorded failure at lower effort. Its self-checking is not external acceptance: promotion still requires a different-family audit. Batch is not supported.
+**Token rule:** start `high`; use `xhigh` only after a recorded failure at lower effort. Its self-checking is not external acceptance: promotion still requires a different-family audit. `--best-of-n` and the self-check `--check` were removed in CLI 1.0, and `/goal` is TUI-only. Use `--json-schema` with `--output-format json` for machine-consumed output and validate the envelope outside the model. In headless research the page tool `web_fetch` must be allowed explicitly (`--allow web_fetch`); without it the turn is cancelled after one line (fixed in `cli-ask.sh` 2026-10-08). Require claim-to-passage support, not just resolving URLs.
 
 ### Gemini 3.8 Flash / Live — multimodal analysis and realtime dialogue
 
-**Flash prompt shape:** XML boundaries for `<task>`, `<context>`, `<data>`, and `<output_schema>`; a real JSON schema; enumerated entities; `NOT_FOUND` for unobserved fields. Put behavioral rules before the task and execution directions after a large data block.
+**Flash prompt shape:** XML boundaries for `<task>`, `<context>`, `<data>`, and `<output_schema>`; a real JSON schema; enumerated entities; `NOT_FOUND` for unobserved fields. Put behavioral rules before the task and execution directions after a large data block. XML is our house convention, not a measured advantage: Google's prompting guide (17 Sep 2026) accepts Markdown headings equally. Keep temperature at the default 1.0; thinking levels are `low` / `medium` (default) / `high`, and `minimal` is rejected. In `agy`, use an object-root `--json-schema`, keep stdout and stderr separate, and treat blank output, `AGY_ERROR`, or a soft-denied required tool as failure whatever the exit code. Research cards add: cite only URLs returned by tools; never construct one.
 
 **Live prompt shape:** short turn-level intent, interrupt/recover behavior, and what may happen while the user speaks. Do not treat Live’s realtime dialogue profile as a large static-document route.
 
@@ -158,7 +160,35 @@ Officially released 29 September for complex coding and professional work. Use t
 
 **Use for:** high-volume first-pass work.
 
-**Prompt shape:** no agentic file-read language; include the necessary content inline or through the actual pipeline. Temperature 0, fixed JSON keys, closed label set, abstention value, and sampled deterministic QA.
+**Prompt shape:** no agentic file-read language; include the necessary content inline or through the actual pipeline. Temperature 0, fixed JSON keys, closed label set, abstention value, and sampled deterministic QA. On Ollama pass the real JSON Schema in `format` (and in the prompt), `stream:false`, top-level `think:false` (not inside `options`), and one consistent `num_ctx` across every client so the runner does not reload. Embeddings (bge-m3): `/api/embed` with `input`, `num_ctx` 8192 pinned, chunks pre-sized by tokens; the deprecated `/api/embeddings` has no truncation control and overflows on dense JSON/code.
+
+### Claude Sonnet 5.5 — specified agentic worker
+
+**Use for:** well-specified coding and bounded agentic implementation; the cheaper Claude worker below Opus 5.5.
+
+**Prompt shape:** name the required test/build/check and the stop: "when the requested work is done and its checks pass, stop and report; do not launch reviewer subagents unless asked." Higher effort makes it more thorough (extra files, reviews), so bound scope rather than adding prose.
+
+**Token rule:** pin `claude-sonnet-5-5`; start `medium` for specified agentic work (the API default is `high`), escalate on a recorded failure. $2/$10 per MTok.
+
+### Claude Haiku 4.5 — reconnaissance and extraction subagent
+
+**Use for:** bounded search, extraction and classification with checkable output. Pin `claude-haiku-4-5-20251001`; **omit effort** (Haiku rejects the parameter). 200K context. Subagents share the parent's weekly pool: a separate context is not a separate quota. Per-subagent effort is overridden by `CLAUDE_CODE_EFFORT_LEVEL` if that is set.
+
+### Muse Spark 1.3 (Muse Code) — read-only cross-family second opinion
+
+**Use for:** bounded reviews and second opinions from a family no other lane has (provisional; promotion needs an evaluation record). Small $5/month plan: never batch it.
+
+**Prompt shape:** ROLE (independent read-only reviewer) / SCOPE (named files, claim IDs) / TASK / AUTHORITY / STOP / OUTPUT (per claim: verdict, file:line evidence, gap) / GROUNDING. Select `muse-spark-1.3` explicitly (config docs still name 1.2). Efforts `minimal`..`xhigh`; `none` returns HTTP 400; `max` is Standard-tier only. Read-only needs **both** `--disable-write --disable-shell`; approval mode alone does not enforce it. Standard tier only: Contributor trains on prompts and completions.
+
+### DeepSeek V4.x Flash — metered trial auditor
+
+**Use for:** cheap mechanical checks and a different-lineage audit, through `tools/ask-trial.py deepseek` only (pay-per-token; AGENTS.md §7.2.a trial, $20/month cap enforced in code). The bare `cli-ask.sh deepseek` lane refuses by design.
+
+**Prompt shape:** stable rubric in `system`, evidence in `user`; for JSON write the word "json" and one example object, use `response_format: json_object` (no `json_schema` enforcement), and reject empty content even with `finish_reason: stop`. Disable thinking for mechanical work; `medium`/`high`/`xhigh` all map to `high`. Off-peak pricing is half (peak = Mon-Fri 01:00-04:00 and 06:00-10:00 UTC).
+
+### Qwen 3.8 — interactive use only, not an automated lane
+
+Adrian's Qwen access is the **Individual Token Plan**, whose terms limit use to interactive work inside programming/agent tools and forbid automation scripts and non-interactive batch calls, on pain of suspension or key ban (read directly 2026-10-08). It stays off `cli-ask`, councils and scripts. Automated Qwen would need the pay-per-token Model Studio API, which is metered (§7.2) and currently unpurchased.
 
 ## Evaluation protocol for a new model
 
@@ -175,6 +205,10 @@ Vendor and community reports are discovery signals. They are not routing evidenc
 Store each record as a dated evaluation annex with its fixture, receipt references, pass/fail thresholds, acceptance decision, and rollback trigger. It is the durable evidence behind a route state; the capability board records availability facts but does not replace it.
 
 Every current document in this family must show an authority/status label, an effective or `as_of` date, and its redirect target if superseded. History preserves prior facts; specialist evidence preserves reusable methods; neither is a current route authority.
+
+## Current factual checkpoint — 8 October 2026
+
+Live lane probe 2026-10-08 00:45 WITA (one real call each): Codex Astra on both ChatGPT accounts, Grok, grok-web, Muse and the local Ollama lane answered on the Mini; `agy` answered on M1 (not installed on the Mini); DeepSeek answered through `ask-trial.py`; Qwen refused (key invalid, and see its profile above). Versions: Codex CLI 0.153.4 on all nodes vs latest stable 0.161.0 (7 Oct; its bundled default model is GPT-6.1 Sol, our lanes pin their own); Claude Code 2.1.280-2.1.287 vs 2.1.292; Grok CLI 1.0.46; `agy` 1.3.1 on M1, 1.2.17 on Studio; Muse 1.4.3 on the Mini. Research detail: the [8 Oct field guide](model-prompting-field-guide-2026-10-08.md).
 
 ## Current factual checkpoint — 4 October 2026
 

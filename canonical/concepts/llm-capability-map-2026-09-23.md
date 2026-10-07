@@ -2,14 +2,33 @@
 title: LLM Capability Map — current evidence board
 status: CURRENT
 date: 2026-09-23
-as_of: 2026-10-04
+as_of: 2026-10-08
 authority: companion-evidence-board
 supersedes: canonical/concepts/llm-capability-map-2026-09-22.md
 ---
 
-# LLM Capability Map — evidence refreshed 4 October 2026
+# LLM Capability Map — evidence refreshed 8 October 2026
 
 This existing home remains the companion to the [routing and prompting protocol](token-enriched-delegation-prompting-protocol-2026-09-23.md). It is factual availability evidence, not default-promotion authority. Public release, catalogue, authentication, successful inference and task performance are distinct states. Historical figures never establish current quota.
+
+## Live lane probe — 8 October 2026 (one real call per lane, ~00:45 WITA)
+
+| Lane | Ran on | Result | Note |
+|---|---|---|---|
+| `codex-astra` (Photon ChatGPT login, default) | Mini | Answered | CLI 0.153.4; latest stable 0.161.0 (7 Oct) |
+| `codex-astra` with `CLI_ASK_CODEX_ACCOUNT=osb` | Mini | Answered | OSB ChatGPT pool at 87% of its window per the quota accountant (vendor endpoint), 8 Oct ~01:10 WITA |
+| `grok` / `grok-web` | Mini | Answered (`grok-4.7` per session log) | grok-web page reads were cancelled headless until `--allow web_fetch` was added 8 Oct |
+| `muse` | Mini | Answered | Muse Code 1.4.3 |
+| `local` (Ollama) | Mini | Answered | |
+| `agy` (Gemini 3.8 Flash High) | M1 | Answered | Not installed on the Mini; Studio is off CLI work since 6 Oct; CLI notice line now stripped |
+| DeepSeek via `tools/ask-trial.py` | M1 (API) | Answered | Pay-per-token trial, §7.2.a; bare `cli-ask.sh deepseek` refuses by design |
+| `qwen` | — | Refused (DashScope 403 Unpurchased; Token Plan key 401) | Token Plan terms forbid automated use: keep off the team |
+| `cloud` (M1 credit) | — | $21 of $250 on Adrian's claude.ai usage page, 8 Oct 00:33 WITA; $15 floor | Refused synchronous tasks now fall back to codex-astra, then grok |
+| `cloud` (OSB credit) | Mini (dispatch) | Not yet usable | $215 on Adrian's screen 6 Oct; git channel blocked by a GitHub 500 on pushes to the workspace repo since ~00:53 WITA 8 Oct |
+
+Research behind the prompting rules: [model prompting field guide, 8 Oct 2026](model-prompting-field-guide-2026-10-08.md).
+
+## Evidence table — 4 October 2026
 
 | Family / route | Vendor evidence | Local evidence observed 4 Oct WITA | Status |
 |---|---|---|---|
