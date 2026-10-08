@@ -208,6 +208,16 @@ there by TCC** and needs a one-time Full Disk Access grant for `/usr/libexec/ssh
 not the route. `M2_HOST=mini-ts tools/m2-claude.sh` retargets the existing Claude dispatcher with no code
 change.
 
+**REPEAT JOBS AND BROWSERS (Adrian-direct 2026-10-08, live ruling `m1-repeat-jobs-off-m1`).** *"anything that can
+be done on a different machine needs to be done on a different machine. To leave maximum utility for the M1."*
+The rule above covered CLI calls and sessions, and a scheduled automation slipped through: the evening SS
+reshare drove his own Chrome on the M1 while he worked. A LaunchAgent, scheduled task or wake agent that drives
+a browser or starts a Claude session runs that part on the Mini. M1 keeps only the zero-LLM probe when it needs
+the vault: `wake-runner.py --remote-profile mini-photon` (the M1's own Claude account; `mini-osb-reels` is the
+social pipeline's), with `--context-cmd` to hand the
+session what it needs and `--result-hook` to record what it did. Gate G18 blocks such a plist on M1 unless it is
+routed or marked `<!-- M1-PINNED: reason -->` for a lane pinned above.
+
 ## §6 — The Prescriptive-Prompt Law (the fix for confabulation)
 
 > **SCOPE — this section governs prompts written FOR THE TEAM (agy / grok / codex), not for Claude.**
@@ -381,6 +391,7 @@ Superseded by §14 where they conflict. The current operational SSOT is [[token-
 ---
 
 revision_history (one line per layer — the full-text entries are preserved verbatim in the archive named in the frontmatter):
+- 2026-10-08: **§5.1 extended to repeat jobs and browsers (Adrian-direct, ruling m1-repeat-jobs-off-m1).** AGENTS.md §8 class: SCOPE CLARIFICATION, no gate weakened (it adds one, G18). Trigger: the SS personal-profile reshare took over his Chrome on M1; moved to the Mini the same evening.
 - 2026-10-08: **§4 lane 5 (qwen) corrected (Adrian-direct commission to get the whole team working and refresh prompting).** AGENTS.md §8 class: FACTUAL CORRECTION, no gate weakened (it removes a route). The Qwen Token Plan's terms of use, read directly, forbid automation scripts and batch calls. Same session: grok-web `--allow web_fetch` fix, codex live web search, cloud-lane team fallback and OSB dispatch moved to the Mini; per-model rules in token-enriched-delegation-prompting-protocol and the new model-prompting-field-guide-2026-10-08.
 - 2026-10-06: **§4 lane 1 and §16.3 corrected (Adrian-direct: OSB Claude account is the social media pipeline's alone).** AGENTS.md §8 class: FACTUAL CORRECTION + RULE NARROWING, no safety gate weakened (the change only removes a route). Reason: the 5 Oct SS Stories mining sent ~300 calls through `cli-ask.sh claude`, hit the OSB 5-hour limit and paused the M2 reel pipeline, while this section, the quota policy file and the resource router all still named that account as the coordinated Claude route. Mechanism, not prose: cli-ask claude-lane guard, decision-gates G1, quota-accountant HARD_RESERVED_ACCOUNTS. Record: `working/_research/2026-10-06-orchestrator-failure-review/`.
 - 2026-09-25: **§4 `muse` lane added as dispatch family 9 (Adrian-direct: "yes, add it on the $5 plan").** AGENTS.md §8 class: NEW LANE, operational addition. No rule weakened and no spend gate touched: Adrian bought the flat-rate subscription himself, pay-per-token is structurally impossible (cli-ask strips the API key and the Model API account has no payment method), and contributor models are refused. Mechanism: a `muse` block in `tools/cli-ask.sh` plus probe and credential entries in `tools/node-exec.sh`; registered in `tools/lanes.py` and [[llm-capability-map-2026-09-23]]; §5.1 table row added. Verified: cli-ask self-test 22/22, 4 mock checks, 2 live calls on the Mini. Record: `episodic/sessions/2026-09-25-meta-muse-access-for-stack.md`.
