@@ -2,7 +2,7 @@
 title: LLM Capability Map — current evidence board
 status: CURRENT
 date: 2026-09-23
-as_of: 2026-10-09
+as_of: 2026-10-10
 authority: companion-evidence-board
 supersedes: canonical/concepts/llm-capability-map-2026-09-22.md
 ---
@@ -37,6 +37,16 @@ OpenAI launched **dots** on 29 Sep 2026: an always-on GPT-6 Astra agent with its
 - **Not a CLI lane:** no API and no Codex CLI access, so `cli-ask.sh` cannot drive it. It can create Codex cloud tasks and, if allowed, use a connected local computer.
 - **Safety fit:** background "proactive research" uses read-only tools. Custom rules (act / act if pre-approved / ask / hand off) govern everything else. Writing into his personal apps stays banned (AGENTS.md section 7) unless he sets that up himself.
 - **Account choice:** the OSB ChatGPT subscription ends about 12 Oct and is not renewing, so a dot belongs on Photon only.
+
+## Gemini Spark — checked 10 October 2026 (not a lane)
+
+Google's always-on personal agent in the Gemini app: tasks, reusable skills and schedules, using connected Google apps, a remote browser and computer, and sites you are signed into. Source: [Gemini Apps Help 17094507](https://support.google.com/gemini/answer/17094507), read directly 10 Oct ~12:40 am WITA.
+
+- **Access:** Google AI Pro or Ultra, personal Google account only, 18+, Keep Activity on. Excluded in the EEA, Nigeria, Switzerland and the UK. Codex cites a Google Indonesia post announcing it for Pro and Ultra in late July (not read directly).
+- **Surfaces:** Gemini web, mobile and Mac app only. No CLI or API, so agy cannot drive it.
+- **Limits:** draws the Gemini app's compute-based usage limits, not agy's pool (see memory gemini-app-pool-separate). Up to 15 tasks at once. Google's page says schedules do not run while Spark is off or the device is off.
+- **Local Chrome is US-only:** Spark can browse through your own desktop Chrome (with your logins) only via Chrome auto browse, which requires being in the US ([Help 16821166](https://support.google.com/gemini/answer/16821166), read 10 Oct). From Bali it uses Google's remote browser, which runs whether or not any device is on but has none of your logins. Set up 10 Oct on the Mini's Chrome (Pro account subconassassin144, Spark tab on); a test task confirmed it has no local-browser access.
+- **Fit:** overlaps OpenAI dots. Its edge is Google-account context (Gmail, Drive, Sheets, Calendar, Photos). Never let it move or reorganise his files (AGENTS.md section 15).
 
 ## Evidence table — 4 October 2026
 
