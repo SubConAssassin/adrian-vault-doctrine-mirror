@@ -217,6 +217,11 @@ social pipeline's), with `--context-cmd` to hand the
 session what it needs and `--result-hook` to record what it did. Gate G18 blocks such a plist on M1 unless it is
 routed or marked `<!-- M1-PINNED: reason -->` for a lane pinned above.
 
+**BROWSER CHECKS (Adrian-direct 2026-10-10, live ruling `browser-tests-never-on-m1`).** A task brief that says
+"verify in a real foreground browser" means a browser on a fleet node, not on M1. Playwright or Chrome
+harnesses, screenshot runs and the dev servers they test run on the Mini over ssh (headless), or on the Studio
+when it is idle and claimed. M1 only reads the report and the PNGs. Gate G19 blocks browser automation on M1.
+
 ## §6 — The Prescriptive-Prompt Law (the fix for confabulation)
 
 > **SCOPE — this section governs prompts written FOR THE TEAM (agy / grok / codex), not for Claude.**
