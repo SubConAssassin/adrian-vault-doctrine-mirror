@@ -2,7 +2,7 @@
 title: LLM Capability Map — current evidence board
 status: CURRENT
 date: 2026-09-23
-as_of: 2026-10-08
+as_of: 2026-10-09
 authority: companion-evidence-board
 supersedes: canonical/concepts/llm-capability-map-2026-09-22.md
 ---
@@ -27,6 +27,16 @@ This existing home remains the companion to the [routing and prompting protocol]
 | `cloud` (OSB credit) | Mini (dispatch) | Not yet usable | $215 on Adrian's screen 6 Oct; git channel blocked by a GitHub 500 on pushes to the workspace repo since ~00:53 WITA 8 Oct |
 
 Research behind the prompting rules: [model prompting field guide, 8 Oct 2026](model-prompting-field-guide-2026-10-08.md).
+
+## OpenAI dots — checked 9 October 2026 (not a lane)
+
+OpenAI launched **dots** on 29 Sep 2026: an always-on GPT-6 Astra agent with its own cloud computer and browser, memory, scheduled tasks, 4,000+ app plugins, reachable in ChatGPT (desktop, web, mobile), Slack and Teams. Source: [Introducing dots](https://openai.com/index/introducing-dots/) and [Help Center 20001530](https://help.openai.com/en/articles/20001530-getting-started-with-your-dot), both read directly 9 Oct ~11:45 pm WITA.
+
+- **Cost:** first dot included in Pro at no extra cost. Conversations with it do not count toward ChatGPT limits; Codex or ChatGPT Work tasks it starts do. Extended deeper-work limits for the first month after launch (to about 29 Oct).
+- **Regions:** Pro excludes the EEA, Switzerland and the UK. The Photon ChatGPT account showed "Your dot" in its sidebar on 9 Oct, so it is enabled there. Whether a dot has been created on it: not checked.
+- **Not a CLI lane:** no API and no Codex CLI access, so `cli-ask.sh` cannot drive it. It can create Codex cloud tasks and, if allowed, use a connected local computer.
+- **Safety fit:** background "proactive research" uses read-only tools. Custom rules (act / act if pre-approved / ask / hand off) govern everything else. Writing into his personal apps stays banned (AGENTS.md section 7) unless he sets that up himself.
+- **Account choice:** the OSB ChatGPT subscription ends about 12 Oct and is not renewing, so a dot belongs on Photon only.
 
 ## Evidence table — 4 October 2026
 

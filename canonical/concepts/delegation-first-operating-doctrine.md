@@ -149,15 +149,14 @@ memory-free with disk-free: the Mini has read 89% memory-free on a nearly full b
 |---|---|---|---|
 | `codex` + all its aliases | binary present, **credential pending Adrian** | **READY, verified end-to-end** | one ChatGPT Pro account |
 | `grok` / `grok-web` | not installed | binary + credential present | |
-| `agy` | not installed | token present, **a real prompt timed out — NOT proven** | stays M1-pinned until a real call returns |
+| `agy` | **READY, verified end-to-end 2026-10-09** (1.3.2; token file kept fresh by `agy-token-ensure.py`; helper runs under Homebrew Python) | token present, not routed | Mini-only via `node-exec.sh pick agy`; M1 is the fallback when the Mini is not READY |
 | `qwen` / `qwen-plus` | no `bl` | no `bl` | **M1-pinned** |
 | `local` / `local-fast` | — | Ollama serves it | **already remote over HTTP; leave alone** |
 | `local-vision` | — | — | PC's llama.cpp; its key lives in M1's `.env`, so **M1-credential-pinned** |
 | `deepseek` | — | — | **METERED. M1-pinned so `metered-guard.py` stays in the call path.** |
 | `muse` | **READY, verified end-to-end 2026-09-25** (device-code sign-in) | not installed | flat $5/month plan; refused rather than run on M1 |
 
-**M1-PINNED LANES, AND ONLY THESE:** `qwen`/`qwen-plus` · `deepseek` · `agy` (until a real remote call
-returns) · any call carrying `--image` · any call with an explicit `CLI_ASK_CODEX`/`CLI_ASK_GROK` binary
+**M1-PINNED LANES, AND ONLY THESE:** `qwen`/`qwen-plus` · `deepseek` · any call carrying `--image` · any call with an explicit `CLI_ASK_CODEX`/`CLI_ASK_GROK`/`AGY_BIN` binary
 override · anything that reads M1's own state.
 
 **NODE FAN-OUT IS NOT POOL FAN-OUT.** M1, Studio and the Mini all run codex on **one** ChatGPT Pro
@@ -391,6 +390,7 @@ Superseded by §14 where they conflict. The current operational SSOT is [[token-
 ---
 
 revision_history (one line per layer — the full-text entries are preserved verbatim in the archive named in the frontmatter):
+- 2026-10-09: **§5.1 agy moved to the Mini (Adrian-direct: "Is the Mini fully set up and optimized for our workflow").** AGENTS.md §8 class: FACTUAL CORRECTION, no gate weakened. agy 1.3.2 installed and signed in on the Mini; `cli-ask.sh agy` now picks the Mini when READY and falls back to M1; an explicit AGY_BIN stays on M1. Three traps fixed: interactive sign-in lands in the keychain, which SSH cannot read (rc 36), so `agy-token-ensure.py` ran once in the gui domain to write the token file; agy under a PTY waits for an answer to ESC[>c, now answered by agy-ask.py; macOS Python 3.9 pty.spawn hangs at child exit, so the Mini runs the helper under Homebrew Python. Live calls verified on both routes; selftest 8 pass / 16 pre-existing fails (accountant-owned, unchanged).
 - 2026-10-08: **§5.1 extended to repeat jobs and browsers (Adrian-direct, ruling m1-repeat-jobs-off-m1).** AGENTS.md §8 class: SCOPE CLARIFICATION, no gate weakened (it adds one, G18). Trigger: the SS personal-profile reshare took over his Chrome on M1; moved to the Mini the same evening.
 - 2026-10-08: **§4 lane 5 (qwen) corrected (Adrian-direct commission to get the whole team working and refresh prompting).** AGENTS.md §8 class: FACTUAL CORRECTION, no gate weakened (it removes a route). The Qwen Token Plan's terms of use, read directly, forbid automation scripts and batch calls. Same session: grok-web `--allow web_fetch` fix, codex live web search, cloud-lane team fallback and OSB dispatch moved to the Mini; per-model rules in token-enriched-delegation-prompting-protocol and the new model-prompting-field-guide-2026-10-08.
 - 2026-10-06: **§4 lane 1 and §16.3 corrected (Adrian-direct: OSB Claude account is the social media pipeline's alone).** AGENTS.md §8 class: FACTUAL CORRECTION + RULE NARROWING, no safety gate weakened (the change only removes a route). Reason: the 5 Oct SS Stories mining sent ~300 calls through `cli-ask.sh claude`, hit the OSB 5-hour limit and paused the M2 reel pipeline, while this section, the quota policy file and the resource router all still named that account as the coordinated Claude route. Mechanism, not prose: cli-ask claude-lane guard, decision-gates G1, quota-accountant HARD_RESERVED_ACCOUNTS. Record: `working/_research/2026-10-06-orchestrator-failure-review/`.
