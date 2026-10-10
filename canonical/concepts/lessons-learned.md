@@ -4274,3 +4274,15 @@ On the Ashta meeting-2 engine (a 3,000-line SQL state machine), Grok-only fix ro
 ### LL-2026-10-09-004 — pipeline hygiene: kill remote children, compare JSON structurally, read only new log lines
 `tags: [mistake, tooling]`
 Three defects in one evening of zero-LLM orchestration: (1) killing a local launcher left its ssh children's Grok jobs running on the Mini, and they collided with the relaunch; kill remote work by exact PID or tag before relaunching. (2) A line-based "every list entry survived the merge" check fired a false alarm because the resolver reformatted pg-suites.json; parse structured files and compare entries. (3) A switch-over watcher grepped the whole append-only log, matched an old line and exited at once; watchers must read only lines written after they start.
+
+### LL-2026-10-10-001 — a code review that cannot run the database is not a database verdict
+`tags: [mistake, process-change]`
+Ashta meeting-2: Codex reviews in a read-only sandbox gave SHIP to branches whose real PostgreSQL suites failed (engine 0295 89/8, choice 0302 111/10). The sandbox denies shared memory, so those suites never ran. For database-touching work, trust SHIP only after the real suites pass: run the fixer with full access in a remote-less clone (no remote, so nothing can be pushed by accident), or wait for green CI. Source: raw/sessions/2026-10-10-1300-ashta-meeting-2-build-4d15a204.md.
+
+### LL-2026-10-10-002 — scope a reviewer away from older copies of code another branch owns
+`tags: [mistake, process-change]`
+When a branch carries a merged older copy of another branch's code, its reviewer keeps finding bugs that the owning branch has already fixed, and the fix loop never converges. Confirm the fix exists on the owner branch, then add an "owned elsewhere" note to the review card so those findings are listed but kept out of the verdict. Source: raw/sessions/2026-10-10-1300-ashta-meeting-2-build-4d15a204.md.
+
+### LL-2026-10-10-003 — one integration branch beats chasing main on every branch
+`tags: [discovery]`
+Merging main plus every feature branch into one integration branch, then running its full suites once, caught a cross-branch fixture dependency that no single branch showed, and gave the release owner a pre-resolved merge. Build it in a remote-less clone, then push it to a branch pattern that CI runs on push. Source: raw/sessions/2026-10-10-1300-ashta-meeting-2-build-4d15a204.md.
