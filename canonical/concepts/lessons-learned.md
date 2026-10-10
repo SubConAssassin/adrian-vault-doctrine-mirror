@@ -4298,3 +4298,23 @@ The real-footage judge called `cli-ask local`, which uses the Mini's shared qwen
 ### LL-2026-10-10-006 — "no transcript evidence" is not "unmined speech"
 `tags: [discovery]`
 Lists of files with no transcript on record (8 Oct mining audit) looked like a large untapped supply. Transcribing 131 of them gave 20 with real Adrian speech. The rest were silent, music, other languages, fewer than 150 words, or other people, and 46 of 90 cloud masters had no audio track at all. The genuine new speech came from material created or recovered after the July pass. Mitigation: probe for an audio track and sample before committing download or GPU time, and say "files with an audio track", never "hours of his speech", until speech is measured.
+
+### LL-2026-10-10-007 — test against what production actually has, not the repo's full chain
+`tags: [mistake, process-change]`
+Ashta speaker-only (10 Oct): every local and CI suite passed, yet production rejected the migrations three times for reasons the test set-up could not see. (1) Supabase's postgres role is not a superuser, so `alter default privileges for role X` and owner changes to a freshly created role failed (42501). (2) 0290 depended on schema ashta_private from 0192, which is HELD and was never applied, because local replay applies every file in the repo. (3) The QA file used two begin/rollback envelopes, which the management tool refuses. Mitigation: always run the release tool's `--qa-only` on production before trusting a migration; add a test that replays only the production chain (apply-order phases before HELD, plus applied manifest entries) and applies as a non-superuser CREATEROLE role (tools/release/qa/0290_production_chain.test.mjs). Owner: release owner.
+
+### LL-2026-10-10-008 — a loop's generated instructions can be wrong in ways the builder will obey
+`tags: [mistake, process-change, tooling]`
+Two stale instructions reached builders on 10 Oct: the SPK-1 reviewer got a generic card (the loop picked templates by KIND, ignoring the custom card) and blocked twice on a migration rule for another base; the speaker builder was told "PostgreSQL suites cannot run here" after it had full access, so it skipped the database tests and shipped two failing ones. Adrian: "can we make sure that you're not making these simple mistakes by pushing the wrong thing?" Mitigation: branch-loop12/13 always use a custom review card when given, refuse to send a card that does not name REVIEW_BASE or matches STALE_RE, log the first line of every card sent, and the stale PostgreSQL line was replaced. Read the "fix card:" and "review card:" log lines after every launch. Memory: feedback-gate-the-card-a-loop-sends.
+
+### LL-2026-10-10-009 — vet every dependency a builder adds before it ships
+`tags: [mistake, process-change]`
+Speaker-only r25 added `@hoardodile/ffmpeg-bin@1.0.0` (created 2026-09-02, one maintainer, 259 downloads a month) whose install script would run inside the Vercel build next to production secrets. Reviews check code, not who publishes a dependency. Mitigation: diff package.json after each build round and check maintainers, created date, downloads and install scripts; for production binaries prefer a repo-owned fetch pinned to the upstream release and an exact SHA-256. Memory: feedback-builders-pick-obscure-npm-binaries.
+
+### LL-2026-10-10-010 — loop working files must be gitignored in the product repo
+`tags: [mistake, tooling]`
+c61c73cf (Ashta lounge fix, deployed) committed DONE-FIX and FIX-R2.md, because that loop's clones lacked the .git/info/exclude entries. Every later clone from main then started with DONE-FIX present and the loop skipped the build ("commit failed"). Mitigation: DONE-FIX, DONE-REVIEW and FIX-R2.md go in the repo's .gitignore (member-flow build), and delete DONE-FIX before launching a loop on any clone of main until that lands.
+
+### LL-2026-10-10-011 — a Vercel preview answers 200 while it is still building, and blocked deploys hang silently
+`tags: [tool-gotcha]`
+subconscioussurgery.com, 10 Oct: a live-versus-preview comparison showed zero banned words on every preview page because each path returned 200 "Deployment is building" (19 KB). The CLI then sat for 30 minutes on a deployment the API reported as BLOCKED: the commit author was not on the Vercel team. Mitigation: check the preview's title and page sizes before comparing; read readyState from the Vercel API (`/v13/deployments/<url>`) instead of trusting the CLI; commit SS-site deploys as SubConAssassin <ukphotonutilities@ymail.com>. Memory: vercel-preview-200-while-building.
