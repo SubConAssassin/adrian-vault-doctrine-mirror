@@ -367,6 +367,8 @@ Superseded by §14 where they conflict. The current operational SSOT is [[token-
 
 ## §15 — GEMINI ULTRA→BASE DOWNGRADE CORRECTION (2026-08-04) — supersedes every "agy = biggest pool" claim
 
+> **REVERSED 2026-10-10 (Adrian-direct, ruling `google-ai-ultra-5x`):** the Google account is on **Google AI Ultra 5x** again (20 TB, 5x Pro limits, higher Antigravity limits). agy is a large flat-rate lane once more; the "small, scarce lane" text below is history.
+
 **Adrian-direct, 2026-07-29:** the Google/Antigravity subscription was downgraded from **Ultra ($200, 20×)** to a **~$20-30 basic tier**. It still includes Antigravity, but with a materially smaller token pool. Reason, Adrian's own words: *"predominantly because you failed to use it when I had the Ultra account."* The vault's records back this up — AG sat idle for long stretches (a 15.5-day silent outage, a 14-day dead period, repeated "AG idle = active financial bleed" entries in this doctrine's own history). The capacity was paid for and not used, so it was cut. Source: memory `gemini-subscription-downgraded-from-ultra` (originating session `264c6cac-5098-4d97-82ed-4c66d02405ff`, 2026-07-29).
 
 **What this invalidates.** Every claim that agy/Gemini is the "biggest pool," "largest," "default grind engine (60% share)," or has a "30,000,000+ tokens/day" target described the **Ultra** plan and is now factually WRONG. The collapsed §4, §5 and §12.1 carry the correction in place; this section is the single canonical explanation — **do not re-add "agy = biggest pool" language anywhere in this file without first striking this section.**
