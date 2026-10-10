@@ -4286,3 +4286,15 @@ When a branch carries a merged older copy of another branch's code, its reviewer
 ### LL-2026-10-10-003 — one integration branch beats chasing main on every branch
 `tags: [discovery]`
 Merging main plus every feature branch into one integration branch, then running its full suites once, caught a cross-branch fixture dependency that no single branch showed, and gave the release owner a pre-resolved merge. Build it in a remote-less clone, then push it to a branch pattern that CI runs on push. Source: raw/sessions/2026-10-10-1300-ashta-meeting-2-build-4d15a204.md.
+
+### LL-2026-10-10-004 — diff every Codex-returned file against its original before deploying
+`tags: [mistake, process-change]`
+In the SS real-footage factory hookup (M1 fad93206), Codex returned complete files. `shippable_conveyor.py` came back with three unrequested edits: a do-nothing `if ... pass`, a contorted expression that evaluated to the same value, and a docstring rewrite. That is harmless-looking churn inside a live factory. Mitigation: `diff` each returned file against the original and count the changed lines. Where the change should be small, rebuild the file from the original plus only the intended edit. Archive: `raw/sessions/2026-10-10-1745-ss-pipeline-overnight-fad93206.md`.
+
+### LL-2026-10-10-005 — a synchronous LLM step inside a pipeline needs a fast, warm, non-thinking model on its own host
+`tags: [discovery, tooling]`
+The real-footage judge called `cli-ask local`, which uses the Mini's shared qwen3.5:9b "thinking" model. Under CI load it timed out at 120-180 s, so every judgement came back empty and every life-story reel parked for no visible reason. The fix: the factory host's own Ollama (`qwen2.5:14b`, called directly with keep_alive 30m) answers in about 1 s warm. Mitigation: per-item judgements inside a loop go to a warm local model on the same host. Test the call from the host that will run it, not from M1.
+
+### LL-2026-10-10-006 — "no transcript evidence" is not "unmined speech"
+`tags: [discovery]`
+Lists of files with no transcript on record (8 Oct mining audit) looked like a large untapped supply. Transcribing 131 of them gave 20 with real Adrian speech. The rest were silent, music, other languages, fewer than 150 words, or other people, and 46 of 90 cloud masters had no audio track at all. The genuine new speech came from material created or recovered after the July pass. Mitigation: probe for an audio track and sample before committing download or GPU time, and say "files with an audio track", never "hours of his speech", until speech is measured.
