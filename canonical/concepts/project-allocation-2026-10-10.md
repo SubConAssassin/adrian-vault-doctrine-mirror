@@ -81,7 +81,7 @@ Legal material within AGA / Tri Hita stays exclusively with Claude Max in CORE. 
 
 ### Spend plan
 
-- Photon had 28% of the week left at 3:20 pm WITA on 10 Oct (live token secretary) and resets 16 Oct 5:32 pm WITA. Preserve the 70% Ashta reserve. The OSB ChatGPT account is cancelled and is never routed.
+- Photon got its last banked weekly reset on 11 Oct about 3 am WITA (Adrian); no more resets until the natural weekly reset (ruling codex-last-reset-pace-the-week). Pace it at about one seventh a day, read live from the token secretary. Preserve the 70% Ashta reserve. The OSB ChatGPT account is cancelled and is never routed.
 - Preserve Claude Max for its restricted work through 15 Oct, 05:00 WITA. agy-Claude (Opus/Sonnet 5.5) is a separate Antigravity pool, now on Ultra 5x: on Pro it ran out after about 7 Opus calls; after the upgrade a 200 KB audit ran fine. Measure before bulk use.
 - Muse has $5 via CORE [CONFIRMED] and failing status [CONFIRMED]. Count zero capacity until lane-health.sh returns clean output.
 - Run DeepSeek v4-pro through metered-guard.py preflight. Antigravity AI credit overage stays off without Adrian's approval (AGENTS.md 7.2).
